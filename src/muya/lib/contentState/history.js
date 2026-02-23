@@ -25,7 +25,10 @@ class History {
   }
 
   redo () {
-    this.pending = null
+    // Commit any pending state first so it is not silently discarded,
+    // then step forward in the stack. This mirrors what undo() does and
+    // prevents redo from appearing broken when a pending snapshot exists.
+    this.commitPending()
     const { index, stack } = this
     const len = stack.length
     if (index < len - 1) {

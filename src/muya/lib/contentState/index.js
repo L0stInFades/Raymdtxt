@@ -161,16 +161,14 @@ class ContentState {
         // Push history immediately
         this.history.push(getHistoryState())
       } else {
-        // WORKAROUND: The current engine doesn't support a smart history and we
-        // need to store the whole state. Therefore, we push history only when the
-        // user stops typing. Pushing one pending entry allows us to commit the
-        // change before an undo action is triggered to partially solve #1321.
+        // Commit pending state at shorter intervals so that undo steps are
+        // more granular (fixes #1321 — undo removing entire paragraphs).
         if (this.historyTimer) clearTimeout(this.historyTimer)
         this.history.pushPending(getHistoryState())
 
         this.historyTimer = setTimeout(() => {
           this.history.commitPending()
-        }, 2000)
+        }, 500)
       }
     }
   }
