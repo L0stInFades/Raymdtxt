@@ -1,0 +1,162 @@
+// @ts-expect-error TS(7016): Could not find a declaration file for module 'popp... Remove this comment to see the full error message
+import Popper from 'popper.js/dist/esm/popper'
+// @ts-expect-error TS(7016): Could not find a declaration file for module 'elem... Remove this comment to see the full error message
+import resizeDetector from 'element-resize-detector'
+import { noop } from '../../utils'
+import { EVENT_KEYS } from '../../config'
+import type { IMuya } from '../../types'
+import './index.css'
+
+interface FloatOptions {
+  placement?: string
+  modifiers?: Record<string, unknown>
+  showArrow?: boolean
+  [key: string]: unknown
+}
+
+const defaultOptions = (): FloatOptions => ({
+  placement: 'bottom-start',
+  modifiers: {
+    offset: {
+      offset: '0, 12',
+    },
+  },
+  showArrow: true,
+})
+
+class BaseFloat {
+  cb: (...args: unknown[]) => void;
+  container: HTMLDivElement;
+  floatBox: HTMLDivElement;
+  lastScrollTop: number | null;
+  muya: IMuya;
+  name: string;
+  options: FloatOptions;
+  popper: InstanceType<typeof Popper> | null;
+  // biome-ignore lint/suspicious/noExplicitAny: element-resize-detector has no types
+  resizeDetector: any;
+  status: boolean;
+  constructor(muya: IMuya, name: string, options: FloatOptions = {}) {
+    this.name = name
+    this.muya = muya
+    this.options = Object.assign({}, defaultOptions(), options)
+    this.status = false
+    this.floatBox = null as unknown as HTMLDivElement
+    this.container = null as unknown as HTMLDivElement
+    this.popper = null
+    this.lastScrollTop = null
+    this.resizeDetector = null
+    this.cb = noop
+    this.init()
+  }
+
+  init() {
+    const { showArrow } = this.options
+    const floatBox = document.createElement('div')
+    const container = document.createElement('div')
+    // Use to remember whick float container is shown.
+    container.classList.add(this.name)
+    container.classList.add('ag-float-container')
+    floatBox.classList.add('ag-float-wrapper')
+
+    if (showArrow) {
+      const arrow = document.createElement('div')
+      arrow.setAttribute('x-arrow', '')
+      arrow.classList.add('ag-popper-arrow')
+      floatBox.appendChild(arrow)
+    }
+
+    floatBox.appendChild(container)
+    document.body.appendChild(floatBox)
+    this.resizeDetector = resizeDetector({
+      strategy: 'scroll',
+    })
+
+    // use polyfill
+    this.resizeDetector.listenTo(container, (ele: HTMLElement) => {
+      const { offsetWidth, offsetHeight } = ele
+      Object.assign(floatBox.style, { width: `${offsetWidth}px`, height: `${offsetHeight}px` })
+      this.popper?.update()
+    })
+
+    // const ro = new ResizeObserver(entries => {
+    //   for (const entry of entries) {
+    //     const { offsetWidth, offsetHeight } = entry.target
+    //     Object.assign(floatBox.style, { width: `${offsetWidth + 2}px`, height: `${offsetHeight + 2}px` })
+    //     this.popper && this.popper.update()
+    //   }
+    // })
+    // ro.observe(container)
+    this.floatBox = floatBox
+    this.container = container
+  }
+
+  listen() {
+    const { eventCenter, container } = this.muya
+    const { floatBox } = this
+    const keydownHandler = (event: Event) => {
+      if ((event as KeyboardEvent).key === EVENT_KEYS.Escape) {
+        this.hide()
+      }
+    }
+    const scrollHandler = (event: Event) => {
+      if (typeof this.lastScrollTop !== 'number') {
+        this.lastScrollTop = (event.target as HTMLElement).scrollTop
+        return
+      }
+      // only when scoll distance great than 50px, then hide the float box.
+      if (this.status && Math.abs((event.target as HTMLElement).scrollTop - this.lastScrollTop) > 50) {
+        this.hide()
+      }
+    }
+
+    eventCenter.attachDOMEvent(document, 'click', this.hide.bind(this))
+    eventCenter.attachDOMEvent(floatBox, 'click', (event: Event) => {
+      event.stopPropagation()
+      event.preventDefault()
+    })
+    eventCenter.attachDOMEvent(container, 'keydown', keydownHandler)
+    eventCenter.attachDOMEvent(container, 'scroll', scrollHandler)
+  }
+
+  hide() {
+    const { eventCenter } = this.muya
+    if (!this.status) return
+    this.status = false
+    if (this.popper?.destroy) {
+      this.popper.destroy()
+    }
+    this.cb = noop
+    eventCenter.dispatch('muya-float', this, false)
+    this.lastScrollTop = null
+  }
+
+  show(reference: HTMLElement | { getBoundingClientRect(): DOMRect }, cb = noop) {
+    const { floatBox } = this
+    const { eventCenter } = this.muya
+    const { placement, modifiers } = this.options
+    if (this.popper?.destroy) {
+      this.popper.destroy()
+    }
+    this.cb = cb
+    this.popper = new Popper(reference, floatBox, {
+      placement,
+      modifiers,
+    })
+    this.status = true
+    eventCenter.dispatch('muya-float', this, true)
+  }
+
+  destroy() {
+    if (this.popper?.destroy) {
+      this.popper.destroy()
+    }
+    if (this.resizeDetector && this.container) {
+      this.resizeDetector.uninstall(this.container)
+    }
+    this.floatBox.remove()
+  }
+}
+
+export default BaseFloat
+export type { FloatOptions }

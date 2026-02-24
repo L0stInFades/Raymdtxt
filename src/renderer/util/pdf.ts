@@ -117,6 +117,7 @@ interface TocOptions {
 
 const generateHtmlToc = (
   tocList: TocEntry[],
+  // @ts-ignore - Slugger is a prototype-based constructor, not a class
   slugger: InstanceType<typeof Slugger>,
   currentLevel: number,
   options: TocOptions,
@@ -149,6 +150,7 @@ const generateHtmlToc = (
 
 export const getHtmlToc = (toc: TocEntry[], options: TocOptions = {}): string => {
   const list = cloneObj(toc)
+  // @ts-ignore - Slugger is a prototype-based constructor
   const slugger = new Slugger()
   const tocList = generateHtmlToc(list, slugger, 0, options)
   if (!tocList) {

@@ -43,13 +43,13 @@
       },
       "style": {
         "noNonNullAssertion": "off",
-        "useConst": "off"
+        "useConst": "warn"
       },
       "suspicious": {
         "noConsole": "off",
         "noPrototypeBuiltins": "off",
         "noDebugger": "warn",
-        "noExplicitAny": "off"
+        "noExplicitAny": "warn"
       }
     }
   },

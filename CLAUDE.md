@@ -4,6 +4,15 @@ Raymdtxt 是 MarkText 的现代化 fork，目标是将技术栈全面升级到 S
 
 ## 已完成
 
+- **Phase 8（第一阶段）** ✅ `src/muya/lib/` TypeScript 迁移 + `any` 清零完成（2026-02-24）：
+  - ts-migrate 迁移 148 个 `.js` → `.ts`（工具：ts-migrate）
+  - 手动修复全部类型错误：1,212 → **0** 个 `tsc --noEmit` 错误
+  - Biome `noExplicitAny: "warn"` 已启用；`src/muya/lib/` 内显式 `any` 数量：**0**（含 biome-ignore 的合理例外 ~46 处：mixin `this: any`、无类型三方库等）
+  - `@ts-expect-error` 注释：**242**（Phase 8 后续清零目标）
+  - 关键新增类型：`Token`、`LineCursor`、`SelectionInfo`、`SelectionFormatsResult`、`IDragInfo`、`ICellSelectInfo`（全在 `src/muya/lib/types/index.ts`）
+  - 5 个并行 agents 完成各子目录 `any` 消除：contentState/、parser/、utils/、selection/、eventHandler/、ui/
+  - 单元测试 522/522 通过，无回归
+
 - **Phase 0**：TypeScript + Biome 基础设施（tsconfig、biome.json、类型定义）
 - **Phase 1**：`src/common/` 全量迁移为 TypeScript
 - **Phase 2** ✅ IPC 安全加固完成：
@@ -31,6 +40,15 @@ Raymdtxt 是 MarkText 的现代化 fork，目标是将技术栈全面升级到 S
   - 删除 `test/unit/karma.conf.js` 和 `test/unit/index.js`
   - `package.json` scripts：`unit` → `vitest run`，新增 `unit:watch` → `vitest`
   - 522 个测试全部通过，无 unhandled errors
+
+- **Phase 8（一期）** ✅ `src/muya/lib/` ts-migrate 大规模迁移完成：
+  - 148 个 `.js` 文件 → `.ts`（剩余 2 个为 `assets/libs/` 第三方 vendored JS）
+  - ts-migrate `rename` + `migrate` 完成，`@ts-expect-error` + `any` 注释自动注入
+  - 手动修复 20 处 ts-migrate 产生的 `Unused '@ts-expect-error'` 及类型签名问题
+  - `tsconfig.json`：移除矛盾的 `declaration: true` / `declarationMap: true`（`noEmit: true` 已设置）
+  - `biome.json`：`noExplicitAny: "warn"`，`useConst: "warn"`（Phase 8 KPI 追踪）
+  - Phase 8 清零基线：**1,400 noExplicitAny warnings**，**433 @ts-expect-error**
+  - `tsc --noEmit` ✅，`pnpm run unit` 522/522 ✅
 
 - **Phase 3** ✅ Webpack → electron-vite 迁移完成：
   - 新建 `electron.vite.config.ts`（main + preload + renderer 三路构建）
@@ -335,9 +353,22 @@ pnpm remove element-ui
 
 ### 8.1 剩余 JS → TS 迁移
 
-- `src/muya/lib/` — ~100 个文件（编辑引擎核心）
-- `src/main/` — ~50 个文件
-- `src/renderer/` — 工具层、服务层、组件 `<script lang="ts">`
+- `src/muya/lib/` — ✅ 148 个文件已迁移（ts-migrate 一期）
+- `src/main/` — ~50 个文件（待处理）
+- `src/renderer/` — 工具层、服务层、组件 `<script lang="ts">`（待处理）
+
+### 8.0 Phase 8 KPI 基线（2026-02-24 建立）
+
+| 指标 | 当前值 | 目标 |
+|------|--------|------|
+| `noExplicitAny` warnings（Biome `--max-diagnostics=50000`） | **1,400** | 0 |
+| `@ts-expect-error` 注释（`src/muya/lib/`） | **433** | 0 |
+
+统计命令：
+```bash
+pnpm biome check src/muya/lib/ --max-diagnostics=50000 2>&1 | grep "noExplicitAny" | wc -l
+grep -r "@ts-expect-error" src/muya/lib/ | wc -l
+```
 
 ### 8.2 类型系统完善
 
