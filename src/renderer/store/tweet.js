@@ -10,7 +10,7 @@ const actions = {
   LISTEN_FOR_TWEET() {
     window.api.ipc.on('mt::tweet', (type) => {
       if (type === 'twitter') {
-        bus.$emit('tweetDialog')
+        bus.emit('tweetDialog')
       }
     })
   },

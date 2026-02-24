@@ -2,7 +2,7 @@
   <div class="key-input-dialog">
     <div v-if="showKeyInputDialog" class="input-overlay"></div>
     <el-dialog
-      :visible.sync="showKeyInputDialog"
+      v-model:visible="showKeyInputDialog"
       :show-close="false"
       :modal="false"
       @close="cancelKeybinding"

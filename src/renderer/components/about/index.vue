@@ -1,7 +1,7 @@
 <template>
   <div class="about-dialog">
     <el-dialog
-      :visible.sync="showAboutDialog"
+      v-model:visible="showAboutDialog"
       :show-close="false"
       :modal="true"
       custom-class="ag-dialog-table"
@@ -47,15 +47,15 @@ export default {
     }),
   },
   created() {
-    bus.$on('aboutDialog', this.showDialog)
+    bus.on('aboutDialog', this.showDialog)
   },
   beforeDestroy() {
-    bus.$off('aboutDialog', this.showDialog)
+    bus.off('aboutDialog', this.showDialog)
   },
   methods: {
     showDialog() {
       this.showAboutDialog = true
-      bus.$emit('editor-blur')
+      bus.emit('editor-blur')
     },
   },
 }

@@ -56,6 +56,9 @@ const bootstrapRenderer = () => {
         stack,
       }
 
+      // DEBUG: log full stack to console for easier debugging
+      console.error('[RENDERER ERROR]', name, message, '\n', stack)
+
       exceptionLogger(event.error)
 
       // Pass exception to main process exception handler to show a error dialog.

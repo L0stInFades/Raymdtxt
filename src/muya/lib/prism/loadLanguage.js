@@ -1,6 +1,12 @@
 import components from 'prismjs/components.js'
 import getLoader from 'prismjs/dependencies'
 import { getDefer } from '../utils'
+
+// Pre-bundle all prismjs language components so Vite can resolve them.
+const prismLangModules = import.meta.glob(
+  '../../../../node_modules/prismjs/components/prism-*.js',
+  { eager: false }
+)
 /**
  * The set of all languages which have been loaded using the below function.
  *
@@ -72,7 +78,10 @@ function initLoadLanguage(Prism) {
         })
       } else {
         delete Prism.languages[lang]
-        await import(`prismjs/components/prism-${lang}`)
+        const key = Object.keys(prismLangModules).find(k => k.endsWith(`/prism-${lang}.js`))
+        if (key) {
+          await prismLangModules[key]()
+        }
         defer.resolve({
           lang,
           status: 'loaded',

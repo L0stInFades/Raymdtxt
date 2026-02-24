@@ -1,8 +1,8 @@
 import { createRequire } from 'module'
 import { defineConfig, externalizeDepsPlugin } from 'electron-vite'
 import { resolve, basename } from 'path'
-import { readFileSync } from 'fs'
-import vue from '@vitejs/plugin-vue2'
+import { readFileSync, cpSync } from 'fs'
+import vue from '@vitejs/plugin-vue'
 import { viteStaticCopy } from 'vite-plugin-static-copy'
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
 import type { Plugin } from 'vite'
@@ -116,7 +116,17 @@ export default defineConfig(({ mode }) => {
   return {
     // ---- Main Process -------------------------------------------------------
     main: {
-      plugins: [externalizeDepsPlugin()],
+      plugins: [
+        externalizeDepsPlugin(),
+        // Copy static/ → dist/electron/static/ after main build.
+        // (viteStaticCopy doesn't run in SSR/node mode, so we use closeBundle.)
+        {
+          name: 'copy-static-dir',
+          closeBundle() {
+            cpSync(resolve('static'), resolve('dist/electron/static'), { recursive: true })
+          },
+        } satisfies Plugin,
+      ],
       resolve: {
         alias: {
           common: resolve('src/common'),
@@ -165,7 +175,9 @@ export default defineConfig(({ mode }) => {
         nodePolyfills({
           // Only polyfill built-ins that are actually used
           include: ['path', 'os', 'buffer', 'events', 'util', 'stream', 'crypto'],
-          globals: { process: true, Buffer: true },
+          // Electron's renderer sandbox already provides `process` natively (correct platform etc.)
+          // Do NOT override it with a browser shim — that would break process.platform detection.
+          globals: { Buffer: true },
         }),
         // Copy CodeMirror mode files so dynamic require()/import() works.
         // Resolve the path at config-eval time (handles pnpm's virtual store).
@@ -198,8 +210,6 @@ export default defineConfig(({ mode }) => {
           { find: 'muya', replacement: resolve('src/muya') },
           { find: 'main', replacement: resolve('src/main') },
           { find: 'snapsvg', replacement: resolve('src/muya/lib/assets/libs/snap.svg-min.js') },
-          // Vue 2 runtime + compiler build (needed for in-template expressions)
-          { find: /^vue$/, replacement: resolve('node_modules/vue/dist/vue.esm.js') },
           // Renderer-safe stubs for Node.js-only packages
           { find: /^electron-log$/, replacement: resolve('src/renderer/node/electron-log-renderer.js') },
           { find: /^vscode-ripgrep$/, replacement: resolve('src/renderer/node/vscode-ripgrep-stub.js') },
@@ -219,6 +229,7 @@ export default defineConfig(({ mode }) => {
         outDir: 'dist/electron',
         // Don't clean — main.js and preload.js are built first and must survive.
         emptyOutDir: false,
+        sourcemap: 'inline',
         rollupOptions: {
           external: ['electron'],
         },

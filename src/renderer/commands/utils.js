@@ -5,6 +5,9 @@ import { isFile } from 'common/filesystem'
 export const isUpdatable = () => {
   // TODO: If not updatable, allow to check whether there is a new version available.
 
+  if (!process.resourcesPath) {
+    return false
+  }
   const resFile = isFile(path.join(process.resourcesPath, 'app-update.yml'))
   if (!resFile) {
     // No update resource file available.

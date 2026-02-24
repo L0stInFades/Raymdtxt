@@ -15,25 +15,25 @@ const actions = {
           showSideBar: true,
         })
       }
-      bus.$emit(type, type)
+      bus.emit(type, type)
     })
   },
 
   LISTEN_FOR_SHOW_DIALOG({ commit }) {
     window.api.ipc.on('mt::about-dialog', () => {
-      bus.$emit('aboutDialog')
+      bus.emit('aboutDialog')
     })
     window.api.ipc.on('mt::show-export-dialog', (type) => {
-      bus.$emit('showExportDialog', type)
+      bus.emit('showExportDialog', type)
     })
   },
 
   LISTEN_FOR_PARAGRAPH_INLINE_STYLE() {
     window.api.ipc.on('mt::editor-paragraph-action', ({ type }) => {
-      bus.$emit('paragraph', type)
+      bus.emit('paragraph', type)
     })
     window.api.ipc.on('mt::editor-format-action', ({ type }) => {
-      bus.$emit('format', type)
+      bus.emit('format', type)
     })
   },
 }

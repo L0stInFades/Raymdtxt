@@ -33,7 +33,7 @@ const mutations = {
       window.DIRNAME = pathname ? path.dirname(pathname) : ''
       // set state first, then emit file changed event
       state.currentFile = currentFile
-      bus.$emit('file-changed', { id, markdown, cursor, renderCursor: true, history })
+      bus.emit('file-changed', { id, markdown, cursor, renderCursor: true, history })
     }
   },
   ADD_FILE_TO_TABS(state, currentFile) {
@@ -56,7 +56,7 @@ const mutations = {
       if (typeof fileState.markdown === 'string') {
         const { id, markdown, cursor, history, pathname } = fileState
         window.DIRNAME = pathname ? path.dirname(pathname) : ''
-        bus.$emit('file-changed', { id, markdown, cursor, renderCursor: true, history })
+        bus.emit('file-changed', { id, markdown, cursor, renderCursor: true, history })
       }
     }
 
@@ -160,7 +160,7 @@ const mutations = {
     if (pathname === currentFile.pathname) {
       state.currentFile = tab
       const { id, cursor, history } = tab
-      bus.$emit('file-changed', { id, markdown, cursor, renderCursor: true, history })
+      bus.emit('file-changed', { id, markdown, cursor, renderCursor: true, history })
     }
   },
   // NOTE: Please call this function only from main process via "mt::set-pathname" and free resources before!
@@ -269,7 +269,7 @@ const mutations = {
       if (typeof state.currentFile.markdown === 'string') {
         const { id, markdown, cursor, history, pathname } = state.currentFile
         window.DIRNAME = pathname ? path.dirname(pathname) : ''
-        bus.$emit('file-changed', { id, markdown, cursor, renderCursor: true, history })
+        bus.emit('file-changed', { id, markdown, cursor, renderCursor: true, history })
       }
     }
 
@@ -335,7 +335,7 @@ const actions = {
 
   LISTEN_SCREEN_SHOT({ commit }) {
     window.api.ipc.on('mt::screenshot-captured', () => {
-      bus.$emit('screenshot-captured')
+      bus.emit('screenshot-captured')
     })
   },
 
@@ -593,7 +593,7 @@ const actions = {
         defaultPath,
       })
     } else {
-      bus.$emit('rename')
+      bus.emit('rename')
     }
   },
 
@@ -619,14 +619,14 @@ const actions = {
   LISTEN_FOR_BOOTSTRAP_WINDOW({ commit, state, dispatch, rootState }) {
     // Delay load runtime commands and initialize commands.
     setTimeout(() => {
-      bus.$emit('cmd::register-command', new FileEncodingCommand(rootState.editor))
-      bus.$emit('cmd::register-command', new QuickOpenCommand(rootState))
-      bus.$emit('cmd::register-command', new LineEndingCommand(rootState.editor))
-      bus.$emit('cmd::register-command', new TrailingNewlineCommand(rootState.editor))
+      bus.emit('cmd::register-command', new FileEncodingCommand(rootState.editor))
+      bus.emit('cmd::register-command', new QuickOpenCommand(rootState))
+      bus.emit('cmd::register-command', new LineEndingCommand(rootState.editor))
+      bus.emit('cmd::register-command', new TrailingNewlineCommand(rootState.editor))
 
       setTimeout(() => {
         window.api.ipc.send('mt::request-keybindings')
-        bus.$emit('cmd::sort-commands')
+        bus.emit('cmd::sort-commands')
       }, 100)
     }, 400)
 
@@ -738,7 +738,7 @@ const actions = {
   RENAME_FILE({ commit, dispatch }, file) {
     commit('SET_CURRENT_FILE', file)
     dispatch('UPDATE_LINE_ENDING_MENU')
-    bus.$emit('rename')
+    bus.emit('rename')
   },
 
   // Direction is a boolean where false is left and true right.
@@ -818,7 +818,7 @@ const actions = {
     if (selected) {
       const { id, markdown } = fileState
       dispatch('UPDATE_CURRENT_FILE', fileState)
-      bus.$emit('file-loaded', { id, markdown })
+      bus.emit('file-loaded', { id, markdown })
     } else {
       commit('ADD_FILE_TO_TABS', fileState)
     }
@@ -871,7 +871,7 @@ const actions = {
 
     if (selected) {
       dispatch('UPDATE_CURRENT_FILE', docState)
-      bus.$emit('file-loaded', { id, markdown, cursor })
+      bus.emit('file-loaded', { id, markdown, cursor })
     } else {
       commit('ADD_FILE_TO_TABS', docState)
     }
@@ -1082,7 +1082,7 @@ const actions = {
 
   LINTEN_FOR_PRINT_SERVICE_CLEARUP({ commit }) {
     window.api.ipc.on('mt::print-service-clearup', () => {
-      bus.$emit('print-service-clearup')
+      bus.emit('print-service-clearup')
     })
   },
 
@@ -1196,31 +1196,31 @@ const actions = {
 
   LISTEN_FOR_RELOAD_IMAGES() {
     window.api.ipc.on('mt::invalidate-image-cache', () => {
-      bus.$emit('invalidate-image-cache')
+      bus.emit('invalidate-image-cache')
     })
   },
 
   LISTEN_FOR_CONTEXT_MENU() {
     // General context menu
     window.api.ipc.on('mt::cm-copy-as-markdown', () => {
-      bus.$emit('copyAsMarkdown', 'copyAsMarkdown')
+      bus.emit('copyAsMarkdown', 'copyAsMarkdown')
     })
     window.api.ipc.on('mt::cm-copy-as-html', () => {
-      bus.$emit('copyAsHtml', 'copyAsHtml')
+      bus.emit('copyAsHtml', 'copyAsHtml')
     })
     window.api.ipc.on('mt::cm-paste-as-plain-text', () => {
-      bus.$emit('pasteAsPlainText', 'pasteAsPlainText')
+      bus.emit('pasteAsPlainText', 'pasteAsPlainText')
     })
     window.api.ipc.on('mt::cm-insert-paragraph', (location) => {
-      bus.$emit('insertParagraph', location)
+      bus.emit('insertParagraph', location)
     })
 
     // Spelling
     window.api.ipc.on('mt::spelling-replace-misspelling', (info) => {
-      bus.$emit('replace-misspelling', info)
+      bus.emit('replace-misspelling', info)
     })
     window.api.ipc.on('mt::spelling-show-switch-language', () => {
-      bus.$emit('open-command-spellchecker-switch-language')
+      bus.emit('open-command-spellchecker-switch-language')
     })
   },
 }

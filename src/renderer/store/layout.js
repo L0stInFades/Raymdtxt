@@ -51,7 +51,7 @@ const actions = {
       dispatch('DISPATCH_LAYOUT_MENU_ITEMS')
     })
 
-    bus.$on('view:toggle-layout-entry', (entryName) => {
+    bus.on('view:toggle-layout-entry', (entryName) => {
       commit('TOGGLE_LAYOUT_ENTRY', entryName)
       const { windowId } = global.marktext.env
       window.api.ipc.send('mt::view-layout-changed', windowId, { [entryName]: state[entryName] })

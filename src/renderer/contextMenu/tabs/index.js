@@ -2,13 +2,13 @@ import bus from '../../bus'
 
 // Map context menu action names to bus events
 const actionMap = {
-  closeThis: (tabId) => bus.$emit('TABS::close-this', tabId),
-  closeOthers: (tabId) => bus.$emit('TABS::close-others', tabId),
-  closeSaved: () => bus.$emit('TABS::close-saved'),
-  closeAll: () => bus.$emit('TABS::close-all'),
-  rename: (tabId) => bus.$emit('TABS::rename', tabId),
-  copyPath: (tabId) => bus.$emit('TABS::copy-path', tabId),
-  showInFolder: (tabId) => bus.$emit('TABS::show-in-folder', tabId),
+  closeThis: (tabId) => bus.emit('TABS::close-this', tabId),
+  closeOthers: (tabId) => bus.emit('TABS::close-others', tabId),
+  closeSaved: () => bus.emit('TABS::close-saved'),
+  closeAll: () => bus.emit('TABS::close-all'),
+  rename: (tabId) => bus.emit('TABS::rename', tabId),
+  copyPath: (tabId) => bus.emit('TABS::copy-path', tabId),
+  showInFolder: (tabId) => bus.emit('TABS::show-in-folder', tabId),
 }
 
 // Listen for context menu actions dispatched from main process

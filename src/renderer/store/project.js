@@ -127,17 +127,17 @@ const actions = {
     window.api.ipc.send('mt::ask-for-open-project-in-sidebar')
   },
   LISTEN_FOR_SIDEBAR_CONTEXT_MENU({ commit, state }) {
-    bus.$on('SIDEBAR::show-in-folder', () => {
+    bus.on('SIDEBAR::show-in-folder', () => {
       const { pathname } = state.activeItem
       window.api.shell.showItemInFolder(pathname)
     })
-    bus.$on('SIDEBAR::new', (type) => {
+    bus.on('SIDEBAR::new', (type) => {
       const { pathname, isDirectory } = state.activeItem
       const dirname = isDirectory ? pathname : path.dirname(pathname)
       commit('CREATE_PATH', { dirname, type })
-      bus.$emit('SIDEBAR::show-new-input')
+      bus.emit('SIDEBAR::show-new-input')
     })
-    bus.$on('SIDEBAR::remove', () => {
+    bus.on('SIDEBAR::remove', () => {
       const { pathname } = state.activeItem
       window.api.ipc.invoke('mt::fs-trash-item', pathname).catch((err) => {
         notice.notify({
@@ -147,11 +147,11 @@ const actions = {
         })
       })
     })
-    bus.$on('SIDEBAR::copy-cut', (type) => {
+    bus.on('SIDEBAR::copy-cut', (type) => {
       const { pathname: src } = state.activeItem
       commit('SET_CLIPBOARD', { type, src })
     })
-    bus.$on('SIDEBAR::paste', () => {
+    bus.on('SIDEBAR::paste', () => {
       const { clipboard } = state
       const { pathname, isDirectory } = state.activeItem
       const dirname = isDirectory ? pathname : path.dirname(pathname)
@@ -180,10 +180,10 @@ const actions = {
           })
       }
     })
-    bus.$on('SIDEBAR::rename', () => {
+    bus.on('SIDEBAR::rename', () => {
       const { pathname } = state.activeItem
       commit('SET_RENAME_CACHE', pathname)
-      bus.$emit('SIDEBAR::show-rename-input')
+      bus.emit('SIDEBAR::show-rename-input')
     })
   },
 

@@ -1,7 +1,7 @@
 <template>
   <div class="rename">
     <el-dialog
-      :visible.sync="showRename"
+      v-model:visible="showRename"
       :show-close="false"
       :modal="true"
       custom-class="ag-dialog-table"
@@ -36,11 +36,11 @@ export default {
   },
   created() {
     this.$nextTick(() => {
-      bus.$on('rename', this.handleRename)
+      bus.on('rename', this.handleRename)
     })
   },
   beforeDestroy() {
-    bus.$off('rename', this.handleRename)
+    bus.off('rename', this.handleRename)
   },
   computed: {
     ...mapState({

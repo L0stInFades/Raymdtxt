@@ -1,7 +1,7 @@
 <template>
   <div class="tweet-dialog">
     <el-dialog
-      :visible.sync="showTweetDialog"
+      v-model:visible="showTweetDialog"
       :show-close="false"
       :modal="true"
       custom-class="ag-dialog-table"
@@ -78,16 +78,16 @@ export default {
     }
   },
   created() {
-    bus.$on('tweetDialog', this.showDialog)
+    bus.on('tweetDialog', this.showDialog)
   },
   beforeDestroy() {
-    bus.$off('tweetDialog', this.showDialog)
+    bus.off('tweetDialog', this.showDialog)
   },
   methods: {
     showDialog() {
       this.showTweetDialog = true
       this.value = ''
-      bus.$emit('editor-blur')
+      bus.emit('editor-blur')
       this.$nextTick(() => {
         this.$refs.textarea.focus()
       })

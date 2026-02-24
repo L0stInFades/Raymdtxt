@@ -155,6 +155,9 @@ export const deepClone = (obj) => {
   return JSON.parse(JSON.stringify(obj))
 }
 
-export const isOsx = process.platform === 'darwin'
-export const isWindows = process.platform === 'win32'
-export const isLinux = process.platform === 'linux'
+// Use window.api.platform (injected by preload via contextBridge) — reliable source.
+// Falls back to process.platform which Electron exposes in the sandboxed renderer.
+const _platform = (typeof window !== 'undefined' && window.api?.platform) || process.platform || ''
+export const isOsx = _platform === 'darwin'
+export const isWindows = _platform === 'win32'
+export const isLinux = _platform === 'linux'

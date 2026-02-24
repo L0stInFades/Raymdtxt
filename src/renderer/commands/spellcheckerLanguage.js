@@ -34,13 +34,13 @@ class SpellcheckerLanguageCommand {
   execute = async () => {
     // Timeout to hide the command palette and then show again to prevent issues.
     await delay(100)
-    bus.$emit('show-command-palette', this)
+    bus.emit('show-command-palette', this)
   }
 
   executeSubcommand = async (id) => {
     const command = this.subcommands.find((cmd) => cmd.id === id)
     if (this.spellchecker.isEnabled) {
-      bus.$emit('switch-spellchecker-language', command.value)
+      bus.emit('switch-spellchecker-language', command.value)
     } else {
       notice.notify({
         title: 'Spelling',

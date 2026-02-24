@@ -142,7 +142,7 @@ const actions = {
 
   LISTEN_FOR_VIEW({ commit, dispatch }) {
     window.api.ipc.on('mt::show-command-palette', () => {
-      bus.$emit('show-command-palette')
+      bus.emit('show-command-palette')
     })
     window.api.ipc.on('mt::toggle-view-mode-entry', (entryName) => {
       commit('TOGGLE_VIEW_MODE', entryName)
@@ -152,7 +152,7 @@ const actions = {
 
   // Toggle a view option and notify main process to toggle menu item.
   LISTEN_TOGGLE_VIEW({ commit, dispatch, state }) {
-    bus.$on('view:toggle-view-entry', (entryName) => {
+    bus.on('view:toggle-view-entry', (entryName) => {
       commit('TOGGLE_VIEW_MODE', entryName)
       dispatch('DISPATCH_EDITOR_VIEW_STATE', { [entryName]: state[entryName] })
     })

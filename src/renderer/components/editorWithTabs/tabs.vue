@@ -120,13 +120,13 @@ export default {
   },
   created() {
     this.$nextTick(() => {
-      bus.$on('TABS::close-this', this.closeTab)
-      bus.$on('TABS::close-others', this.closeOthers)
-      bus.$on('TABS::close-saved', this.closeSaved)
-      bus.$on('TABS::close-all', this.closeAll)
-      bus.$on('TABS::rename', this.rename)
-      bus.$on('TABS::copy-path', this.copyPath)
-      bus.$on('TABS::show-in-folder', this.showInFolder)
+      bus.on('TABS::close-this', this.closeTab)
+      bus.on('TABS::close-others', this.closeOthers)
+      bus.on('TABS::close-saved', this.closeSaved)
+      bus.on('TABS::close-all', this.closeAll)
+      bus.on('TABS::rename', this.rename)
+      bus.on('TABS::copy-path', this.copyPath)
+      bus.on('TABS::show-in-folder', this.showInFolder)
     })
   },
   mounted() {
@@ -187,13 +187,13 @@ export default {
     }
   },
   beforeDestroy() {
-    bus.$off('TABS::close-this', this.closeTab)
-    bus.$off('TABS::close-others', this.closeOthers)
-    bus.$off('TABS::close-saved', this.closeSaved)
-    bus.$off('TABS::close-all', this.closeAll)
-    bus.$off('TABS::rename', this.rename)
-    bus.$off('TABS::copy-path', this.copyPath)
-    bus.$off('TABS::show-in-folder', this.showInFolder)
+    bus.off('TABS::close-this', this.closeTab)
+    bus.off('TABS::close-others', this.closeOthers)
+    bus.off('TABS::close-saved', this.closeSaved)
+    bus.off('TABS::close-all', this.closeAll)
+    bus.off('TABS::rename', this.rename)
+    bus.off('TABS::copy-path', this.copyPath)
+    bus.off('TABS::show-in-folder', this.showInFolder)
   },
 }
 </script>

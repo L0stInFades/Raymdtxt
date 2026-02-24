@@ -41,10 +41,9 @@
         <el-tooltip
           v-if="wordCount"
           class="item"
-          :content="`${wordCount[show]} ${HASH[show].full + (wordCount[show] > 1 ? 's' : '')}`"
           placement="bottom-end"
         >
-          <div slot="content">
+          <template #content>
             <div class="title-item">
               <span class="front">Words:</span><span class="text">{{wordCount['word']}}</span>
             </div>
@@ -54,9 +53,8 @@
             <div class="title-item">
               <span class="front">Paragraphs:</span><span class="text">{{wordCount['paragraph']}}</span>
             </div>
-          </div>
+          </template>
           <div
-            v-if="wordCount"
             class="word-count"
             :class="[{ 'title-no-drag': platform !== 'darwin' }]"
             @click.stop="handleWordClick"
@@ -105,33 +103,21 @@ import { isOsx } from '@/util'
 
 export default {
   data() {
-    this.isOsx = isOsx
-    this.HASH = {
-      word: {
-        short: 'W',
-        full: 'word',
-      },
-      character: {
-        short: 'C',
-        full: 'character',
-      },
-      paragraph: {
-        short: 'P',
-        full: 'paragraph',
-      },
-      all: {
-        short: 'A',
-        full: '(with space)character',
-      },
-    }
-    this.windowIconMinimize = minimizePath
-    this.windowIconRestore = restorePath
-    this.windowIconMaximize = maximizePath
-    this.windowIconClose = closePath
     return {
       isFullScreen: false,
       isMaximized: false,
       show: 'word',
+      isOsx,
+      HASH: {
+        word: { short: 'W', full: 'word' },
+        character: { short: 'C', full: 'character' },
+        paragraph: { short: 'P', full: 'paragraph' },
+        all: { short: 'A', full: '(with space)character' },
+      },
+      windowIconMinimize: minimizePath,
+      windowIconRestore: restorePath,
+      windowIconMaximize: maximizePath,
+      windowIconClose: closePath,
     }
   },
   async created() {
@@ -233,7 +219,7 @@ export default {
       this.isFullScreen = false
     },
   },
-  beforeDestroy() {
+  beforeUnmount() {
     window.api.ipc.off('mt::window-maximize', this.onMaximize)
     window.api.ipc.off('mt::window-unmaximize', this.onUnmaximize)
     window.api.ipc.off('mt::window-enter-full-screen', this.onEnterFullScreen)

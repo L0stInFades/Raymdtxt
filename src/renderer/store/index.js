@@ -1,5 +1,4 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
+import { createStore } from 'vuex'
 
 import listenForMain from './listenForMain'
 import project from './project'
@@ -10,8 +9,6 @@ import autoUpdates from './autoUpdates'
 import notification from './notification'
 import tweet from './tweet'
 import commandCenter from './commandCenter'
-
-Vue.use(Vuex)
 
 // global states
 const state = {
@@ -44,7 +41,7 @@ const actions = {
   },
 }
 
-const store = new Vuex.Store({
+const store = createStore({
   state,
   getters,
   mutations,
