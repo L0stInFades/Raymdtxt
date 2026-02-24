@@ -11,19 +11,19 @@ export default {
   props: {
     size: {
       type: Number,
-      default: 14
-    }
+      default: 14,
+    },
   },
 
   computed: {
-    dotSize () {
+    dotSize() {
       const size = `${this.size}px`
       return {
         width: size,
-        height: size
+        height: size,
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

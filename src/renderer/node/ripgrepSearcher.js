@@ -21,16 +21,16 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import { spawn } from 'child_process'
-import path from 'path'
+import { spawn } from 'node:child_process'
+import path from 'node:path'
 
-function cleanResultLine (resultLine) {
+function cleanResultLine(resultLine) {
   resultLine = getText(resultLine)
 
   return resultLine[resultLine.length - 1] === '\n' ? resultLine.slice(0, -1) : resultLine
 }
 
-function getPositionFromColumn (lines, column) {
+function getPositionFromColumn(lines, column) {
   let currentLength = 0
   let currentLine = 0
   let previousLength = 0
@@ -44,7 +44,7 @@ function getPositionFromColumn (lines, column) {
   return [currentLine - 1, column - previousLength]
 }
 
-function processUnicodeMatch (match) {
+function processUnicodeMatch(match) {
   const text = getText(match.lines)
 
   if (text.length === Buffer.byteLength(text)) {
@@ -56,7 +56,7 @@ function processUnicodeMatch (match) {
   let currentLength = 0
   let previousPosition = 0
 
-  function convertPosition (position) {
+  function convertPosition(position) {
     const currentBuffer = remainingBuffer.slice(0, position - previousPosition)
     currentLength = currentBuffer.toString().length + currentLength
     remainingBuffer = remainingBuffer.slice(position - previousPosition)
@@ -79,7 +79,7 @@ function processUnicodeMatch (match) {
 // range. This is mostly needed for multi-line results, since the range
 // will have differnt start and end rows and we need to calculate these
 // based on the lines that ripgrep returns.
-function processSubmatch (submatch, lineText, offsetRow) {
+function processSubmatch(submatch, lineText, offsetRow) {
   const lineParts = lineText.split('\n')
 
   const start = getPositionFromColumn(lineParts, submatch.start)
@@ -100,16 +100,16 @@ function processSubmatch (submatch, lineText, offsetRow) {
 
   return {
     range: [start, end],
-    lineText: cleanResultLine({ text: lineParts.join('\n') })
+    lineText: cleanResultLine({ text: lineParts.join('\n') }),
   }
 }
 
-function getText (input) {
+function getText(input) {
   return 'text' in input ? input.text : Buffer.from(input.bytes, 'base64').toString()
 }
 
 class RipgrepDirectorySearcher {
-  constructor () {
+  constructor() {
     this.rgPath = global.marktext.paths.ripgrepBinaryPath
   }
 
@@ -147,11 +147,11 @@ class RipgrepDirectorySearcher {
 
   // Returns a *thenable* `DirectorySearch` that includes a `cancel()` method. If `cancel()` is
   // invoked before the `DirectorySearch` is determined, it will resolve the `DirectorySearch`.
-  search (directories, pattern, options) {
+  search(directories, pattern, options) {
     const numPathsFound = { num: 0 }
 
-    const allPromises = directories.map(
-      directory => this.searchInDirectory(directory, pattern, options, numPathsFound)
+    const allPromises = directories.map((directory) =>
+      this.searchInDirectory(directory, pattern, options, numPathsFound),
     )
 
     const promise = Promise.all(allPromises)
@@ -165,7 +165,7 @@ class RipgrepDirectorySearcher {
     return promise
   }
 
-  searchInDirectory (directoryPath, pattern, options, numPathsFound) {
+  searchInDirectory(directoryPath, pattern, options, numPathsFound) {
     let regexpStr = null
     let textPattern = null
     const args = ['--json']
@@ -194,7 +194,7 @@ class RipgrepDirectorySearcher {
       args.push('--follow')
     }
     if (options.maxFileSize) {
-      args.push('--max-filesize', options.maxFileSize + '')
+      args.push('--max-filesize', `${options.maxFileSize}`)
     }
     if (options.includeHidden) {
       args.push('--hidden')
@@ -213,7 +213,7 @@ class RipgrepDirectorySearcher {
       args.push('--iglob', inclusion)
     }
     for (const exclusion of this.prepareGlobs(options.exclusions, directoryPath)) {
-      args.push('--iglob', '!' + exclusion)
+      args.push('--iglob', `!${exclusion}`)
     }
 
     args.push('--')
@@ -228,7 +228,7 @@ class RipgrepDirectorySearcher {
     try {
       child = spawn(this.rgPath, args, {
         cwd: directoryPath,
-        stdio: ['pipe', 'pipe', 'pipe']
+        stdio: ['pipe', 'pipe', 'pipe'],
       })
     } catch (err) {
       return Promise.reject(err)
@@ -244,7 +244,7 @@ class RipgrepDirectorySearcher {
       let pendingLeadingContext
       let pendingTrailingContexts
 
-      child.on('close', (code, signal) => {
+      child.on('close', (code, _signal) => {
         // code 1 is used when no results are found.
         if (code !== null && code > 1) {
           reject(new Error(bufferError))
@@ -252,15 +252,15 @@ class RipgrepDirectorySearcher {
           resolve()
         }
       })
-      child.on('error', err => {
+      child.on('error', (err) => {
         reject(err)
       })
 
-      child.stderr.on('data', chunk => {
+      child.stderr.on('data', (chunk) => {
         bufferError += chunk
       })
 
-      child.stdout.on('data', chunk => {
+      child.stdout.on('data', (chunk) => {
         if (cancelled) {
           return
         }
@@ -273,7 +273,7 @@ class RipgrepDirectorySearcher {
           if (message.type === 'begin') {
             pendingEvent = {
               filePath: getText(message.data.path),
-              matches: []
+              matches: [],
             }
             pendingLeadingContext = []
             pendingTrailingContexts = new Set()
@@ -285,7 +285,7 @@ class RipgrepDirectorySearcher {
               const { lineText, range } = processSubmatch(
                 submatch,
                 getText(message.data.lines),
-                message.data.line_number - 1
+                message.data.line_number - 1,
               )
 
               pendingEvent.matches.push({
@@ -293,7 +293,7 @@ class RipgrepDirectorySearcher {
                 lineText,
                 range,
                 leadingContextLines: [...pendingLeadingContext],
-                trailingContextLines
+                trailingContextLines,
               })
             }
           } else if (message.type === 'end') {
@@ -316,7 +316,7 @@ class RipgrepDirectorySearcher {
   // We need to prepare the "globs" that we receive from the user to make their behaviour more
   // user-friendly (e.g when adding `src/` the user probably means `src/**/*`).
   // This helper function takes care of that.
-  prepareGlobs (globs, projectRootPath) {
+  prepareGlobs(globs, projectRootPath) {
     const output = []
 
     for (let pattern of globs) {
@@ -337,7 +337,7 @@ class RipgrepDirectorySearcher {
         continue
       }
 
-      if (pattern.startsWith(projectName + '/')) {
+      if (pattern.startsWith(`${projectName}/`)) {
         pattern = pattern.slice(projectName.length + 1)
       }
 
@@ -354,7 +354,7 @@ class RipgrepDirectorySearcher {
     return output
   }
 
-  prepareRegexp (regexpStr) {
+  prepareRegexp(regexpStr) {
     // ripgrep handles `--` as the arguments separator, so we need to escape it if the
     // user searches for that exact same string.
     if (regexpStr === '--') {
@@ -368,7 +368,7 @@ class RipgrepDirectorySearcher {
     return regexpStr
   }
 
-  isMultilineRegexp (regexpStr) {
+  isMultilineRegexp(regexpStr) {
     if (regexpStr.includes('\\n')) {
       return true
     }

@@ -12,22 +12,20 @@
 </template>
 
 <script>
-import { shell } from 'electron'
-
 export default {
-  data () {
+  data() {
     return {}
   },
   props: {
-    uploaderService: Object
+    uploaderService: Object,
   },
   methods: {
-    openUrl (link) {
+    openUrl(link) {
       if (link) {
-        shell.openExternal(link)
+        window.api.shell.openExternal(link)
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

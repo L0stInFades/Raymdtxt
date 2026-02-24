@@ -1,31 +1,34 @@
 export const themes = [
   {
-    name: 'light'
+    name: 'light',
   },
   {
-    name: 'dark'
+    name: 'dark',
   },
   {
-    name: 'graphite'
+    name: 'graphite',
   },
   {
-    name: 'material-dark'
+    name: 'material-dark',
   },
   {
-    name: 'ulysses'
+    name: 'ulysses',
   },
   {
-    name: 'one-dark'
-  }
+    name: 'one-dark',
+  },
 ]
 
-export const autoSwitchThemeOptions = [{
-  label: 'Adjust theme at startup', // Always
-  value: 0
-}, /* {
+export const autoSwitchThemeOptions = [
+  {
+    label: 'Adjust theme at startup', // Always
+    value: 0,
+  },
+  /* {
   label: 'Only at runtime',
   value: 1
 }, */ {
-  label: 'Never',
-  value: 2
-}]
+    label: 'Never',
+    value: 2,
+  },
+]

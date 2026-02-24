@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { ipcRenderer } from 'electron'
 
 import listenForMain from './listenForMain'
 import project from './project'
@@ -19,30 +18,30 @@ const state = {
   platform: process.platform, // platform of system `darwin` | `win32` | `linux`
   appVersion: process.versions.MARKTEXT_VERSION_STRING, // MarkText version string
   windowActive: true, // whether current window is active or focused
-  init: false // whether MarkText is initialized
+  init: false, // whether MarkText is initialized
 }
 
 const getters = {}
 
 const mutations = {
-  SET_WIN_STATUS (state, status) {
+  SET_WIN_STATUS(state, status) {
     state.windowActive = status
   },
-  SET_INITIALIZED (state) {
+  SET_INITIALIZED(state) {
     state.init = true
-  }
+  },
 }
 
 const actions = {
-  LINTEN_WIN_STATUS ({ commit, state }) {
-    ipcRenderer.on('mt::window-active-status', (e, { status }) => {
+  LINTEN_WIN_STATUS({ commit, state }) {
+    window.api.ipc.on('mt::window-active-status', ({ status }) => {
       commit('SET_WIN_STATUS', status)
     })
   },
 
-  SEND_INITIALIZED ({ commit }) {
+  SEND_INITIALIZED({ commit }) {
     commit('SET_INITIALIZED')
-  }
+  },
 }
 
 const store = new Vuex.Store({
@@ -61,8 +60,8 @@ const store = new Vuex.Store({
     preferences,
     editor,
     layout,
-    commandCenter
-  }
+    commandCenter,
+  },
 })
 
 export default store

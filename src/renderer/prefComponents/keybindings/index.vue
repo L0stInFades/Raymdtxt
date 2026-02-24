@@ -47,7 +47,6 @@
 </template>
 
 <script>
-import { ipcRenderer, shell } from 'electron'
 import log from 'electron-log'
 import { setKeyboardLayout } from '@hfelix/electron-localshortcut'
 import Compound from '../common/compound'
@@ -60,80 +59,84 @@ export default {
   components: {
     Compound,
     Separator,
-    KeyInputDialog
+    KeyInputDialog,
   },
-  data () {
+  data() {
     return {
       showDebugTools: false,
       keybindingConfigurator: null,
       selectedShortcutId: null,
-      keybindingList: []
+      keybindingList: [],
     }
   },
 
-  mounted () {
-    ipcRenderer.invoke('mt::keybinding-get-keyboard-info')
+  mounted() {
+    window.api.ipc
+      .invoke('mt::keybinding-get-keyboard-info')
       .then(({ layout, keymap }) => {
         // Update the key mapper to prevent problems on non-US keyboards.
         setKeyboardLayout(layout, keymap)
       })
-      .catch(error => log.error('Error while loading keyboard information for settings:', error))
+      .catch((error) => log.error('Error while loading keyboard information for settings:', error))
 
-    ipcRenderer.invoke('mt::keybinding-get-pref-keybindings')
+    window.api.ipc
+      .invoke('mt::keybinding-get-pref-keybindings')
       .then(({ defaultKeybindings, userKeybindings }) => {
         this.keybindingConfigurator = new KeybindingConfigurator(defaultKeybindings, userKeybindings)
         this.keybindingList = this.keybindingConfigurator.getKeybindings()
       })
-      .catch(error => log.error('Error while loading keyboard information for settings:', error))
+      .catch((error) => log.error('Error while loading keyboard information for settings:', error))
 
     // Show keyboard debugging tools which has been moved from CLI because we
     // need an active window on Windows.
     this.showDebugTools = global.marktext.env.debug
   },
 
-  unmounted () {
+  unmounted() {
     this.keybindingList = []
     this.keybindingConfigurator = null
   },
 
   methods: {
-    openKeybindingWiki () {
-      shell.openExternal('https://github.com/marktext/marktext/blob/master/docs/KEYBINDINGS.md')
+    openKeybindingWiki() {
+      window.api.shell.openExternal('https://github.com/marktext/marktext/blob/master/docs/KEYBINDINGS.md')
     },
-    saveKeybindings () {
+    saveKeybindings() {
       if (this.keybindingConfigurator && this.keybindingList.length > 0) {
-        this.keybindingConfigurator.save()
-          .then(success => {
+        this.keybindingConfigurator
+          .save()
+          .then((success) => {
             if (!success) {
               notice.notify({
                 title: 'Failed to save',
                 type: 'error',
-                message: 'An unexpected error occurred while saving.'
+                message: 'An unexpected error occurred while saving.',
               })
             }
           })
-          .catch(error => log.error(error))
+          .catch((error) => log.error(error))
       }
     },
-    restoreDefaults () {
-      this.keybindingConfigurator.resetAll()
-        .then(success => {
+    restoreDefaults() {
+      this.keybindingConfigurator
+        .resetAll()
+        .then((success) => {
           if (!success) {
             notice.notify({
               title: 'Failed to save',
               type: 'error',
-              message: 'An unexpected error occurred while saving.'
+              message: 'An unexpected error occurred while saving.',
             })
           }
         })
-        .catch(error => log.error(error))
+        .catch((error) => log.error(error))
     },
-    handleEditClick (index, entry) {
+    handleEditClick(index, entry) {
       if (index >= 0 && entry) {
         this.selectedShortcutId = entry.id
       }
     },
-    handleResetClick (index, entry) {
+    handleResetClick(_index, entry) {
       const { keybindingConfigurator } = this
       const { id } = entry
       const success = keybindingConfigurator.resetToDefault(id)
@@ -141,10 +144,10 @@ export default {
         this.handleDuplicateShortcut(id, keybindingConfigurator.getDefaultAccelerator(id))
       }
     },
-    handleUnbindClick (index, entry) {
+    handleUnbindClick(_index, entry) {
       this.keybindingConfigurator.unbind(entry.id)
     },
-    onKeybinding (value) {
+    onKeybinding(value) {
       const selectedId = this.selectedShortcutId
       if (value && selectedId) {
         const success = this.keybindingConfigurator.change(selectedId, value)
@@ -154,17 +157,17 @@ export default {
       }
       this.selectedShortcutId = null
     },
-    handleDuplicateShortcut (id, accelerator) {
+    handleDuplicateShortcut(_id, accelerator) {
       notice.notify({
         title: 'Shortcut already in use',
         type: 'warning',
-        message: `The shortcut "${accelerator}" is already in use. Please unset the shortcut and try again.`
+        message: `The shortcut "${accelerator}" is already in use. Please unset the shortcut and try again.`,
       })
     },
-    dumpKeyboardInformation () {
-      ipcRenderer.send('mt::keybinding-debug-dump-keyboard-info')
-    }
-  }
+    dumpKeyboardInformation() {
+      window.api.ipc.send('mt::keybinding-debug-dump-keyboard-info')
+    },
+  },
 }
 </script>
 

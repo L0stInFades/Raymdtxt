@@ -1,5 +1,5 @@
-import fs from 'fs'
-import path from 'path'
+import fs from 'node:fs'
+import path from 'node:path'
 import { filter } from 'fuzzaldrin'
 import log from 'electron-log'
 import { isDirectory, isFile } from 'common/filesystem'
@@ -13,9 +13,9 @@ const IMAGE_PATH = new Map()
 export const watchers = new Map()
 
 const filesHandler = (files, directory, key) => {
-  const IMAGE_REG = new RegExp('(' + IMAGE_EXTENSIONS.join('|') + ')$', 'i')
+  const IMAGE_REG = new RegExp(`(${IMAGE_EXTENSIONS.join('|')})$`, 'i')
   const onlyDirAndImage = files
-    .map(file => {
+    .map((file) => {
       const fullPath = path.join(directory, file)
       let type = ''
       if (isDirectory(fullPath)) {
@@ -25,13 +25,10 @@ const filesHandler = (files, directory, key) => {
       }
       return {
         file,
-        type
+        type,
       }
     })
-    .filter(({
-      file,
-      type
-    }) => {
+    .filter(({ file, type }) => {
       if (BLACK_LIST.includes(file)) return false
       return type === 'directory' || type === 'image'
     })
@@ -39,7 +36,7 @@ const filesHandler = (files, directory, key) => {
   IMAGE_PATH.set(directory, onlyDirAndImage)
   if (key !== undefined) {
     return filter(onlyDirAndImage, key, {
-      key: 'file'
+      key: 'file',
     })
   }
 }
@@ -54,9 +51,9 @@ const rebuild = (directory) => {
   })
 }
 
-const watchDirectory = directory => {
+const watchDirectory = (directory) => {
   if (watchers.has(directory)) return // Do not duplicate watch the same directory
-  const watcher = fs.watch(directory, (eventType, filename) => {
+  const watcher = fs.watch(directory, (eventType, _filename) => {
     if (eventType === 'rename') {
       rebuild(directory)
     }

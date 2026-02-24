@@ -1,6 +1,5 @@
-import path from 'path'
+import path from 'node:path'
 import { BrowserWindow, ipcMain } from 'electron'
-import { enable as remoteEnable } from '@electron/remote/main'
 import { electronLocalshortcut } from '@hfelix/electron-localshortcut'
 import BaseWindow, { WindowLifecycle, WindowType } from './base'
 import { centerWindowOptions } from './utils'
@@ -10,7 +9,7 @@ class SettingWindow extends BaseWindow {
   /**
    * @param {Accessor} accessor The application accessor for application instances.
    */
-  constructor (accessor) {
+  constructor(accessor) {
     super(accessor)
     this.type = WindowType.SETTINGS
   }
@@ -20,7 +19,7 @@ class SettingWindow extends BaseWindow {
    *
    * @param {*} [category] The settings category tab name.
    */
-  createWindow (category = null) {
+  createWindow(category = null) {
     const { menu: appMenu, env, keybindings, preferences } = this._accessor
     const winOptions = Object.assign({}, preferencesWinOptions)
     centerWindowOptions(winOptions)
@@ -43,8 +42,7 @@ class SettingWindow extends BaseWindow {
 
     winOptions.backgroundColor = this._getPreferredBackgroundColor(theme)
 
-    let win = this.browserWindow = new BrowserWindow(winOptions)
-    remoteEnable(win.webContents)
+    let win = (this.browserWindow = new BrowserWindow(winOptions))
     this.id = win.id
 
     // Create a menu for the current window
@@ -66,7 +64,7 @@ class SettingWindow extends BaseWindow {
       win.webContents.send('mt::window-active-status', { status: false })
     })
 
-    win.on('close', event => {
+    win.on('close', (event) => {
       this.emit('window-close')
 
       event.preventDefault()
@@ -94,7 +92,7 @@ class SettingWindow extends BaseWindow {
     return win
   }
 
-  _buildUrlString (windowId, env, userPreference, category) {
+  _buildUrlString(windowId, env, userPreference, category) {
     const url = this._buildUrlWithSettings(windowId, env, userPreference)
     if (category) {
       // Overwrite type to add category name

@@ -98,49 +98,52 @@
 </template>
 
 <script>
-import { ipcRenderer } from 'electron'
-import { getCurrentWindow, Menu as RemoteMenu } from '@electron/remote'
 import { mapState } from 'vuex'
 import { minimizePath, restorePath, maximizePath, closePath } from '../../assets/window-controls.js'
 import { PATH_SEPARATOR } from '../../config'
 import { isOsx } from '@/util'
 
 export default {
-  data () {
+  data() {
     this.isOsx = isOsx
     this.HASH = {
       word: {
         short: 'W',
-        full: 'word'
+        full: 'word',
       },
       character: {
         short: 'C',
-        full: 'character'
+        full: 'character',
       },
       paragraph: {
         short: 'P',
-        full: 'paragraph'
+        full: 'paragraph',
       },
       all: {
         short: 'A',
-        full: '(with space)character'
-      }
+        full: '(with space)character',
+      },
     }
     this.windowIconMinimize = minimizePath
     this.windowIconRestore = restorePath
     this.windowIconMaximize = maximizePath
     this.windowIconClose = closePath
     return {
-      isFullScreen: getCurrentWindow().isFullScreen(),
-      isMaximized: getCurrentWindow().isMaximized(),
-      show: 'word'
+      isFullScreen: false,
+      isMaximized: false,
+      show: 'word',
     }
   },
-  created () {
-    ipcRenderer.on('mt::window-maximize', this.onMaximize)
-    ipcRenderer.on('mt::window-unmaximize', this.onUnmaximize)
-    ipcRenderer.on('mt::window-enter-full-screen', this.onEnterFullScreen)
-    ipcRenderer.on('mt::window-leave-full-screen', this.onLeaveFullScreen)
+  async created() {
+    // Initialize window state via preload API (with fallback if window.api not ready)
+    if (window.api) {
+      this.isFullScreen = await window.api.window.isFullScreen()
+      this.isMaximized = await window.api.window.isMaximized()
+    }
+    window.api.ipc.on('mt::window-maximize', this.onMaximize)
+    window.api.ipc.on('mt::window-unmaximize', this.onUnmaximize)
+    window.api.ipc.on('mt::window-enter-full-screen', this.onEnterFullScreen)
+    window.api.ipc.on('mt::window-leave-full-screen', this.onLeaveFullScreen)
   },
   props: {
     project: Object,
@@ -149,26 +152,26 @@ export default {
     active: Boolean,
     wordCount: Object,
     platform: String,
-    isSaved: Boolean
+    isSaved: Boolean,
   },
   computed: {
     ...mapState({
-      titleBarStyle: state => state.preferences.titleBarStyle,
-      showTabBar: state => state.layout.showTabBar
+      titleBarStyle: (state) => state.preferences.titleBarStyle,
+      showTabBar: (state) => state.layout.showTabBar,
     }),
-    paths () {
+    paths() {
       if (!this.pathname) return []
-      const pathnameToken = this.pathname.split(PATH_SEPARATOR).filter(i => i)
+      const pathnameToken = this.pathname.split(PATH_SEPARATOR).filter((i) => i)
       return pathnameToken.slice(0, pathnameToken.length - 1).slice(-3)
     },
-    showCustomTitleBar () {
+    showCustomTitleBar() {
       return this.titleBarStyle === 'custom' && !this.isOsx
-    }
+    },
   },
   watch: {
     filename: function (value) {
       // Set filename when hover on dock
-      const hasOpenFolder = this.project && this.project.name
+      const hasOpenFolder = this.project?.name
       let title = ''
       if (value) {
         title = hasOpenFolder ? `${value} - ${this.project.name}` : `${value} - MarkText`
@@ -177,10 +180,10 @@ export default {
       }
 
       document.title = title
-    }
+    },
   },
   methods: {
-    handleWordClick () {
+    handleWordClick() {
       const ITEMS = ['word', 'paragraph', 'character', 'all']
       const len = ITEMS.length
       let index = ITEMS.indexOf(this.show)
@@ -189,61 +192,53 @@ export default {
       this.show = ITEMS[index]
     },
 
-    handleCloseClick () {
-      getCurrentWindow().close()
+    handleCloseClick() {
+      window.api.window.close()
     },
 
-    handleMaximizeClick () {
-      const win = getCurrentWindow()
-      if (win.isFullScreen()) {
-        win.setFullScreen(false)
-      } else if (win.isMaximized()) {
-        win.unmaximize()
-      } else {
-        win.maximize()
-      }
+    handleMaximizeClick() {
+      window.api.window.toggleMaximize()
     },
 
-    toggleMaxmizeOnMacOS () {
+    toggleMaxmizeOnMacOS() {
       if (this.isOsx) {
         this.handleMaximizeClick()
       }
     },
 
-    handleMinimizeClick () {
-      getCurrentWindow().minimize()
+    handleMinimizeClick() {
+      window.api.window.minimize()
     },
 
-    handleMenuClick () {
-      const win = getCurrentWindow()
-      RemoteMenu.getApplicationMenu().popup({ window: win, x: 23, y: 20 })
+    handleMenuClick() {
+      window.api.contextMenu.showAppMenu(23, 20)
     },
 
-    rename () {
+    rename() {
       if (this.platform === 'darwin') {
         this.$store.dispatch('RESPONSE_FOR_RENAME')
       }
     },
 
-    onMaximize () {
+    onMaximize() {
       this.isMaximized = true
     },
-    onUnmaximize () {
+    onUnmaximize() {
       this.isMaximized = false
     },
-    onEnterFullScreen () {
+    onEnterFullScreen() {
       this.isFullScreen = true
     },
-    onLeaveFullScreen  () {
+    onLeaveFullScreen() {
       this.isFullScreen = false
-    }
+    },
   },
-  beforeDestroy () {
-    ipcRenderer.off('window-maximize', this.onMaximize)
-    ipcRenderer.off('window-unmaximize', this.onUnmaximize)
-    ipcRenderer.off('window-enter-full-screen', this.onEnterFullScreen)
-    ipcRenderer.off('window-leave-full-screen', this.onLeaveFullScreen)
-  }
+  beforeDestroy() {
+    window.api.ipc.off('mt::window-maximize', this.onMaximize)
+    window.api.ipc.off('mt::window-unmaximize', this.onUnmaximize)
+    window.api.ipc.off('mt::window-enter-full-screen', this.onEnterFullScreen)
+    window.api.ipc.off('mt::window-leave-full-screen', this.onLeaveFullScreen)
+  },
 }
 </script>
 

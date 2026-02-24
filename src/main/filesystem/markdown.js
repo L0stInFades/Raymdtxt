@@ -1,5 +1,5 @@
-import fsPromises from 'fs/promises'
-import path from 'path'
+import fsPromises from 'node:fs/promises'
+import path from 'node:path'
 import log from 'electron-log'
 import iconv from 'iconv-lite'
 import { LINE_ENDING_REG, LF_LINE_ENDING_REG, CRLF_LINE_ENDING_REG } from '../config'
@@ -8,7 +8,7 @@ import { isMarkdownFile } from 'common/filesystem/paths'
 import { normalizeAndResolvePath, writeFile } from '../filesystem'
 import { guessEncoding } from './encoding'
 
-const getLineEnding = lineEnding => {
+const getLineEnding = (lineEnding) => {
   if (lineEnding === 'lf') {
     return '\n'
   } else if (lineEnding === 'crlf') {
@@ -31,7 +31,7 @@ const convertLineEndings = (text, lineEnding) => {
  * @returns {{isDir: boolean, path: string}?} Returns the normalize path and a
  * directory hint or null if it's not a directory or markdown file.
  */
-export const normalizeMarkdownPath = pathname => {
+export const normalizeMarkdownPath = (pathname) => {
   const isDir = isDirectory2(pathname)
   if (isDir || isMarkdownFile(pathname)) {
     // Normalize and resolve the path or link target.
@@ -143,6 +143,6 @@ export const loadMarkdownFile = async (pathname, preferredEol, autoGuessEncoding
     trimTrailingNewline,
 
     // raw file information
-    isMixedLineEndings
+    isMixedLineEndings,
   }
 }

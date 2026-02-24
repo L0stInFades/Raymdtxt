@@ -52,7 +52,6 @@ import { loadingPageMixins } from '@/mixins'
 import { mapState } from 'vuex'
 import bus from '@/bus'
 import { DEFAULT_STYLE } from '@/config'
-import { ipcRenderer } from 'electron'
 
 export default {
   name: 'marktext',
@@ -66,50 +65,47 @@ export default {
     Rename,
     Tweet,
     ImportModal,
-    CommandPalette
+    CommandPalette,
   },
   mixins: [loadingPageMixins],
-  data () {
-    return {
-    }
+  data() {
+    return {}
   },
   computed: {
     ...mapState({
-      showTabBar: state => state.layout.showTabBar,
-      sourceCode: state => state.preferences.sourceCode,
-      theme: state => state.preferences.theme,
-      textDirection: state => state.preferences.textDirection
+      showTabBar: (state) => state.layout.showTabBar,
+      sourceCode: (state) => state.preferences.sourceCode,
+      theme: (state) => state.preferences.theme,
+      textDirection: (state) => state.preferences.textDirection,
     }),
     ...mapState({
-      zoom: state => state.preferences.zoom
+      zoom: (state) => state.preferences.zoom,
     }),
     ...mapState({
-      projectTree: state => state.project.projectTree,
-      pathname: state => state.editor.currentFile.pathname,
-      filename: state => state.editor.currentFile.filename,
-      isSaved: state => state.editor.currentFile.isSaved,
-      markdown: state => state.editor.currentFile.markdown,
-      cursor: state => state.editor.currentFile.cursor,
-      wordCount: state => state.editor.currentFile.wordCount
+      projectTree: (state) => state.project.projectTree,
+      pathname: (state) => state.editor.currentFile.pathname,
+      filename: (state) => state.editor.currentFile.filename,
+      isSaved: (state) => state.editor.currentFile.isSaved,
+      markdown: (state) => state.editor.currentFile.markdown,
+      cursor: (state) => state.editor.currentFile.cursor,
+      wordCount: (state) => state.editor.currentFile.wordCount,
     }),
-    ...mapState([
-      'windowActive', 'platform', 'init'
-    ]),
-    hasCurrentFile () {
+    ...mapState(['windowActive', 'platform', 'init']),
+    hasCurrentFile() {
       return this.markdown !== undefined
-    }
+    },
   },
   watch: {
-    theme: function (value, oldValue) {
+    theme: (value, oldValue) => {
       if (value !== oldValue) {
         addThemeStyle(value)
       }
     },
-    zoom: function (zoom) {
-      ipcRenderer.emit('mt::window-zoom', null, zoom)
-    }
+    zoom: (zoom) => {
+      window.api.localEmit('mt::window-zoom', zoom)
+    },
   },
-  created () {
+  created() {
     const { commit, dispatch } = this.$store
 
     // Apply initial state (theme and titleBarStyle) and delay load other values.
@@ -166,37 +162,41 @@ export default {
     dispatch('LISTEN_FOR_NOTIFICATION')
 
     // prevent Chromium's default behavior and try to open the first file
-    window.addEventListener('dragover', e => {
-      // Cancel to allow tab drag&drop.
-      if (!e.dataTransfer.types.length) return
+    window.addEventListener(
+      'dragover',
+      (e) => {
+        // Cancel to allow tab drag&drop.
+        if (!e.dataTransfer.types.length) return
 
-      if (e.dataTransfer.types.indexOf('Files') >= 0) {
-        if (e.dataTransfer.items.length === 1 && e.dataTransfer.items[0].type.indexOf('image') > -1) {
-          // Do nothing, because we already drag/drop image in muya.
-        } else {
-          e.preventDefault()
-          if (this.timer) {
-            clearTimeout(this.timer)
+        if (e.dataTransfer.types.indexOf('Files') >= 0) {
+          if (e.dataTransfer.items.length === 1 && e.dataTransfer.items[0].type.indexOf('image') > -1) {
+            // Do nothing, because we already drag/drop image in muya.
+          } else {
+            e.preventDefault()
+            if (this.timer) {
+              clearTimeout(this.timer)
+            }
+            this.timer = setTimeout(() => {
+              bus.$emit('importDialog', false)
+            }, 300)
+            bus.$emit('importDialog', true)
           }
-          this.timer = setTimeout(() => {
-            bus.$emit('importDialog', false)
-          }, 300)
-          bus.$emit('importDialog', true)
-        }
 
-        e.dataTransfer.dropEffect = 'copy'
-      } else {
-        e.stopPropagation()
-        e.dataTransfer.dropEffect = 'none'
-      }
-    }, false)
+          e.dataTransfer.dropEffect = 'copy'
+        } else {
+          e.stopPropagation()
+          e.dataTransfer.dropEffect = 'none'
+        }
+      },
+      false,
+    )
 
     this.$nextTick(() => {
       const style = global.marktext.initialState || DEFAULT_STYLE
       addStyles(style)
       this.hideLoadingPage()
     })
-  }
+  },
 }
 </script>
 

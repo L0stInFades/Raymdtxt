@@ -41,7 +41,6 @@
 </template>
 
 <script>
-import { shell, clipboard } from 'electron'
 import { mapState } from 'vuex'
 import autoScroll from 'dom-autoscroller'
 import dragula from 'dragula'
@@ -50,7 +49,7 @@ import { showContextMenu } from '../../contextMenu/tabs'
 import bus from '../../bus'
 
 export default {
-  data () {
+  data() {
     this.autoScroller = null
     this.drake = null
     return {}
@@ -58,15 +57,15 @@ export default {
   mixins: [tabsMixins],
   computed: {
     ...mapState({
-      currentFile: state => state.editor.currentFile,
-      tabs: state => state.editor.tabs
-    })
+      currentFile: (state) => state.editor.currentFile,
+      tabs: (state) => state.editor.tabs,
+    }),
   },
   methods: {
-    newFile () {
+    newFile() {
       this.$store.dispatch('NEW_UNTITLED_TAB', {})
     },
-    handleTabScroll (event) {
+    handleTabScroll(event) {
       // Use mouse wheel value first but prioritize X value more (e.g. touchpad input).
       let delta = event.deltaY
       if (event.deltaX !== 0) {
@@ -77,49 +76,49 @@ export default {
       const newLeft = Math.max(0, Math.min(tabs.scrollLeft + delta, tabs.scrollWidth))
       tabs.scrollLeft = newLeft
     },
-    closeTab (tabId) {
-      const tab = this.tabs.find(f => f.id === tabId)
+    closeTab(tabId) {
+      const tab = this.tabs.find((f) => f.id === tabId)
       if (tab) {
         this.$store.dispatch('CLOSE_TAB', tab)
       }
     },
-    closeOthers (tabId) {
-      const tab = this.tabs.find(f => f.id === tabId)
+    closeOthers(tabId) {
+      const tab = this.tabs.find((f) => f.id === tabId)
       if (tab) {
         this.$store.dispatch('CLOSE_OTHER_TABS', tab)
       }
     },
-    closeSaved () {
+    closeSaved() {
       this.$store.dispatch('CLOSE_SAVED_TABS')
     },
-    closeAll () {
+    closeAll() {
       this.$store.dispatch('CLOSE_ALL_TABS')
     },
-    rename (tabId) {
-      const tab = this.tabs.find(f => f.id === tabId)
-      if (tab && tab.pathname) {
+    rename(tabId) {
+      const tab = this.tabs.find((f) => f.id === tabId)
+      if (tab?.pathname) {
         this.$store.dispatch('RENAME_FILE', tab)
       }
     },
-    copyPath (tabId) {
-      const tab = this.tabs.find(f => f.id === tabId)
-      if (tab && tab.pathname) {
-        clipboard.writeText(tab.pathname)
+    copyPath(tabId) {
+      const tab = this.tabs.find((f) => f.id === tabId)
+      if (tab?.pathname) {
+        window.api.clipboard.writeText(tab.pathname)
       }
     },
-    showInFolder (tabId) {
-      const tab = this.tabs.find(f => f.id === tabId)
-      if (tab && tab.pathname) {
-        shell.showItemInFolder(tab.pathname)
+    showInFolder(tabId) {
+      const tab = this.tabs.find((f) => f.id === tabId)
+      if (tab?.pathname) {
+        window.api.shell.showItemInFolder(tab.pathname)
       }
     },
-    handleContextMenu (event, tab) {
+    handleContextMenu(event, tab) {
       if (tab.id) {
         showContextMenu(event, tab)
       }
-    }
+    },
   },
-  created () {
+  created() {
     this.$nextTick(() => {
       bus.$on('TABS::close-this', this.closeTab)
       bus.$on('TABS::close-others', this.closeOthers)
@@ -130,7 +129,7 @@ export default {
       bus.$on('TABS::show-in-folder', this.showInFolder)
     })
   },
-  mounted () {
+  mounted() {
     this.$nextTick(() => {
       const tabs = this.$refs.tabContainer
 
@@ -138,17 +137,17 @@ export default {
       tabs.addEventListener('wheel', this.handleTabScroll)
 
       // Allow tab drag and drop to reorder tabs.
-      const drake = this.drake = dragula([this.$refs.tabDropContainer], {
+      const drake = (this.drake = dragula([this.$refs.tabDropContainer], {
         direction: 'horizontal',
         revertOnSpill: true,
         mirrorContainer: this.$refs.tabDropContainer,
-        ignoreInputTextSelection: false
-      }).on('drop', (el, target, source, sibling) => {
+        ignoreInputTextSelection: false,
+      }).on('drop', (el, _target, _source, sibling) => {
         // Current tab that was dropped and need to be reordered.
         const droppedId = el.getAttribute('data-id')
         // This should be the next tab (tab | ... | el | sibling | tab | ...) but may be
         // the mirror image or null (tab | ... | el | sibling or null) if last tab.
-        const nextTabId = sibling && sibling.getAttribute('data-id')
+        const nextTabId = sibling?.getAttribute('data-id')
         const isLastTab = !sibling || sibling.classList.contains('gu-mirror')
         if (!droppedId || (sibling && !nextTabId)) {
           throw new Error('Cannot reorder tabs: invalid tab id.')
@@ -156,9 +155,9 @@ export default {
 
         this.$store.dispatch('EXCHANGE_TABS_BY_ID', {
           fromId: droppedId,
-          toId: isLastTab ? null : nextTabId
+          toId: isLastTab ? null : nextTabId,
         })
-      })
+      }))
 
       // TODO(perf): Create a copy of dom-autoscroller and just hook tabs-container to
       //   improve performance. Currently autoScroll is triggered when the mouse is moved
@@ -171,11 +170,11 @@ export default {
         scrollWhenOutside: false,
         autoScroll: () => {
           return this.autoScroller.down && drake.dragging
-        }
+        },
       })
     })
   },
-  beforeUnmount () {
+  beforeUnmount() {
     const tabs = this.$refs.tabContainer
     tabs.removeEventListener('wheel', this.handleTabScroll)
 
@@ -187,7 +186,7 @@ export default {
       this.drake.destroy()
     }
   },
-  beforeDestroy () {
+  beforeDestroy() {
     bus.$off('TABS::close-this', this.closeTab)
     bus.$off('TABS::close-others', this.closeOthers)
     bus.$off('TABS::close-saved', this.closeSaved)
@@ -195,7 +194,7 @@ export default {
     bus.$off('TABS::rename', this.rename)
     bus.$off('TABS::copy-path', this.copyPath)
     bus.$off('TABS::show-in-folder', this.showInFolder)
-  }
+  },
 }
 </script>
 

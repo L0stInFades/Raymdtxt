@@ -42,28 +42,28 @@ import Separator from '../common/separator'
 export default {
   components: {
     CurSelect,
-    Separator
+    Separator,
   },
-  data () {
+  data() {
     this.autoSwitchThemeOptions = autoSwitchThemeOptions
     return {
-      themes: []
+      themes: [],
     }
   },
   computed: {
     ...mapState({
-      autoSwitchTheme: state => state.preferences.autoSwitchTheme,
-      theme: state => state.preferences.theme
-    })
+      autoSwitchTheme: (state) => state.preferences.autoSwitchTheme,
+      theme: (state) => state.preferences.theme,
+    }),
   },
-  created () {
+  created() {
     this.$nextTick(async () => {
       const newThemes = []
       for (const theme of themes) {
         const html = await markdownToHtml(themeMd.replace(/{theme}/, theme.name))
         newThemes.push({
           name: theme.name,
-          html
+          html,
         })
       }
 
@@ -71,10 +71,10 @@ export default {
     })
   },
   methods: {
-    onSelectChange (type, value) {
+    onSelectChange(type, value) {
       this.$store.dispatch('SET_SINGLE_PREFERENCE', { type, value })
-    }
-  }
+    },
+  },
 }
 </script>
 

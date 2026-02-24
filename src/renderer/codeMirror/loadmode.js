@@ -1,17 +1,19 @@
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: https://codemirror.net/LICENSE
 
-const loadMore = CodeMirror => {
+const loadMore = (CodeMirror) => {
   if (!CodeMirror.modeURL) {
     CodeMirror.modeURL = '../../mode/%N/%N.js'
   }
 
   const loading = {}
-  function splitCallback (cont, n) {
+  function splitCallback(cont, n) {
     let countDown = n
-    return function () { if (--countDown === 0) cont() }
+    return () => {
+      if (--countDown === 0) cont()
+    }
   }
-  function ensureDeps (mode, cont) {
+  function ensureDeps(mode, cont) {
     const deps = CodeMirror.modes[mode].dependencies
     if (!deps) return cont()
     const missing = []
@@ -27,7 +29,7 @@ const loadMore = CodeMirror => {
     }
   }
 
-  CodeMirror.requireMode = function (mode, cont) {
+  CodeMirror.requireMode = (mode, cont) => {
     if (typeof mode !== 'string') {
       mode = mode.name
     }
@@ -38,9 +40,9 @@ const loadMore = CodeMirror => {
     const script = document.createElement('script')
     script.src = file
     const others = document.getElementsByTagName('script')[0]
-    const list = loading[mode] = [cont]
-    CodeMirror.on(script, 'load', function () {
-      ensureDeps(mode, function () {
+    const list = (loading[mode] = [cont])
+    CodeMirror.on(script, 'load', () => {
+      ensureDeps(mode, () => {
         for (let i = 0; i < list.length; ++i) {
           list[i]()
         }
@@ -49,9 +51,9 @@ const loadMore = CodeMirror => {
     others.parentNode.insertBefore(script, others)
   }
 
-  CodeMirror.autoLoadMode = function (instance, mode) {
+  CodeMirror.autoLoadMode = (instance, mode) => {
     if (!CodeMirror.modes.hasOwnProperty(mode)) {
-      CodeMirror.requireMode(mode, function () {
+      CodeMirror.requireMode(mode, () => {
         instance.setOption('mode', instance.getOption('mode'))
       })
     }

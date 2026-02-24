@@ -98,7 +98,7 @@ import FindRegexIcon from '@/assets/icons/searchIcons/iconRegex.svg'
 import { MARKDOWN_INCLUSIONS } from '../../../common/filesystem/paths'
 
 export default {
-  data () {
+  data() {
     this.lastKeyword = ''
     this.lastSearchTime = new Date()
     this.keyUpTimer = null
@@ -117,20 +117,20 @@ export default {
 
       isCaseSensitive: false,
       isWholeWord: false,
-      isRegexp: false
+      isRegexp: false,
     }
   },
   components: {
-    SearchResultItem
+    SearchResultItem,
   },
   watch: {
     showSideBar: function (value, oldValue) {
       if (value && !oldValue && this.rightColumn === 'search') {
         this.keyword = this.searchMatches.value
       }
-    }
+    },
   },
-  created () {
+  created() {
     this.$nextTick(() => {
       this.keyword = this.searchMatches.value
       bus.$on('findInFolder', this.handleFindInFolder)
@@ -142,17 +142,17 @@ export default {
   },
   computed: {
     ...mapState({
-      rightColumn: state => state.layout.rightColumn,
-      showSideBar: state => state.layout.showSideBar,
-      searchMatches: state => state.editor.currentFile.searchMatches,
-      projectTree: state => state.project.projectTree,
-      searchExclusions: state => state.preferences.searchExclusions,
-      searchMaxFileSize: state => state.preferences.searchMaxFileSize,
-      searchIncludeHidden: state => state.preferences.searchIncludeHidden,
-      searchNoIgnore: state => state.preferences.searchNoIgnore,
-      searchFollowSymlinks: state => state.preferences.searchFollowSymlinks
+      rightColumn: (state) => state.layout.rightColumn,
+      showSideBar: (state) => state.layout.showSideBar,
+      searchMatches: (state) => state.editor.currentFile.searchMatches,
+      projectTree: (state) => state.project.projectTree,
+      searchExclusions: (state) => state.preferences.searchExclusions,
+      searchMaxFileSize: (state) => state.preferences.searchMaxFileSize,
+      searchIncludeHidden: (state) => state.preferences.searchIncludeHidden,
+      searchNoIgnore: (state) => state.preferences.searchNoIgnore,
+      searchFollowSymlinks: (state) => state.preferences.searchFollowSymlinks,
     }),
-    searchResultInfo () {
+    searchResultInfo() {
       const fileCount = this.searchResult.length
       const matchCount = this.searchResult.reduce((acc, item) => {
         return acc + item.matches.length
@@ -160,15 +160,15 @@ export default {
 
       return `${matchCount} ${matchCount > 1 ? 'matches' : 'match'} in ${fileCount} ${fileCount > 1 ? 'files' : 'file'}`
     },
-    showNoFolderOpenedMessage () {
+    showNoFolderOpenedMessage() {
       return !this.projectTree || !this.projectTree.pathname
     },
-    showNoResultFoundMessage () {
+    showNoResultFoundMessage() {
       return this.searchResult.length === 0 && this.searcherRunning === false && this.keyword.length > 0
-    }
+    },
   },
   methods: {
-    search () {
+    search() {
       // No root directory is opened.
       if (this.showNoFolderOpenedMessage) {
         return
@@ -182,7 +182,7 @@ export default {
         isCaseSensitive,
         isWholeWord,
         isRegexp,
-        ripgrepDirectorySearcher
+        ripgrepDirectorySearcher,
       } = this
 
       if (searcherRunning && searcherCancelCallback) {
@@ -203,57 +203,58 @@ export default {
       this.startShowSearchCancelAreaTimer()
 
       const newSearchResult = []
-      const promises = ripgrepDirectorySearcher.search([rootDirectoryPath], keyword, {
-        didMatch: searchResult => {
-          if (canceled) return
+      const promises = ripgrepDirectorySearcher
+        .search([rootDirectoryPath], keyword, {
+          didMatch: (searchResult) => {
+            if (canceled) return
 
-          // filePath: "<file>"
-          // matches: Array(1)
-          // 0:
-          //   leadingContextLines: []
-          //   lineText: "foo-test"
-          //   matchText: "foo"
-          //   range: Array(2)
-          //     0: (2) [0, 0]
-          //     1: (2) [0, 3]
-          //   length: 2
-          //   trailingContextLines: []
+            // filePath: "<file>"
+            // matches: Array(1)
+            // 0:
+            //   leadingContextLines: []
+            //   lineText: "foo-test"
+            //   matchText: "foo"
+            //   range: Array(2)
+            //     0: (2) [0, 0]
+            //     1: (2) [0, 3]
+            //   length: 2
+            //   trailingContextLines: []
 
-          newSearchResult.push(searchResult)
-        },
-        didSearchPaths: numPathsFound => {
-          // More than 100 files with (multiple) matches were found.
-          if (!canceled && numPathsFound > 100) {
-            canceled = true
-            if (promises.cancel) {
-              promises.cancel()
+            newSearchResult.push(searchResult)
+          },
+          didSearchPaths: (numPathsFound) => {
+            // More than 100 files with (multiple) matches were found.
+            if (!canceled && numPathsFound > 100) {
+              canceled = true
+              if (promises.cancel) {
+                promises.cancel()
+              }
+              this.searchErrorString = 'Search was limited to 100 files.'
             }
-            this.searchErrorString = 'Search was limited to 100 files.'
-          }
-        },
+          },
 
-        // UI options
-        isCaseSensitive,
-        isWholeWord,
-        isRegexp,
+          // UI options
+          isCaseSensitive,
+          isWholeWord,
+          isRegexp,
 
-        // Options loaded from settings
-        exclusions: this.searchExclusions,
-        maxFileSize: this.searchMaxFileSize || null,
-        includeHidden: this.searchIncludeHidden,
-        noIgnore: this.searchNoIgnore,
-        followSymlinks: this.searchFollowSymlinks,
+          // Options loaded from settings
+          exclusions: this.searchExclusions,
+          maxFileSize: this.searchMaxFileSize || null,
+          includeHidden: this.searchIncludeHidden,
+          noIgnore: this.searchNoIgnore,
+          followSymlinks: this.searchFollowSymlinks,
 
-        // Only search markdown files
-        inclusions: MARKDOWN_INCLUSIONS
-      })
+          // Only search markdown files
+          inclusions: MARKDOWN_INCLUSIONS,
+        })
         .then(() => {
           this.searchResult = newSearchResult
           this.searcherRunning = false
           this.searcherCancelCallback = null
           this.stopShowSearchCancelAreaTimer()
         })
-        .catch(err => {
+        .catch((err) => {
           canceled = true
           if (promises.cancel) {
             promises.cancel()
@@ -278,7 +279,7 @@ export default {
      * Slightly delay showing the "cancel search" button so we don't
      * see it after every keypress, but only when a search query is lagging.
      */
-    startShowSearchCancelAreaTimer () {
+    startShowSearchCancelAreaTimer() {
       this.stopShowSearchCancelAreaTimer()
 
       const SHOW_SEARCH_CANCEL_DELAY_MS = 5000
@@ -286,7 +287,7 @@ export default {
         this.showSearchCancelArea = true
       }, SHOW_SEARCH_CANCEL_DELAY_MS)
     },
-    stopShowSearchCancelAreaTimer () {
+    stopShowSearchCancelAreaTimer() {
       this.showSearchCancelArea = false
       if (!this.showSearchCancelAreaTimer) {
         return
@@ -294,35 +295,35 @@ export default {
       window.clearTimeout(this.showSearchCancelAreaTimer)
       this.showSearchCancelAreaTimer = null
     },
-    cancelSearcher () {
+    cancelSearcher() {
       const { searcherCancelCallback } = this
       if (searcherCancelCallback) {
         searcherCancelCallback()
         this.searcherCancelCallback = null
       }
     },
-    caseSensitiveClicked () {
+    caseSensitiveClicked() {
       this.isCaseSensitive = !this.isCaseSensitive
       this.search()
     },
-    wholeWordClicked () {
+    wholeWordClicked() {
       this.isWholeWord = !this.isWholeWord
       this.search()
     },
-    regexpClicked () {
+    regexpClicked() {
       this.isRegexp = !this.isRegexp
       this.search()
     },
-    openFolder () {
+    openFolder() {
       this.$store.dispatch('ASK_FOR_OPEN_PROJECT')
     },
-    handleFindInFolder () {
+    handleFindInFolder() {
       this.keyword = this.searchMatches.value
-    }
+    },
   },
-  destroyed () {
+  destroyed() {
     bus.$off('findInFolder', this.handleFindInFolder)
-  }
+  },
 }
 </script>
 

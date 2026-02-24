@@ -1,12 +1,12 @@
-import path from 'path'
+import path from 'node:path'
 import { app } from 'electron'
-import os from 'os'
+import os from 'node:os'
 import { isDirectory } from 'common/filesystem'
 import parseArgs from './parser'
 import { getPath } from '../utils'
 
-const write = s => process.stdout.write(s)
-const writeLine = s => write(s + '\n')
+const write = (s) => process.stdout.write(s)
+const writeLine = (s) => write(`${s}\n`)
 
 const cli = () => {
   let argv = process.argv.slice(1)

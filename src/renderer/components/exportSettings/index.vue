@@ -220,9 +220,9 @@
 
 <script>
 import { mapState } from 'vuex'
-import fs from 'fs'
-import fsPromises from 'fs/promises'
-import path from 'path'
+import fs from 'node:fs'
+import fsPromises from 'node:fs/promises'
+import path from 'node:path'
 import { isDirectory, isFile } from 'common/filesystem'
 import bus from '../../bus'
 import Bool from '@/prefComponents/common/bool'
@@ -230,12 +230,7 @@ import CurSelect from '@/prefComponents/common/select'
 import FontTextBox from '@/prefComponents/common/fontTextBox'
 import Range from '@/prefComponents/common/range'
 import TextBox from '@/prefComponents/common/textBox'
-import {
-  pageSizeList,
-  headerFooterTypes,
-  headerFooterStyles,
-  exportThemeList
-} from './exportOptions'
+import { pageSizeList, headerFooterTypes, headerFooterStyles, exportThemeList } from './exportOptions'
 
 export default {
   components: {
@@ -243,9 +238,9 @@ export default {
     CurSelect,
     FontTextBox,
     Range,
-    TextBox
+    TextBox,
   },
-  data () {
+  data() {
     this.exportType = ''
     this.themesLoaded = false
     this.pageSizeList = pageSizeList
@@ -284,21 +279,20 @@ export default {
       headerFooterStyled: true,
       headerFooterFontSize: 12,
       tocTitle: '',
-      tocIncludeTopHeading: true
+      tocIncludeTopHeading: true,
     }
   },
   computed: {
-    ...mapState({
-    })
+    ...mapState({}),
   },
-  created () {
+  created() {
     bus.$on('showExportDialog', this.showDialog)
   },
-  beforeDestroy () {
+  beforeDestroy() {
     bus.$off('showExportDialog', this.showDialog)
   },
   methods: {
-    showDialog (type) {
+    showDialog(type) {
       this.exportType = type
       this.isPrintable = type !== 'styledHtml'
       if (!this.isPrintable && (this.activeName === 'header' || this.activeName === 'page')) {
@@ -313,7 +307,7 @@ export default {
         this.loadThemesFromDisk()
       }
     },
-    handleClicked () {
+    handleClicked() {
       const {
         exportType,
         isPrintable,
@@ -345,7 +339,7 @@ export default {
         headerFooterStyled,
         headerFooterFontSize,
         tocTitle,
-        tocIncludeTopHeading
+        tocIncludeTopHeading,
       } = this
       const options = {
         type: exportType,
@@ -361,7 +355,7 @@ export default {
         showFrontMatter,
         theme: theme === 'default' ? null : theme,
         tocTitle,
-        tocIncludeTopHeading
+        tocIncludeTopHeading,
       }
 
       if (!isPrintable) {
@@ -372,7 +366,7 @@ export default {
         Object.assign(options, {
           fontSize,
           lineHeight,
-          fontFamily: fontFamily === 'Default' ? null : fontFamily
+          fontFamily: fontFamily === 'Default' ? null : fontFamily,
         })
       }
 
@@ -382,8 +376,8 @@ export default {
             type: headerType,
             left: headerTextLeft,
             center: headerTextCenter,
-            right: headerTextRight
-          }
+            right: headerTextRight,
+          },
         })
       }
 
@@ -393,31 +387,31 @@ export default {
             type: footerType,
             left: footerTextLeft,
             center: footerTextCenter,
-            right: footerTextRight
-          }
+            right: footerTextRight,
+          },
         })
       }
 
       if (headerFooterCustomize) {
         Object.assign(options, {
           headerFooterStyled,
-          headerFooterFontSize
+          headerFooterFontSize,
         })
       }
 
       this.showExportSettingsDialog = false
       bus.$emit('export', options)
     },
-    onSelectChange (key, value) {
+    onSelectChange(key, value) {
       this[key] = value
     },
-    loadThemesFromDisk () {
+    loadThemesFromDisk() {
       const { userDataPath } = global.marktext.paths
       const themeDir = path.join(userDataPath, 'themes/export')
 
       // Search for dictionaries on filesystem.
       if (isDirectory(themeDir)) {
-        fs.readdirSync(themeDir).forEach(async filename => {
+        fs.readdirSync(themeDir).forEach(async (filename) => {
           const fullname = path.join(themeDir, filename)
           if (/.+\.css$/i.test(filename) && isFile(fullname)) {
             try {
@@ -427,7 +421,7 @@ export default {
               const match = content.match(/^(?:\/\*+[ \t]*([A-z0-9 -]+)[ \t]*(?:\*+\/|[\n\r])?)/)
 
               let label
-              if (match && match[1]) {
+              if (match?.[1]) {
                 label = match[1]
               } else {
                 label = filename
@@ -435,7 +429,7 @@ export default {
 
               this.themeList.push({
                 value: filename,
-                label
+                label,
               })
             } catch (e) {
               console.error('loadThemesFromDisk failed:', e)
@@ -443,8 +437,8 @@ export default {
           }
         })
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

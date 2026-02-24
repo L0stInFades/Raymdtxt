@@ -59,33 +59,33 @@
 </template>
 
 <script>
-import path from 'path'
+import path from 'node:path'
 import { mapState } from 'vuex'
 import { fileMixins } from '../../mixins'
 import { PATH_SEPARATOR } from '../../config'
 
 export default {
   mixins: [fileMixins],
-  data () {
+  data() {
     return {
       showSearchMatches: this.searchResult.matches.length <= 20,
       allMatchesShown: this.searchResult.matches.length <= 10,
-      shownMatches: 10
+      shownMatches: 10,
     }
   },
   props: {
     searchResult: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
   },
   computed: {
     ...mapState({
-      tabs: state => state.editor.tabs,
-      currentFile: state => state.editor.currentFile
+      tabs: (state) => state.editor.tabs,
+      currentFile: (state) => state.editor.currentFile,
     }),
 
-    getMatches () {
+    getMatches() {
       if (this.searchResult.matches.length === 0 || this.allMatchesShown) {
         return this.searchResult.matches
       }
@@ -93,43 +93,42 @@ export default {
     },
 
     // Return filename without extension.
-    filename () {
+    filename() {
       return path.basename(this.searchResult.filePath, path.extname(this.searchResult.filePath))
     },
 
-    matchCount () {
+    matchCount() {
       return this.searchResult.matches.length
     },
 
     // Return the filename extension or null.
-    extension () {
+    extension() {
       return path.extname(this.searchResult.filePath)
     },
 
     // Return the parent directory with trailing path separator.
-    dirname () {
+    dirname() {
       return path.join(path.dirname(this.searchResult.filePath), PATH_SEPARATOR)
-    }
+    },
   },
   methods: {
-    toggleSearchMatches () {
+    toggleSearchMatches() {
       this.showSearchMatches = !this.showSearchMatches
     },
 
-    handleShowMoreMatches (event) {
+    handleShowMoreMatches(event) {
       this.shownMatches += 15
-      if (event.ctrlKey || event.metaKey ||
-          this.shownMatches >= this.searchResult.matches.length) {
+      if (event.ctrlKey || event.metaKey || this.shownMatches >= this.searchResult.matches.length) {
         this.allMatchesShown = true
       }
     },
 
-    ellipsisText (text) {
+    ellipsisText(text) {
       const len = text.length
       const MAX_PRETEXT_LEN = 6
       return len > MAX_PRETEXT_LEN ? `...${text.substring(len - MAX_PRETEXT_LEN)}` : text
-    }
-  }
+    },
+  },
 }
 </script>
 

@@ -69,7 +69,6 @@
 </template>
 
 <script>
-import { shell } from 'electron'
 import services, { isValidService } from './services.js'
 import legalNoticesCheckbox from './legalNoticesCheckbox'
 import { isFileExecutableSync } from '@/util/fileSystem'
@@ -80,14 +79,14 @@ import notice from '@/services/notification'
 export default {
   components: {
     legalNoticesCheckbox,
-    CurSelect
+    CurSelect,
   },
-  data () {
-    this.uploaderOptions = Object.keys(services).map(name => {
+  data() {
+    this.uploaderOptions = Object.keys(services).map((name) => {
       const { name: label } = services[name]
       return {
         label,
-        value: name
+        value: name,
       }
     })
     return {
@@ -95,55 +94,55 @@ export default {
       github: {
         owner: '',
         repo: '',
-        branch: ''
+        branch: '',
       },
       cliScript: '',
       picgoExists: true,
       uploadServices: services,
       legalNoticesErrorStates: {
-        github: false
-      }
+        github: false,
+      },
     }
   },
   computed: {
     currentUploader: {
       get: function () {
         return this.$store.state.preferences.currentUploader
-      }
+      },
     },
     imageBed: {
       get: function () {
         return this.$store.state.preferences.imageBed
-      }
+      },
     },
     prefGithubToken: {
       get: function () {
         return this.$store.state.preferences.githubToken
-      }
+      },
     },
     prefCliScript: {
       get: function () {
         return this.$store.state.preferences.cliScript
-      }
+      },
     },
-    githubDisable () {
+    githubDisable() {
       return !this.githubToken || !this.github.owner || !this.github.repo
     },
-    cliScriptDisable () {
+    cliScriptDisable() {
       if (!this.cliScript) {
         return true
       }
       return !isFileExecutableSync(this.cliScript)
-    }
+    },
   },
   watch: {
     imageBed: function (value, oldValue) {
       if (value !== oldValue) {
         this.github = value.github
       }
-    }
+    },
   },
-  created () {
+  created() {
     this.$nextTick(() => {
       this.github = this.imageBed.github
       this.githubToken = this.prefGithubToken
@@ -156,57 +155,60 @@ export default {
     })
   },
   methods: {
-    isValidUploaderService (name) {
+    isValidUploaderService(name) {
       return isValidService(name)
     },
 
-    getServiceNameById (id) {
+    getServiceNameById(id) {
       const service = services[id]
       return service ? service.name : id
     },
 
-    open (link) {
-      shell.openExternal(link)
+    open(link) {
+      window.api.shell.openExternal(link)
     },
 
-    save (type) {
+    save(type) {
       if (!this.validate(type)) {
         return
       }
       const newImageBedConfig = Object.assign({}, this.imageBed, { [type]: this[type] })
       this.$store.dispatch('SET_USER_DATA', {
         type: 'imageBed',
-        value: newImageBedConfig
+        value: newImageBedConfig,
       })
       if (type === 'github') {
         this.$store.dispatch('SET_USER_DATA', {
           type: 'githubToken',
-          value: this.githubToken
+          value: this.githubToken,
         })
       }
       if (type === 'cliScript') {
         this.$store.dispatch('SET_USER_DATA', {
           type: 'cliScript',
-          value: this.cliScript
+          value: this.cliScript,
         })
       }
       notice.notify({
         title: 'Save Config',
-        message: type === 'github' ? 'The Github configration has been saved.' : 'The command line script configuration has been saved',
-        type: 'primary'
+        message:
+          type === 'github'
+            ? 'The Github configration has been saved.'
+            : 'The command line script configuration has been saved',
+        type: 'primary',
       })
     },
 
-    setCurrentUploader (value) {
+    setCurrentUploader(value) {
       const type = 'currentUploader'
       this.$store.dispatch('SET_USER_DATA', { type, value })
     },
 
-    testPicgo () {
+    testPicgo() {
       this.picgoExists = commandExists.sync('picgo')
     },
 
-    validate (value) {
+    validate(value) {
       const service = services[value]
       const { agreedToLegalNotices } = service
       if (!agreedToLegalNotices) {
@@ -218,8 +220,8 @@ export default {
       }
 
       return true
-    }
-  }
+    },
+  },
 }
 </script>
 

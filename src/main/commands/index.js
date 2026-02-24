@@ -4,17 +4,17 @@ import { loadTabCommands } from './tab'
 
 export const COMMANDS = COMMAND_CONSTANTS
 
-export const loadDefaultCommands = commandManager => {
+export const loadDefaultCommands = (commandManager) => {
   loadFileCommands(commandManager)
   loadTabCommands(commandManager)
 }
 
 class CommandManager {
-  constructor () {
+  constructor() {
     this._commands = new Map()
   }
 
-  add (id, callback) {
+  add(id, callback) {
     const { _commands } = this
     if (_commands.has(id)) {
       throw new Error(`Command with id="${id}" already exists.`)
@@ -22,15 +22,15 @@ class CommandManager {
     _commands.set(id, callback)
   }
 
-  remove (id) {
+  remove(id) {
     return this._commands.delete(id)
   }
 
-  has (id) {
+  has(id) {
     return this._commands.has(id)
   }
 
-  execute (id, ...args) {
+  execute(id, ...args) {
     const command = this._commands.get(id)
     if (!command) {
       throw new Error(`No command found with id="${id}".`)
@@ -38,9 +38,9 @@ class CommandManager {
     return command(...args)
   }
 
-  __verifyDefaultCommands () {
+  __verifyDefaultCommands() {
     const { _commands } = this
-    Object.keys(COMMANDS).forEach(propertyName => {
+    Object.keys(COMMANDS).forEach((propertyName) => {
       const id = COMMANDS[propertyName]
       if (!_commands.has(id)) {
         console.error(`[DEBUG] Default command with id="${id}" isn't available!`)

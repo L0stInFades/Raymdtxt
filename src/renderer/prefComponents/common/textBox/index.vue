@@ -22,14 +22,12 @@
 </template>
 
 <script>
-import { shell } from 'electron'
-
 export default {
-  data () {
+  data() {
     this.inputTimer = null
     return {
       inputText: this.input,
-      invalidInput: false
+      invalidInput: false,
     }
   },
   props: {
@@ -40,37 +38,37 @@ export default {
     more: String,
     disable: {
       type: Boolean,
-      default: false
+      default: false,
     },
     defaultValue: {
       type: String,
-      default: ''
+      default: '',
     },
     emitTime: {
       type: Number,
-      default: 800
+      default: 800,
     },
     regexValidator: {
       type: RegExp,
-      default () {
+      default() {
         return /(.*?)/
-      }
-    }
+      },
+    },
   },
   watch: {
     input: function (value, oldValue) {
       if (value !== oldValue) {
         this.inputText = value
       }
-    }
+    },
   },
   methods: {
-    handleMoreClick () {
+    handleMoreClick() {
       if (typeof this.more === 'string') {
-        shell.openExternal(this.more)
+        window.api.shell.openExternal(this.more)
       }
     },
-    handleInput (value) {
+    handleInput(value) {
       const result = this.regexValidator.test(value)
       this.invalidInput = !result
 
@@ -92,8 +90,8 @@ export default {
           this.onChange(value)
         }, emitTime)
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

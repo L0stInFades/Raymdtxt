@@ -32,32 +32,32 @@ import bus from '../../bus'
 import MarkTextLogo from '../../assets/images/logo.png'
 
 export default {
-  data () {
+  data() {
     this.name = 'MarkText'
     this.copyright = `Copyright © 2017-${new Date().getFullYear()} Luo Ran`
     this.copyrightContributors = `Copyright © 2018-${new Date().getFullYear()} MarkText Contributors`
     this.logo = MarkTextLogo
     return {
-      showAboutDialog: false
+      showAboutDialog: false,
     }
   },
   computed: {
     ...mapState({
-      appVersion: state => state.appVersion
-    })
+      appVersion: (state) => state.appVersion,
+    }),
   },
-  created () {
+  created() {
     bus.$on('aboutDialog', this.showDialog)
   },
-  beforeDestroy () {
+  beforeDestroy() {
     bus.$off('aboutDialog', this.showDialog)
   },
   methods: {
-    showDialog () {
+    showDialog() {
       this.showAboutDialog = true
       bus.$emit('editor-blur')
-    }
-  }
+    },
+  },
 }
 </script>
 

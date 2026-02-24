@@ -58,36 +58,36 @@ import { createFileOrDirectoryMixins } from '../../mixins'
 export default {
   mixins: [createFileOrDirectoryMixins],
   name: 'folder',
-  data () {
+  data() {
     return {
       createName: '',
-      newName: ''
+      newName: '',
     }
   },
   props: {
     folder: {
       type: Object,
-      required: true
+      required: true,
     },
     depth: {
       type: Number,
-      required: true
-    }
+      required: true,
+    },
   },
   components: {
-    File: () => import('./treeFile.vue')
+    File: () => import('./treeFile.vue'),
   },
   computed: {
     ...mapState({
-      renameCache: state => state.project.renameCache,
-      createCache: state => state.project.createCache,
-      activeItem: state => state.project.activeItem,
-      clipboard: state => state.project.clipboard
-    })
+      renameCache: (state) => state.project.renameCache,
+      createCache: (state) => state.project.createCache,
+      activeItem: (state) => state.project.activeItem,
+      clipboard: (state) => state.project.clipboard,
+    }),
   },
-  created () {
+  created() {
     this.$nextTick(() => {
-      this.$refs.folder.addEventListener('contextmenu', event => {
+      this.$refs.folder.addEventListener('contextmenu', (event) => {
         event.preventDefault()
         this.$store.dispatch('CHANGE_ACTIVE_ITEM', this.folder)
         showContextMenu(event, !!this.clipboard)
@@ -97,11 +97,11 @@ export default {
     })
   },
   methods: {
-    folderNameClick () {
+    folderNameClick() {
       this.folder.isCollapsed = !this.folder.isCollapsed
     },
-    noop () {},
-    focusRenameInput () {
+    noop() {},
+    focusRenameInput() {
       this.$nextTick(() => {
         if (this.$refs.renameInput) {
           this.$refs.renameInput.focus()
@@ -109,13 +109,13 @@ export default {
         }
       })
     },
-    rename () {
+    rename() {
       const { newName } = this
       if (newName) {
         this.$store.dispatch('RENAME_IN_SIDEBAR', newName)
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

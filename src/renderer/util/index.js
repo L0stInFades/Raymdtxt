@@ -1,4 +1,4 @@
-export const delay = time => {
+export const delay = (time) => {
   let timerId
   let rejectFn
   const p = new Promise((resolve, reject) => {
@@ -22,15 +22,14 @@ export const delay = time => {
 const ID_PREFEX = 'mt-'
 let id = 0
 
-export const serialize = function (params) {
-  return Object.keys(params).map(key => `${key}=${encodeURI(params[key])}`).join('&')
-}
+export const serialize = (params) =>
+  Object.keys(params)
+    .map((key) => `${key}=${encodeURI(params[key])}`)
+    .join('&')
 
-export const merge = function (...args) {
-  return Object.assign({}, ...args)
-}
+export const merge = (...args) => Object.assign({}, ...args)
 
-export const dataURItoBlob = function (dataURI) {
+export const dataURItoBlob = (dataURI) => {
   const data = dataURI.split(';base64,')
   const byte = window.atob(data[1])
   const mime = data[0].split(':')[1]
@@ -48,10 +47,12 @@ export const adjustCursor = (cursor, preline, line, nextline) => {
   let newCursor = Object.assign({}, { line: cursor.line, ch: cursor.ch })
   // It's need to adjust the cursor when cursor is at begin or end in table row.
   if (/\|[^|]+\|.+\|\s*$/.test(line)) {
-    if (/\|\s*:?-+:?\s*\|[:-\s|]+\|\s*$/.test(line)) { // cursor in `| --- | :---: |` :the second line of table
+    if (/\|\s*:?-+:?\s*\|[:-\s|]+\|\s*$/.test(line)) {
+      // cursor in `| --- | :---: |` :the second line of table
       newCursor.line += 1 // reset the cursor to the next line
       newCursor.ch = nextline.indexOf('|') + 1
-    } else { // cursor is not at the second line to table
+    } else {
+      // cursor is not at the second line to table
       if (cursor.ch <= line.indexOf('|')) newCursor.ch = line.indexOf('|') + 1
       if (cursor.ch >= line.lastIndexOf('|')) newCursor.ch = line.lastIndexOf('|') - 1
     }
@@ -81,10 +82,10 @@ export const adjustCursor = (cursor, preline, line, nextline) => {
   return newCursor
 }
 
-export const animatedScrollTo = function (element, to, duration, callback) {
+export const animatedScrollTo = (element, to, duration, callback) => {
   const start = element.scrollTop
   const change = to - start
-  const animationStart = +new Date()
+  const animationStart = Date.now()
 
   // Prevent animation on small steps or duration is 0
   if (Math.abs(change) <= 6 || duration === 0) {
@@ -92,15 +93,15 @@ export const animatedScrollTo = function (element, to, duration, callback) {
     return
   }
 
-  const easeInOutQuad = function (t, b, c, d) {
+  const easeInOutQuad = (t, b, c, d) => {
     t /= d / 2
     if (t < 1) return (c / 2) * t * t + b
     t--
     return (-c / 2) * (t * (t - 2) - 1) + b
   }
 
-  const animateScroll = function () {
-    const now = +new Date()
+  const animateScroll = () => {
+    const now = Date.now()
     const val = Math.floor(easeInOutQuad(now - animationStart, start, change, duration))
 
     element.scrollTop = val
@@ -122,7 +123,7 @@ export const getUniqueId = () => {
   return `${ID_PREFEX}${id++}`
 }
 
-export const hasKeys = obj => Object.keys(obj).length > 0
+export const hasKeys = (obj) => Object.keys(obj).length > 0
 
 /**
  * Clone an object as a shallow or deep copy.
@@ -150,7 +151,7 @@ export const cloneObject = (obj, inheritFromObject = true) => {
  *
  * @param {*} obj Object to clone
  */
-export const deepClone = obj => {
+export const deepClone = (obj) => {
   return JSON.parse(JSON.stringify(obj))
 }
 

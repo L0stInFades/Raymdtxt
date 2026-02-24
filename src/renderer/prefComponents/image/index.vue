@@ -30,9 +30,9 @@ export default {
     Separator,
     CurSelect,
     FolderSetting,
-    Uploader
+    Uploader,
   },
-  data () {
+  data() {
     this.imageActions = imageActions
 
     return {}
@@ -41,14 +41,14 @@ export default {
     imageInsertAction: {
       get: function () {
         return this.$store.state.preferences.imageInsertAction
-      }
-    }
+      },
+    },
   },
   methods: {
-    onSelectChange (type, value) {
+    onSelectChange(type, value) {
       this.$store.dispatch('SET_SINGLE_PREFERENCE', { type, value })
-    }
-  }
+    },
+  },
 }
 </script>
 

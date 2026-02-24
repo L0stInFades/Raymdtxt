@@ -34,74 +34,76 @@
   </div>
 </template>
 <script>
-import { ipcRenderer } from 'electron'
 import { category, searchContent } from './config'
 
 export default {
-  data () {
+  data() {
     this.category = category
     return {
       currentCategory: 'general',
       restaurants: [],
-      state: ''
+      state: '',
     }
   },
   watch: {
-    '$route' (to, from) {
+    $route(to, from) {
       if (to.name !== from.name) {
         this.currentCategory = to.name
       }
-    }
+    },
   },
   methods: {
-    querySearch (queryString, cb) {
+    querySearch(queryString, cb) {
       const restaurants = this.restaurants
       const results = queryString ? restaurants.filter(this.createFilter(queryString)) : restaurants
       // call callback return this results
       cb(results)
     },
-    createFilter (queryString) {
+    createFilter(queryString) {
       return (restaurant) => {
-        return (restaurant.preference.toLowerCase().indexOf(queryString.toLowerCase()) >= 0) ||
-            (restaurant.category.toLowerCase().indexOf(queryString.toLowerCase()) >= 0)
+        return (
+          restaurant.preference.toLowerCase().indexOf(queryString.toLowerCase()) >= 0 ||
+          restaurant.category.toLowerCase().indexOf(queryString.toLowerCase()) >= 0
+        )
       }
     },
-    loadAll () {
+    loadAll() {
       return searchContent
     },
-    handleSelect (item) {
+    handleSelect(item) {
       this.$router.push({
-        path: `/preference/${item.category.toLowerCase()}`
+        path: `/preference/${item.category.toLowerCase()}`,
       })
     },
-    handleCategoryItemClick (item) {
+    handleCategoryItemClick(item) {
       const { currentCategory } = this
       if (item.name.toLowerCase() !== currentCategory) {
         this.$router.push({
-          path: item.path
+          path: item.path,
         })
       }
     },
-    onIpcCategoryChange (event, category) {
-      const validRoute = category && this.$router.getRoutes().findIndex(route => route.path.endsWith(`/${category}`)) !== -1
+    onIpcCategoryChange(_event, category) {
+      const validRoute =
+        category && this.$router.getRoutes().findIndex((route) => route.path.endsWith(`/${category}`)) !== -1
       if (validRoute) {
         this.$router.push({
-          path: `/preference/${category}`
+          path: `/preference/${category}`,
         })
       }
-    }
+    },
   },
 
-  mounted () {
+  mounted() {
     this.restaurants = this.loadAll()
-    if (this.$route && this.$route.name) {
+    if (this.$route?.name) {
       this.currentCategory = this.$route.name
     }
-    ipcRenderer.on('settings::change-tab', this.onIpcCategoryChange)
+    window.api.ipc.on('settings::change-tab', this.onIpcCategoryChange)
   },
-  unmounted () {
-    ipcRenderer.removeAllListener('settings::change-tab', this.onIpcCategoryChange)
-  }
+  unmounted() {
+    window.api.ipc.off('settings::change-tab', this.onIpcCategoryChange)
+  },
 }
 </script>
 

@@ -14,47 +14,39 @@ export const defaultFileState = {
   markdown: '',
   encoding: {
     encoding: 'utf8',
-    isBom: false
+    isBom: false,
   },
   lineEnding: 'lf', // lf or crlf
   trimTrailingNewline: 3,
   adjustLineEndingOnSave: false, // convert editor buffer (LF) to CRLF when saving
   history: {
     stack: [],
-    index: -1
+    index: -1,
   },
   cursor: null,
   wordCount: {
     paragraph: 0,
     word: 0,
     character: 0,
-    all: 0
+    all: 0,
   },
   searchMatches: {
     index: -1,
     matches: [],
-    value: ''
+    value: '',
   },
   // Per tab notifications
-  notifications: []
+  notifications: [],
 }
 
-export const getOptionsFromState = file => {
+export const getOptionsFromState = (file) => {
   const { encoding, lineEnding, adjustLineEndingOnSave, trimTrailingNewline } = file
   return { encoding, lineEnding, adjustLineEndingOnSave, trimTrailingNewline }
 }
 
-export const getFileStateFromData = data => {
+export const getFileStateFromData = (data) => {
   const fileState = JSON.parse(JSON.stringify(defaultFileState))
-  const {
-    markdown,
-    filename,
-    pathname,
-    encoding,
-    lineEnding,
-    adjustLineEndingOnSave,
-    trimTrailingNewline
-  } = data
+  const { markdown, filename, pathname, encoding, lineEnding, adjustLineEndingOnSave, trimTrailingNewline } = data
   const id = getUniqueId()
 
   assertLineEnding(adjustLineEndingOnSave, lineEnding)
@@ -67,19 +59,22 @@ export const getFileStateFromData = data => {
     encoding,
     lineEnding,
     adjustLineEndingOnSave,
-    trimTrailingNewline
+    trimTrailingNewline,
   })
 }
 
 export const getBlankFileState = (tabs, defaultEncoding = 'utf8', lineEnding = 'lf', markdown = '') => {
   const fileState = cloneObj(defaultFileState, true)
-  let untitleId = Math.max(...tabs.map(f => {
-    if (f.pathname === '') {
-      return +f.filename.split('-')[1]
-    } else {
-      return 0
-    }
-  }), 0)
+  let untitleId = Math.max(
+    ...tabs.map((f) => {
+      if (f.pathname === '') {
+        return +f.filename.split('-')[1]
+      } else {
+        return 0
+      }
+    }),
+    0,
+  )
 
   const id = getUniqueId()
 
@@ -94,7 +89,7 @@ export const getBlankFileState = (tabs, defaultEncoding = 'utf8', lineEnding = '
     adjustLineEndingOnSave: lineEnding.toLowerCase() === 'crlf',
     id,
     filename: `Untitled-${++untitleId}`,
-    markdown
+    markdown,
   })
 }
 
@@ -114,7 +109,7 @@ export const getSingleFileState = ({ id = getUniqueId(), markdown, filename, pat
     encoding,
     lineEnding,
     adjustLineEndingOnSave,
-    trimTrailingNewline
+    trimTrailingNewline,
   })
 }
 
@@ -135,7 +130,7 @@ export const createDocumentState = (markdownDocument, id = getUniqueId()) => {
     lineEnding,
     adjustLineEndingOnSave,
     trimTrailingNewline,
-    cursor = null
+    cursor = null,
   } = markdownDocument
 
   assertLineEnding(adjustLineEndingOnSave, lineEnding)
@@ -149,14 +144,13 @@ export const createDocumentState = (markdownDocument, id = getUniqueId()) => {
     lineEnding,
     cursor,
     adjustLineEndingOnSave,
-    trimTrailingNewline
+    trimTrailingNewline,
   })
 }
 
 const assertLineEnding = (adjustLineEndingOnSave, lineEnding) => {
   lineEnding = lineEnding.toLowerCase()
-  if ((adjustLineEndingOnSave && lineEnding !== 'crlf') ||
-    (!adjustLineEndingOnSave && lineEnding === 'crlf')) {
+  if ((adjustLineEndingOnSave && lineEnding !== 'crlf') || (!adjustLineEndingOnSave && lineEnding === 'crlf')) {
     console.error('Assertion failed: Line ending is "CRLF" but document is saved as "LF".')
   }
 }

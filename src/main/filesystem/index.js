@@ -1,5 +1,5 @@
 import fs from 'fs-extra'
-import path from 'path'
+import path from 'node:path'
 import { isDirectory, isFile, isSymbolicLink } from 'common/filesystem'
 
 /**
@@ -9,7 +9,7 @@ import { isDirectory, isFile, isSymbolicLink } from 'common/filesystem'
  * @returns {string} Returns the absolute path and resolved link. If the link target
  *                   cannot be resolved, an empty string is returned.
  */
-export const normalizeAndResolvePath = pathname => {
+export const normalizeAndResolvePath = (pathname) => {
   if (isSymbolicLink(pathname)) {
     const absPath = path.dirname(pathname)
     const targetPath = path.resolve(absPath, fs.readlinkSync(pathname))

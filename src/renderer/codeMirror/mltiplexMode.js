@@ -1,12 +1,12 @@
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
-const multiplexMode = CodeMirror => {
+const multiplexMode = (CodeMirror) => {
   CodeMirror.multiplexingMode = function (outer /*, others */) {
     // Others should be {open, close, mode [, delimStyle] [, innerStyle]} objects
     const others = Array.prototype.slice.call(arguments, 1)
 
-    function indexOf (string, pattern, from, returnEnd) {
+    function indexOf(string, pattern, from, returnEnd) {
       if (typeof pattern === 'string') {
         const found = string.indexOf(pattern, from)
         return returnEnd && found > -1 ? found + pattern.length : found
@@ -16,23 +16,23 @@ const multiplexMode = CodeMirror => {
     }
 
     return {
-      startState () {
+      startState() {
         return {
           outer: CodeMirror.startState(outer),
           innerActive: null,
-          inner: null
+          inner: null,
         }
       },
 
-      copyState (state) {
+      copyState(state) {
         return {
           outer: CodeMirror.copyState(outer, state.outer),
           innerActive: state.innerActive,
-          inner: state.innerActive && CodeMirror.copyState(state.innerActive.mode, state.inner)
+          inner: state.innerActive && CodeMirror.copyState(state.innerActive.mode, state.inner),
         }
       },
 
-      token (stream, state) {
+      token(stream, state) {
         if (!state.innerActive) {
           let cutOff = Infinity
           const oldContent = stream.string
@@ -51,7 +51,7 @@ const multiplexMode = CodeMirror => {
               }
 
               state.inner = CodeMirror.startState(other.mode, outerIndent)
-              return other.delimStyle && (other.delimStyle + ' ' + other.delimStyle + '-open')
+              return other.delimStyle && `${other.delimStyle} ${other.delimStyle}-open`
             } else if (found !== -1 && found < cutOff) {
               cutOff = found
             }
@@ -71,7 +71,7 @@ const multiplexMode = CodeMirror => {
           if (found === stream.pos && !curInner.parseDelimiters) {
             stream.match(curInner.close)
             state.innerActive = state.inner = null
-            return curInner.delimStyle && (curInner.delimStyle + ' ' + curInner.delimStyle + '-close')
+            return curInner.delimStyle && `${curInner.delimStyle} ${curInner.delimStyle}-close`
           }
           if (found > -1) stream.string = oldContent.slice(0, found)
           let innerToken = curInner.mode.token(stream, state.inner)
@@ -82,7 +82,7 @@ const multiplexMode = CodeMirror => {
           }
 
           if (curInner.innerStyle) {
-            if (innerToken) innerToken = innerToken + ' ' + curInner.innerStyle
+            if (innerToken) innerToken = `${innerToken} ${curInner.innerStyle}`
             else innerToken = curInner.innerStyle
           }
 
@@ -90,13 +90,13 @@ const multiplexMode = CodeMirror => {
         }
       },
 
-      indent (state, textAfter) {
+      indent(state, textAfter) {
         const mode = state.innerActive ? state.innerActive.mode : outer
         if (!mode.indent) return CodeMirror.Pass
         return mode.indent(state.innerActive ? state.inner : state.outer, textAfter)
       },
 
-      blankLine (state) {
+      blankLine(state) {
         const mode = state.innerActive ? state.innerActive.mode : outer
         if (mode.blankLine) {
           mode.blankLine(state.innerActive ? state.inner : state.outer)
@@ -116,9 +116,9 @@ const multiplexMode = CodeMirror => {
 
       electricChars: outer.electricChars,
 
-      innerMode (state) {
+      innerMode(state) {
         return state.inner ? { state: state.inner, mode: state.innerActive.mode } : { state: state.outer, mode: outer }
-      }
+      },
     }
   }
 }

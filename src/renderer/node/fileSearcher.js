@@ -1,9 +1,9 @@
-import { spawn } from 'child_process'
+import { spawn } from 'node:child_process'
 import RipgrepDirectorySearcher from './ripgrepSearcher'
 
 // Use ripgrep searcher to search for files on disk only.
 class FileSearcher extends RipgrepDirectorySearcher {
-  searchInDirectory (directoryPath, pattern, options, numPathsFound) {
+  searchInDirectory(directoryPath, _pattern, options, numPathsFound) {
     const args = ['--files']
 
     if (options.followSymlinks) {
@@ -27,7 +27,7 @@ class FileSearcher extends RipgrepDirectorySearcher {
     try {
       child = spawn(this.rgPath, args, {
         cwd: directoryPath,
-        stdio: ['pipe', 'pipe', 'pipe']
+        stdio: ['pipe', 'pipe', 'pipe'],
       })
     } catch (err) {
       return Promise.reject(err)
@@ -40,7 +40,7 @@ class FileSearcher extends RipgrepDirectorySearcher {
       let buffer = ''
       let bufferError = ''
 
-      child.on('close', (code, signal) => {
+      child.on('close', (code, _signal) => {
         // code 1 is used when no results are found.
         if (code !== null && code > 1) {
           reject(new Error(bufferError))
@@ -48,15 +48,15 @@ class FileSearcher extends RipgrepDirectorySearcher {
           resolve()
         }
       })
-      child.on('error', err => {
+      child.on('error', (err) => {
         reject(err)
       })
 
-      child.stderr.on('data', chunk => {
+      child.stderr.on('data', (chunk) => {
         bufferError += chunk
       })
 
-      child.stdout.on('data', chunk => {
+      child.stdout.on('data', (chunk) => {
         if (cancelled) {
           return
         }

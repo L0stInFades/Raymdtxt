@@ -124,7 +124,7 @@ import {
   preferHeadingStyleOptions,
   listIndentationOptions,
   frontmatterTypeOptions,
-  sequenceThemeOptions
+  sequenceThemeOptions,
 } from './config'
 
 export default {
@@ -132,9 +132,9 @@ export default {
     Compound,
     Separator,
     Bool,
-    CurSelect
+    CurSelect,
   },
-  data () {
+  data() {
     this.bulletListMarkerOptions = bulletListMarkerOptions
     this.orderListDelimiterOptions = orderListDelimiterOptions
     this.preferHeadingStyleOptions = preferHeadingStyleOptions
@@ -145,24 +145,24 @@ export default {
   },
   computed: {
     ...mapState({
-      preferLooseListItem: state => state.preferences.preferLooseListItem,
-      bulletListMarker: state => state.preferences.bulletListMarker,
-      orderListDelimiter: state => state.preferences.orderListDelimiter,
-      preferHeadingStyle: state => state.preferences.preferHeadingStyle,
-      listIndentation: state => state.preferences.listIndentation,
-      frontmatterType: state => state.preferences.frontmatterType,
-      superSubScript: state => state.preferences.superSubScript,
-      footnote: state => state.preferences.footnote,
-      isHtmlEnabled: state => state.preferences.isHtmlEnabled,
-      isGitlabCompatibilityEnabled: state => state.preferences.isGitlabCompatibilityEnabled,
-      sequenceTheme: state => state.preferences.sequenceTheme
-    })
+      preferLooseListItem: (state) => state.preferences.preferLooseListItem,
+      bulletListMarker: (state) => state.preferences.bulletListMarker,
+      orderListDelimiter: (state) => state.preferences.orderListDelimiter,
+      preferHeadingStyle: (state) => state.preferences.preferHeadingStyle,
+      listIndentation: (state) => state.preferences.listIndentation,
+      frontmatterType: (state) => state.preferences.frontmatterType,
+      superSubScript: (state) => state.preferences.superSubScript,
+      footnote: (state) => state.preferences.footnote,
+      isHtmlEnabled: (state) => state.preferences.isHtmlEnabled,
+      isGitlabCompatibilityEnabled: (state) => state.preferences.isGitlabCompatibilityEnabled,
+      sequenceTheme: (state) => state.preferences.sequenceTheme,
+    }),
   },
   methods: {
-    onSelectChange (type, value) {
+    onSelectChange(type, value) {
       this.$store.dispatch('SET_SINGLE_PREFERENCE', { type, value })
-    }
-  }
+    },
+  },
 }
 </script>
 

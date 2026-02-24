@@ -40,11 +40,11 @@
 import {
   isCompositionEvent,
   isValidElectronAccelerator,
-  getAcceleratorFromKeyboardEvent
+  getAcceleratorFromKeyboardEvent,
 } from '@hfelix/electron-localshortcut'
 
 export default {
-  data () {
+  data() {
     this.needCommitOnClose = true
     this.currentKeybinding = null
     this.defaultPlaceholderText = 'Press a key combination'
@@ -52,7 +52,7 @@ export default {
       showKeyInputDialog: false,
       placeholderText: this.defaultPlaceholderText,
       isKeybindingValid: true,
-      keybindingInputValue: ''
+      keybindingInputValue: '',
     }
   },
 
@@ -60,8 +60,8 @@ export default {
     onCommit: Function,
     showWithId: {
       type: String,
-      default: null
-    }
+      default: null,
+    },
   },
 
   watch: {
@@ -73,24 +73,24 @@ export default {
           this.cancelKeybinding()
         }
       }
-    }
+    },
   },
 
   methods: {
-    handleShow () {
+    handleShow() {
       this.needCommitOnClose = true
       this.showKeyInputDialog = true
       this.$nextTick(() => {
         this.$refs.intputTextbox.focus()
       })
     },
-    handleDialogClose () {
+    handleDialogClose() {
       this.currentKeybinding = null
       this.isKeybindingValid = true
       this.keybindingInputValue = ''
       this.showKeyInputDialog = false
     },
-    handleKeyDown (event) {
+    handleKeyDown(event) {
       event.preventDefault()
       event.stopPropagation()
       if (isCompositionEvent(event)) {
@@ -110,11 +110,11 @@ export default {
       this.isKeybindingValid = keybinding.isValid && isValidElectronAccelerator(keybinding.accelerator)
       this.keybindingInputValue = keybinding.accelerator
     },
-    handleKeyUp (event) {
+    handleKeyUp(event) {
       event.preventDefault()
       event.stopPropagation()
     },
-    cancelKeybinding () {
+    cancelKeybinding() {
       // Don't commit twice if the user clicks on the background.
       if (this.needCommitOnClose) {
         this.needCommitOnClose = false
@@ -122,7 +122,7 @@ export default {
         this.handleDialogClose()
       }
     },
-    saveKeybinding () {
+    saveKeybinding() {
       if (!this.currentKeybinding) {
         this.cancelKeybinding()
         return
@@ -138,11 +138,11 @@ export default {
       this.onCommit(accelerator)
       this.handleDialogClose()
     },
-    isRawKeyCode (event, keyCode) {
+    isRawKeyCode(event, keyCode) {
       const { code, ctrlKey, altKey, shiftKey, metaKey } = event
       return event && code === keyCode && !ctrlKey && !altKey && !shiftKey && !metaKey
-    }
-  }
+    },
+  },
 }
 </script>
 

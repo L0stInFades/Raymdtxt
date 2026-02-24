@@ -1,7 +1,6 @@
 import './globalSetting'
-import path from 'path'
+import path from 'node:path'
 import { app, dialog } from 'electron'
-import { initialize as remoteInitializeServer } from '@electron/remote/main'
 import cli from './cli'
 import setupExceptionHandler, { initExceptionLogger } from './exceptionHandler'
 import log from 'electron-log'
@@ -9,8 +8,9 @@ import App from './app'
 import Accessor from './app/accessor'
 import setupEnvironment from './app/env'
 import { getLogLevel } from './utils'
+import { registerWindowBridgeHandlers } from './ipc/windowBridge'
 
-const initializeLogger = appEnvironment => {
+const initializeLogger = (appEnvironment) => {
   log.transports.console.level = process.env.NODE_ENV === 'development' ? 'info' : 'error'
   log.transports.rendererConsole = null
   log.transports.file.resolvePath = () => path.join(appEnvironment.paths.logPath, 'main.log')
@@ -23,7 +23,9 @@ const initializeLogger = appEnvironment => {
 
 // NOTE: We only support Linux, macOS and Windows but not BSD nor SunOS.
 if (!/^(darwin|win32|linux)$/i.test(process.platform)) {
-  process.stdout.write(`Operating system "${process.platform}" is not supported! Please open an issue at "https://github.com/marktext/marktext".\n`)
+  process.stdout.write(
+    `Operating system "${process.platform}" is not supported! Please open an issue at "https://github.com/marktext/marktext".\n`,
+  )
   process.exit(1)
 }
 
@@ -61,10 +63,7 @@ try {
   const EXIT_ON_ERROR = !!process.env.MARKTEXT_EXIT_ON_ERROR
   const SHOW_ERROR_DIALOG = !process.env.MARKTEXT_ERROR_INTERACTION
   if (!EXIT_ON_ERROR && SHOW_ERROR_DIALOG) {
-    dialog.showErrorBox(
-      'There was an error during loading',
-      `${msgHint}${err.message}\n\n${err.stack}`
-    )
+    dialog.showErrorBox('There was an error during loading', `${msgHint}${err.message}\n\n${err.stack}`)
   }
   process.exit(1)
 }
@@ -76,9 +75,8 @@ log.transports.file.sync = false
 // Be careful when changing code before this line!
 // NOTE: Do not create classes or other code before this line!
 
-// TODO: We should switch to another async API like https://nornagon.medium.com/electrons-remote-module-considered-harmful-70d69500f31.
-// Enable remote module
-remoteInitializeServer()
+// Register IPC handlers for preload bridge (replaces @electron/remote)
+registerWindowBridgeHandlers()
 
 const marktext = new App(accessor, args)
 marktext.init()

@@ -1,4 +1,3 @@
-import { ipcRenderer } from 'electron'
 import bus from '../bus'
 
 // user preference
@@ -90,79 +89,79 @@ const state = {
     github: {
       owner: '',
       repo: '',
-      branch: ''
-    }
+      branch: '',
+    },
   },
-  cliScript: ''
+  cliScript: '',
 }
 
 const getters = {}
 
 const mutations = {
-  SET_USER_PREFERENCE (state, preference) {
-    Object.keys(preference).forEach(key => {
+  SET_USER_PREFERENCE(state, preference) {
+    Object.keys(preference).forEach((key) => {
       if (typeof preference[key] !== 'undefined' && typeof state[key] !== 'undefined') {
         state[key] = preference[key]
       }
     })
   },
-  SET_MODE (state, { type, checked }) {
+  SET_MODE(state, { type, checked }) {
     state[type] = checked
   },
-  TOGGLE_VIEW_MODE (state, entryName) {
+  TOGGLE_VIEW_MODE(state, entryName) {
     state[entryName] = !state[entryName]
-  }
+  },
 }
 
 const actions = {
-  ASK_FOR_USER_PREFERENCE ({ commit }) {
-    ipcRenderer.send('mt::ask-for-user-preference')
-    ipcRenderer.send('mt::ask-for-user-data')
+  ASK_FOR_USER_PREFERENCE({ commit }) {
+    window.api.ipc.send('mt::ask-for-user-preference')
+    window.api.ipc.send('mt::ask-for-user-data')
 
-    ipcRenderer.on('mt::user-preference', (e, preferences) => {
+    window.api.ipc.on('mt::user-preference', (preferences) => {
       commit('SET_USER_PREFERENCE', preferences)
     })
   },
 
-  SET_SINGLE_PREFERENCE ({ commit }, { type, value }) {
+  SET_SINGLE_PREFERENCE({ commit }, { type, value }) {
     // save to electron-store
-    ipcRenderer.send('mt::set-user-preference', { [type]: value })
+    window.api.ipc.send('mt::set-user-preference', { [type]: value })
   },
 
-  SET_USER_DATA ({ commit }, { type, value }) {
-    ipcRenderer.send('mt::set-user-data', { [type]: value })
+  SET_USER_DATA({ commit }, { type, value }) {
+    window.api.ipc.send('mt::set-user-data', { [type]: value })
   },
 
-  SET_IMAGE_FOLDER_PATH ({ commit }, value) {
-    ipcRenderer.send('mt::ask-for-modify-image-folder-path', value)
+  SET_IMAGE_FOLDER_PATH({ commit }, value) {
+    window.api.ipc.send('mt::ask-for-modify-image-folder-path', value)
   },
 
-  SELECT_DEFAULT_DIRECTORY_TO_OPEN ({ commit }) {
-    ipcRenderer.send('mt::select-default-directory-to-open')
+  SELECT_DEFAULT_DIRECTORY_TO_OPEN({ commit }) {
+    window.api.ipc.send('mt::select-default-directory-to-open')
   },
 
-  LISTEN_FOR_VIEW ({ commit, dispatch }) {
-    ipcRenderer.on('mt::show-command-palette', () => {
+  LISTEN_FOR_VIEW({ commit, dispatch }) {
+    window.api.ipc.on('mt::show-command-palette', () => {
       bus.$emit('show-command-palette')
     })
-    ipcRenderer.on('mt::toggle-view-mode-entry', (event, entryName) => {
+    window.api.ipc.on('mt::toggle-view-mode-entry', (entryName) => {
       commit('TOGGLE_VIEW_MODE', entryName)
       dispatch('DISPATCH_EDITOR_VIEW_STATE', { [entryName]: state[entryName] })
     })
   },
 
   // Toggle a view option and notify main process to toggle menu item.
-  LISTEN_TOGGLE_VIEW ({ commit, dispatch, state }) {
-    bus.$on('view:toggle-view-entry', entryName => {
+  LISTEN_TOGGLE_VIEW({ commit, dispatch, state }) {
+    bus.$on('view:toggle-view-entry', (entryName) => {
       commit('TOGGLE_VIEW_MODE', entryName)
       dispatch('DISPATCH_EDITOR_VIEW_STATE', { [entryName]: state[entryName] })
     })
   },
 
-  DISPATCH_EDITOR_VIEW_STATE (_, viewState) {
+  DISPATCH_EDITOR_VIEW_STATE(_, viewState) {
     const { windowId } = global.marktext.env
-    ipcRenderer.send('mt::view-layout-changed', windowId, viewState)
-  }
+    window.api.ipc.send('mt::view-layout-changed', windowId, viewState)
+  },
 }
 
 const preferences = { state, getters, mutations, actions }

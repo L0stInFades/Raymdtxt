@@ -178,7 +178,7 @@ import {
   endOfLineOptions,
   textDirectionOptions,
   trimTrailingNewlineOptions,
-  getDefaultEncodingOptions
+  getDefaultEncodingOptions,
 } from './config'
 
 export default {
@@ -189,9 +189,9 @@ export default {
     CurSelect,
     Bool,
     Separator,
-    TextBox
+    TextBox,
   },
-  data () {
+  data() {
     this.tabSizeOptions = tabSizeOptions
     this.endOfLineOptions = endOfLineOptions
     this.textDirectionOptions = textDirectionOptions
@@ -201,33 +201,33 @@ export default {
   },
   computed: {
     ...mapState({
-      fontSize: state => state.preferences.fontSize,
-      editorFontFamily: state => state.preferences.editorFontFamily,
-      lineHeight: state => state.preferences.lineHeight,
-      autoPairBracket: state => state.preferences.autoPairBracket,
-      autoPairMarkdownSyntax: state => state.preferences.autoPairMarkdownSyntax,
-      autoPairQuote: state => state.preferences.autoPairQuote,
-      tabSize: state => state.preferences.tabSize,
-      endOfLine: state => state.preferences.endOfLine,
-      textDirection: state => state.preferences.textDirection,
-      codeFontSize: state => state.preferences.codeFontSize,
-      codeFontFamily: state => state.preferences.codeFontFamily,
-      codeBlockLineNumbers: state => state.preferences.codeBlockLineNumbers,
-      trimUnnecessaryCodeBlockEmptyLines: state => state.preferences.trimUnnecessaryCodeBlockEmptyLines,
-      hideQuickInsertHint: state => state.preferences.hideQuickInsertHint,
-      hideLinkPopup: state => state.preferences.hideLinkPopup,
-      autoCheck: state => state.preferences.autoCheck,
-      editorLineWidth: state => state.preferences.editorLineWidth,
-      defaultEncoding: state => state.preferences.defaultEncoding,
-      autoGuessEncoding: state => state.preferences.autoGuessEncoding,
-      trimTrailingNewline: state => state.preferences.trimTrailingNewline
-    })
+      fontSize: (state) => state.preferences.fontSize,
+      editorFontFamily: (state) => state.preferences.editorFontFamily,
+      lineHeight: (state) => state.preferences.lineHeight,
+      autoPairBracket: (state) => state.preferences.autoPairBracket,
+      autoPairMarkdownSyntax: (state) => state.preferences.autoPairMarkdownSyntax,
+      autoPairQuote: (state) => state.preferences.autoPairQuote,
+      tabSize: (state) => state.preferences.tabSize,
+      endOfLine: (state) => state.preferences.endOfLine,
+      textDirection: (state) => state.preferences.textDirection,
+      codeFontSize: (state) => state.preferences.codeFontSize,
+      codeFontFamily: (state) => state.preferences.codeFontFamily,
+      codeBlockLineNumbers: (state) => state.preferences.codeBlockLineNumbers,
+      trimUnnecessaryCodeBlockEmptyLines: (state) => state.preferences.trimUnnecessaryCodeBlockEmptyLines,
+      hideQuickInsertHint: (state) => state.preferences.hideQuickInsertHint,
+      hideLinkPopup: (state) => state.preferences.hideLinkPopup,
+      autoCheck: (state) => state.preferences.autoCheck,
+      editorLineWidth: (state) => state.preferences.editorLineWidth,
+      defaultEncoding: (state) => state.preferences.defaultEncoding,
+      autoGuessEncoding: (state) => state.preferences.autoGuessEncoding,
+      trimTrailingNewline: (state) => state.preferences.trimTrailingNewline,
+    }),
   },
   methods: {
-    onSelectChange (type, value) {
+    onSelectChange(type, value) {
       this.$store.dispatch('SET_SINGLE_PREFERENCE', { type, value })
-    }
-  }
+    },
+  },
 }
 </script>
 

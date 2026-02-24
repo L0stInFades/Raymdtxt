@@ -56,14 +56,14 @@ import loading from '../loading'
 
 export default {
   components: {
-    loading
+    loading,
   },
   computed: {
     ...mapState({
-      rootCommand: state => state.commandCenter.rootCommand
-    })
+      rootCommand: (state) => state.commandCenter.rootCommand,
+    }),
   },
-  data () {
+  data() {
     this.currentCommand = null
     this.defaultPlaceholderText = 'Type a command to execute'
     return {
@@ -72,21 +72,22 @@ export default {
       query: '',
       selectedCommandIndex: -1,
       availableCommands: [],
-      searcherBusy: false
+      searcherBusy: false,
     }
   },
-  created () {
+  created() {
     this.$nextTick(() => {
       bus.$on('show-command-palette', this.handleShow)
     })
   },
-  beforeDestroy () {
+  beforeDestroy() {
     bus.$off('show-command-palette', this.handleShow)
   },
   methods: {
-    handleShow (command) {
+    handleShow(command) {
       this.currentCommand = command || this.rootCommand
-      this.currentCommand.run()
+      this.currentCommand
+        .run()
         .then(() => {
           this.availableCommands = this.currentCommand.subcommands
           this.selectedCommandIndex = this.currentCommand.subcommandSelectedIndex
@@ -107,14 +108,14 @@ export default {
             }
           })
         })
-        .catch(error => {
+        .catch((error) => {
           // Allow to throw new Error(null) to indicate an invalid state.
-          if (error && error.message) {
+          if (error?.message) {
             log.error('Unable to initialize command:', error)
           }
         })
     },
-    handleDialogClose () {
+    handleDialogClose() {
       // Reset all settings
       this.selectedCommandIndex = -1
       this.query = ''
@@ -124,7 +125,7 @@ export default {
       }
       this.currentCommand = null
     },
-    handleBeforeInput (event) {
+    handleBeforeInput(event) {
       const { availableCommands, selectedCommandIndex } = this
       switch (event.key) {
         case 'ArrowUp': {
@@ -159,7 +160,7 @@ export default {
         }
       }
     },
-    handleInput (event) {
+    handleInput(event) {
       if (event.isComposing) {
         return
       }
@@ -189,7 +190,7 @@ export default {
         }
       }
     },
-    search (commandId = null) {
+    search(commandId = null) {
       const { availableCommands, selectedCommandIndex } = this
       if (commandId) {
         // Command selected from dropdown.
@@ -204,22 +205,23 @@ export default {
       // Otherwise update list
       this.updateCommands()
     },
-    updateCommands () {
+    updateCommands() {
       const { currentCommand, query } = this
       const queryString = query.trim()
 
       // Allow to handle search result by command (e.g. quick search).
       if (currentCommand.search) {
         this.searcherBusy = true
-        currentCommand.search(queryString)
-          .then(result => {
+        currentCommand
+          .search(queryString)
+          .then((result) => {
             this.searcherBusy = false
             this.availableCommands = result || []
             this.selectedCommandIndex = this.availableCommands.length ? 0 : -1
           })
-          .catch(error => {
+          .catch((error) => {
             // The query was cancel or restarted if `message` is null.
-            if (error && error.message) {
+            if (error?.message) {
               this.searcherBusy = false
               this.availableCommands = []
               this.selectedCommandIndex = -1
@@ -233,14 +235,15 @@ export default {
       if (!queryString) {
         this.availableCommands = currentCommand.subcommands
       } else {
-        this.availableCommands = currentCommand.subcommands
-          .filter(c => c.description.toLowerCase().indexOf(queryString.toLowerCase()) !== -1)
+        this.availableCommands = currentCommand.subcommands.filter(
+          (c) => c.description.toLowerCase().indexOf(queryString.toLowerCase()) !== -1,
+        )
       }
       this.selectedCommandIndex = this.availableCommands.length ? 0 : -1
     },
-    executeCommand (commandId) {
+    executeCommand(commandId) {
       const { availableCommands, currentCommand } = this
-      const command = availableCommands.find(c => c.id === commandId)
+      const command = availableCommands.find((c) => c.id === commandId)
       if (!command) {
         log.error(`Cannot find command "${commandId}".`)
         return
@@ -266,8 +269,8 @@ export default {
           execute()
         }
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

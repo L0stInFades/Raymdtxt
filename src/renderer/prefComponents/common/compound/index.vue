@@ -14,11 +14,10 @@
 </template>
 
 <script>
-
 export default {
   props: {
-    notes: String
-  }
+    notes: String,
+  },
 }
 </script>
 

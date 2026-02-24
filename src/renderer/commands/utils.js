@@ -1,4 +1,4 @@
-import path from 'path'
+import path from 'node:path'
 import { isFile } from 'common/filesystem'
 
 /// Check whether the package is updatable at runtime.

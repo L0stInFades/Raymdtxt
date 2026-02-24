@@ -7,7 +7,7 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import { app, clipboard, crashReporter, dialog, ipcMain } from 'electron'
-import os from 'os'
+import os from 'node:os'
 import log from 'electron-log'
 import { createAndOpenGitHubIssueUrl } from './utils/createGitHubIssue'
 
@@ -16,7 +16,7 @@ const SHOW_ERROR_DIALOG = !process.env.MARKTEXT_ERROR_INTERACTION
 const ERROR_MSG_MAIN = 'An unexpected error occurred in the main process'
 const ERROR_MSG_RENDERER = 'An unexpected error occurred in the renderer process'
 
-let logger = s => console.error(s)
+let logger = (s) => console.error(s)
 
 const getOSInformation = () => {
   return `${os.type()} ${os.arch()} ${os.release()} (${os.platform()})`
@@ -24,12 +24,14 @@ const getOSInformation = () => {
 
 const exceptionToString = (error, type) => {
   const { message, stack } = error
-  return `Version: ${global.MARKTEXT_VERSION_STRING || app.getVersion()}\n` +
+  return (
+    `Version: ${global.MARKTEXT_VERSION_STRING || app.getVersion()}\n` +
     `OS: ${getOSInformation()}\n` +
     `Type: ${type}\n` +
     `Date: ${new Date().toUTCString()}\n` +
     `Message: ${message}\n` +
     `Stack: ${stack}\n`
+  )
 }
 
 const handleError = async (title, error, type) => {
@@ -54,15 +56,11 @@ const handleError = async (title, error, type) => {
     // Blocking message box
     const { response } = await dialog.showMessageBox({
       type: 'error',
-      buttons: [
-        'OK',
-        'Copy Error',
-        'Report...'
-      ],
+      buttons: ['OK', 'Copy Error', 'Report...'],
       defaultId: 0,
       noLink: true,
       message: title,
-      detail: stack
+      detail: stack,
     })
 
     switch (response) {
@@ -87,7 +85,8 @@ ${title}.
 ### Version
 
 MarkText: ${global.MARKTEXT_VERSION_STRING}
-Operating system: ${getOSInformation()}`)
+Operating system: ${getOSInformation()}`,
+        )
         break
       }
     }
@@ -100,12 +99,12 @@ Operating system: ${getOSInformation()}`)
 
 const setupExceptionHandler = () => {
   // main process error handler
-  process.on('uncaughtException', error => {
+  process.on('uncaughtException', (error) => {
     handleError(ERROR_MSG_MAIN, error, 'main')
   })
 
   // renderer process error handler
-  ipcMain.on('mt::handle-renderer-error', (e, error) => {
+  ipcMain.on('mt::handle-renderer-error', (_e, error) => {
     handleError(ERROR_MSG_RENDERER, error, 'renderer')
   })
 
@@ -115,7 +114,7 @@ const setupExceptionHandler = () => {
     productName: 'marktext',
     submitURL: 'http://0.0.0.0/',
     uploadToServer: false,
-    compress: true
+    compress: true,
   })
 }
 

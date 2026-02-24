@@ -91,41 +91,39 @@ import FolderIcon from '@/assets/icons/undraw_folder.svg'
 
 export default {
   mixins: [createFileOrDirectoryMixins],
-  data () {
+  data() {
     this.depth = 0
     this.FolderIcon = FolderIcon
     return {
       showDirectories: true,
       showNewInput: false,
       showOpenedFiles: true,
-      createName: ''
+      createName: '',
     }
   },
   props: {
     projectTree: {
-      validator: function (value) {
-        return typeof value === 'object'
-      },
-      required: true
+      validator: (value) => typeof value === 'object',
+      required: true,
     },
     openedFiles: Array,
-    tabs: Array
+    tabs: Array,
   },
   components: {
     Folder,
     File,
-    OpenedFile
+    OpenedFile,
   },
   computed: {
     ...mapState({
-      createCache: state => state.project.createCache
-    })
+      createCache: (state) => state.project.createCache,
+    }),
   },
-  created () {
+  created() {
     this.$nextTick(() => {
       bus.$on('SIDEBAR::show-new-input', this.handleInputFocus)
       // hide rename or create input if needed
-      document.addEventListener('click', event => {
+      document.addEventListener('click', (event) => {
         const target = event.target
         if (target.tagName !== 'INPUT') {
           this.$store.dispatch('CHANGE_ACTIVE_ITEM', {})
@@ -133,14 +131,14 @@ export default {
           this.$store.commit('SET_RENAME_CACHE', null)
         }
       })
-      document.addEventListener('contextmenu', event => {
+      document.addEventListener('contextmenu', (event) => {
         const target = event.target
         if (target.tagName !== 'INPUT') {
           this.$store.commit('CREATE_PATH', {})
           this.$store.commit('SET_RENAME_CACHE', null)
         }
       })
-      document.addEventListener('keydown', event => {
+      document.addEventListener('keydown', (event) => {
         if (event.key === 'Escape') {
           this.$store.commit('CREATE_PATH', {})
           this.$store.commit('SET_RENAME_CACHE', null)
@@ -149,23 +147,23 @@ export default {
     })
   },
   methods: {
-    openFolder () {
+    openFolder() {
       this.$store.dispatch('ASK_FOR_OPEN_PROJECT')
     },
-    saveAll (isClose) {
+    saveAll(isClose) {
       this.$store.dispatch('ASK_FOR_SAVE_ALL', isClose)
     },
-    createFile () {
+    createFile() {
       this.$store.dispatch('CHANGE_ACTIVE_ITEM', this.projectTree)
       bus.$emit('SIDEBAR::new', 'file')
     },
-    toggleOpenedFiles () {
+    toggleOpenedFiles() {
       this.showOpenedFiles = !this.showOpenedFiles
     },
-    toggleDirectories () {
+    toggleDirectories() {
       this.showDirectories = !this.showDirectories
-    }
-  }
+    },
+  },
 }
 </script>
 

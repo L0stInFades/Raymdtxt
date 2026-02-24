@@ -5,78 +5,78 @@ const typewriterModeMenuItemId = 'typewriterModeMenuItem'
 const focusModeMenuItemId = 'focusModeMenuItem'
 
 const toggleTypeMode = (win, type) => {
-  if (win && win.webContents) {
+  if (win?.webContents) {
     win.webContents.send('mt::toggle-view-mode-entry', type)
   }
 }
 
 const setLayout = (win, type, value) => {
-  if (win && win.webContents) {
+  if (win?.webContents) {
     win.webContents.send('mt::set-view-layout', { [type]: value })
   }
 }
 
 const toggleLayout = (win, type) => {
-  if (win && win.webContents) {
+  if (win?.webContents) {
     win.webContents.send('mt::toggle-view-layout-entry', type)
   }
 }
 
-export const debugToggleDevTools = win => {
+export const debugToggleDevTools = (win) => {
   if (win && global.MARKTEXT_DEBUG) {
     win.webContents.toggleDevTools()
   }
 }
 
-export const debugReloadWindow = win => {
+export const debugReloadWindow = (win) => {
   if (win && global.MARKTEXT_DEBUG) {
     ipcMain.emit('window-reload-by-id', win.id)
   }
 }
 
-export const showCommandPalette = win => {
-  if (win && win.webContents) {
+export const showCommandPalette = (win) => {
+  if (win?.webContents) {
     win.webContents.send('mt::show-command-palette')
   }
 }
 
-export const toggleFocusMode = win => {
+export const toggleFocusMode = (win) => {
   toggleTypeMode(win, 'focus')
 }
 
-export const toggleSourceCodeMode = win => {
+export const toggleSourceCodeMode = (win) => {
   toggleTypeMode(win, 'sourceCode')
 }
 
-export const toggleSidebar = win => {
+export const toggleSidebar = (win) => {
   toggleLayout(win, 'showSideBar')
 }
 
-export const toggleTabBar = win => {
+export const toggleTabBar = (win) => {
   toggleLayout(win, 'showTabBar')
 }
 
-export const showTabBar = win => {
+export const showTabBar = (win) => {
   setLayout(win, 'showTabBar', true)
 }
 
-export const showTableOfContents = win => {
+export const showTableOfContents = (win) => {
   setLayout(win, 'rightColumn', 'toc')
 }
 
-export const toggleTypewriterMode = win => {
+export const toggleTypewriterMode = (win) => {
   toggleTypeMode(win, 'typewriter')
 }
 
-export const reloadImageCache = win => {
-  if (win && win.webContents) {
+export const reloadImageCache = (win) => {
+  if (win?.webContents) {
     win.webContents.send('mt::invalidate-image-cache')
   }
 }
 
 // --- Commands -------------------------------------------------------------
 
-export const loadViewCommands = commandManager => {
+export const loadViewCommands = (commandManager) => {
   commandManager.add(COMMANDS.VIEW_COMMAND_PALETTE, showCommandPalette)
   commandManager.add(COMMANDS.VIEW_FOCUS_MODE, toggleFocusMode)
   commandManager.add(COMMANDS.VIEW_FORCE_RELOAD_IMAGES, reloadImageCache)

@@ -1,4 +1,3 @@
-import { ipcRenderer } from 'electron'
 import { isOsx } from '@/util'
 
 /**
@@ -10,7 +9,7 @@ export class SpellChecker {
    *
    * @param {boolean} enabled Whether spell checking is enabled in settings.
    */
-  constructor (enabled = true, lang) {
+  constructor(enabled = true, lang) {
     this.enabled = enabled
     this.currentSpellcheckerLanguage = lang
 
@@ -22,7 +21,7 @@ export class SpellChecker {
   /**
    * Whether the spell checker is available and enabled.
    */
-  get isEnabled () {
+  get isEnabled() {
     return this.isProviderAvailable && this.enabled
   }
 
@@ -32,13 +31,13 @@ export class SpellChecker {
    * @param {string} lang The language to set.
    * @returns {Promise<boolean>}
    */
-  async activateSpellchecker (lang) {
+  async activateSpellchecker(lang) {
     try {
       this.enabled = true
       this.isProviderAvailable = true
       if (isOsx) {
         // No language string needed on macOS.
-        return await ipcRenderer.invoke('mt::spellchecker-set-enabled', true)
+        return await window.api.ipc.invoke('mt::spellchecker-set-enabled', true)
       }
       return await this.switchLanguage(lang || this.currentSpellcheckerLanguage)
     } catch (error) {
@@ -50,23 +49,23 @@ export class SpellChecker {
   /**
    * Disables the native spell checker.
    */
-  deactivateSpellchecker () {
+  deactivateSpellchecker() {
     this.enabled = false
     this.isProviderAvailable = false
-    ipcRenderer.invoke('mt::spellchecker-set-enabled', false)
+    window.api.ipc.invoke('mt::spellchecker-set-enabled', false)
   }
 
   /**
    * Return the current language.
    */
-  get lang () {
+  get lang() {
     if (this.isEnabled) {
       return this.currentSpellcheckerLanguage
     }
     return ''
   }
 
-  set lang (lang) {
+  set lang(lang) {
     this.currentSpellcheckerLanguage = lang
   }
 
@@ -78,14 +77,14 @@ export class SpellChecker {
    * @param {string} lang The language code
    * @returns {Promise<boolean>} Return the language on success or null.
    */
-  async switchLanguage (lang) {
+  async switchLanguage(lang) {
     if (isOsx) {
       // NB: On macOS the OS spell checker is used and will detect the language automatically.
       return true
     } else if (!lang) {
       throw new Error('Expected non-empty language for spell checker.')
     } else if (this.isEnabled) {
-      await ipcRenderer.invoke('mt::spellchecker-switch-language', lang)
+      await window.api.ipc.invoke('mt::spellchecker-switch-language', lang)
       this.lang = lang
       return true
     }
@@ -96,11 +95,11 @@ export class SpellChecker {
    * Returns a list of available dictionaries.
    * @returns {Promise<string[]>} Available dictionary languages.
    */
-  static async getAvailableDictionaries () {
+  static async getAvailableDictionaries() {
     if (isOsx) {
       // NB: On macOS the OS spell checker is used and will detect the language automatically.
       return []
     }
-    return ipcRenderer.invoke('mt::spellchecker-get-available-dictionaries')
+    return window.api.ipc.invoke('mt::spellchecker-get-available-dictionaries')
   }
 }

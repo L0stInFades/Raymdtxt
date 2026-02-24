@@ -6,19 +6,21 @@ import SettingIcon from '@/assets/icons/setting.svg'
 export const sideBarIcons = [
   {
     name: 'files',
-    icon: FilesIcon
-  }, {
+    icon: FilesIcon,
+  },
+  {
     name: 'search',
-    icon: SearchIcon
-  }, {
+    icon: SearchIcon,
+  },
+  {
     name: 'toc',
-    icon: TocIcon
-  }
+    icon: TocIcon,
+  },
 ]
 
 export const sideBarBottomIcons = [
   {
     name: 'settings',
-    icon: SettingIcon
-  }
+    icon: SettingIcon,
+  },
 ]

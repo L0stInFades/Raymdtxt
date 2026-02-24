@@ -1,10 +1,10 @@
 import { THEME_STYLE_ID, COMMON_STYLE_ID, DEFAULT_CODE_FONT_FAMILY, oneDarkThemes, railscastsThemes } from '../config'
 import { dark, graphite, materialDark, oneDark, ulysses } from './themeColor'
 import { isLinux } from './index'
-import elementStyle from 'element-ui/lib/theme-chalk/index.css'
+import elementStyle from 'element-ui/lib/theme-chalk/index.css?inline'
 
 const ORIGINAL_THEME = '#409EFF'
-const patchTheme = css => {
+const patchTheme = (css) => {
   return `@media not print {\n${css}\n}`
 }
 
@@ -14,12 +14,13 @@ const getEmojiPickerPatch = () => {
     : ''
 }
 
-const getThemeCluster = themeColor => {
+const getThemeCluster = (themeColor) => {
   const tintColor = (color, tint) => {
     let red = parseInt(color.slice(1, 3), 16)
     let green = parseInt(color.slice(3, 5), 16)
     let blue = parseInt(color.slice(5, 7), 16)
-    if (tint === 0) { // when primary color is in its rgb space
+    if (tint === 0) {
+      // when primary color is in its rgb space
       return [red, green, blue].join(',')
     } else {
       red += Math.round(tint * (255 - red))
@@ -32,21 +33,23 @@ const getThemeCluster = themeColor => {
     }
   }
 
-  const clusters = [{
-    color: themeColor,
-    variable: 'var(--themeColor)'
-  }]
+  const clusters = [
+    {
+      color: themeColor,
+      variable: 'var(--themeColor)',
+    },
+  ]
   for (let i = 9; i >= 1; i--) {
     clusters.push({
       color: tintColor(themeColor, Number((i / 10).toFixed(2))),
-      variable: `var(--themeColor${10 - i}0)`
+      variable: `var(--themeColor${10 - i}0)`,
     })
   }
 
   return clusters
 }
 
-export const addThemeStyle = theme => {
+export const addThemeStyle = (theme) => {
   const isCmRailscasts = railscastsThemes.includes(theme)
   const isCmOneDark = oneDarkThemes.includes(theme)
   const isDarkTheme = isCmOneDark || isCmRailscasts
@@ -103,7 +106,7 @@ export const addThemeStyle = theme => {
   }
 }
 
-export const setEditorWidth = value => {
+export const setEditorWidth = (value) => {
   const EDITOR_WIDTH_STYLE_ID = 'editor-width'
   let result = ''
   if (value && /^[0-9]+(?:ch|px|%)$/.test(value)) {
@@ -120,7 +123,7 @@ export const setEditorWidth = value => {
   styleEle.innerHTML = result
 }
 
-export const addCommonStyle = options => {
+export const addCommonStyle = (options) => {
   const { codeFontFamily, codeFontSize, hideScrollbar } = options
   let sheet = document.querySelector(`#${COMMON_STYLE_ID}`)
   if (!sheet) {
@@ -169,7 +172,7 @@ export const addElementStyle = () => {
 }
 
 // Append common sheet and theme at the end of head - order is important.
-export const addStyles = options => {
+export const addStyles = (options) => {
   const { theme } = options
   addThemeStyle(theme)
   addCommonStyle(options)

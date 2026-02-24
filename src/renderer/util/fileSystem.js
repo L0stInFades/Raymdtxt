@@ -1,24 +1,20 @@
-import path from 'path'
-import crypto from 'crypto'
+import path from 'node:path'
+import crypto from 'node:crypto'
 import fs from 'fs-extra'
-import { statSync, constants } from 'fs'
-import cp from 'child_process'
-import { tmpdir } from 'os'
+import { statSync, constants } from 'node:fs'
+import cp from 'node:child_process'
+import { tmpdir } from 'node:os'
 import dayjs from 'dayjs'
 import { Octokit } from '@octokit/rest'
 import { isImageFile } from 'common/filesystem/paths'
 import { isWindows } from './index'
 
 export const create = async (pathname, type) => {
-  return type === 'directory'
-    ? fs.ensureDir(pathname)
-    : fs.outputFile(pathname, '')
+  return type === 'directory' ? fs.ensureDir(pathname) : fs.outputFile(pathname, '')
 }
 
 export const paste = async ({ src, dest, type }) => {
-  return type === 'cut'
-    ? fs.move(src, dest)
-    : fs.copy(src, dest)
+  return type === 'cut' ? fs.move(src, dest) : fs.copy(src, dest)
 }
 
 export const rename = async (src, dest) => {
@@ -29,7 +25,7 @@ export const getHash = (content, encoding, type) => {
   return crypto.createHash(type).update(content, encoding).digest('hex')
 }
 
-export const getContentHash = content => {
+export const getContentHash = (content) => {
   return getHash(content, 'utf8', 'sha1')
 }
 
@@ -92,7 +88,7 @@ export const moveImageToFolder = async (pathname, image, outputDir) => {
     }
   } else {
     const imagePath = path.join(outputDir, `${dayjs().format('YYYY-MM-DD-HH-mm-ss')}-${image.name}`)
-    const binaryString = await new Promise((resolve, reject) => {
+    const binaryString = await new Promise((resolve, _reject) => {
       const fileReader = new FileReader()
       fileReader.onload = () => {
         resolve(fileReader.result)
@@ -125,9 +121,9 @@ export const uploadImage = async (pathname, image, preferences) => {
 
   const uploadByGithub = (content, filename) => {
     const octokit = new Octokit({
-      auth
+      auth,
     })
-    const path = dayjs().format('YYYY/MM') + `/${dayjs().format('DD-HH-mm-ss')}-${filename}`
+    const path = `${dayjs().format('YYYY/MM')}/${dayjs().format('DD-HH-mm-ss')}-${filename}`
     const message = `Upload by MarkText at ${dayjs().format('YYYY-MM-DD HH:mm:ss')}`
     const payload = {
       owner,
@@ -135,16 +131,17 @@ export const uploadImage = async (pathname, image, preferences) => {
       path,
       branch,
       message,
-      content
+      content,
     }
     if (!branch) {
       delete payload.branch
     }
-    octokit.repos.createOrUpdateFileContents(payload)
-      .then(result => {
+    octokit.repos
+      .createOrUpdateFileContents(payload)
+      .then((result) => {
         re(result.data.content.download_url)
       })
-      .catch(_ => {
+      .catch((_) => {
         rj('Upload failed, the image will be copied to the image folder')
       })
   }
@@ -154,7 +151,7 @@ export const uploadImage = async (pathname, image, preferences) => {
     if (typeof filepath !== 'string') {
       isPath = false
       const data = new Uint8Array(filepath)
-      filepath = path.join(tmpdir(), +new Date())
+      filepath = path.join(tmpdir(), Date.now())
       await fs.writeFile(filepath, data)
     }
     if (uploader === 'picgo') {
@@ -242,7 +239,7 @@ export const isFileExecutableSync = (filepath) => {
   try {
     const stat = statSync(filepath)
     return stat.isFile() && (stat.mode & (constants.S_IXUSR | constants.S_IXGRP | constants.S_IXOTH)) !== 0
-  } catch (err) {
+  } catch (_err) {
     // err ignored
     return false
   }

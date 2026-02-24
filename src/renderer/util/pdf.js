@@ -1,14 +1,14 @@
-import fs from 'fs'
-import path from 'path'
+import fs from 'node:fs'
+import path from 'node:path'
 import Slugger from 'muya/lib/parser/marked/slugger'
 import { isFile } from 'common/filesystem'
 import { escapeHTML, unescapeHTML } from 'muya/lib/utils'
-import academicTheme from '@/assets/themes/export/academic.theme.css'
-import liberTheme from '@/assets/themes/export/liber.theme.css'
+import academicTheme from '@/assets/themes/export/academic.theme.css?inline'
+import liberTheme from '@/assets/themes/export/liber.theme.css?inline'
 import { cloneObj } from '../util'
 import { sanitize, EXPORT_DOMPURIFY_CONFIG } from '../util/dompurify'
 
-export const getCssForOptions = options => {
+export const getCssForOptions = (options) => {
   const {
     type,
     pageMarginTop,
@@ -21,7 +21,7 @@ export const getCssForOptions = options => {
     autoNumberingHeadings,
     showFrontMatter,
     theme,
-    headerFooterFontSize
+    headerFooterFontSize,
   } = options
   const isPrintable = type !== 'styledHtml'
 
@@ -110,10 +110,10 @@ const generateHtmlToc = (tocList, slugger, currentLevel, options) => {
 
   // Generate sub-items
   if (tocList.length !== 0 && tocList[0].lvl > lvl) {
-    html += '<ul>' + generateHtmlToc(tocList, slugger, lvl, options) + '</ul>'
+    html += `<ul>${generateHtmlToc(tocList, slugger, lvl, options)}</ul>`
   }
 
-  html += '</li>' + generateHtmlToc(tocList, slugger, currentLevel, options)
+  html += `</li>${generateHtmlToc(tocList, slugger, currentLevel, options)}`
   return html
 }
 
@@ -131,7 +131,8 @@ export const getHtmlToc = (toc, options = {}) => {
 }
 
 // Don't use "Noto Color Emoji" because it will result in PDF files with multiple MB and weird looking emojis.
-const FALLBACK_FONT_FAMILIES = '"Open Sans","Segoe UI","Helvetica Neue",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji"'
+const FALLBACK_FONT_FAMILIES =
+  '"Open Sans","Segoe UI","Helvetica Neue",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji"'
 
 const autoNumberingHeadingsCss = `body {counter-reset: h2}
 h2 {counter-reset: h3}

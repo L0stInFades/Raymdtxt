@@ -21,8 +21,6 @@
 </template>
 
 <script>
-import { shell } from 'electron'
-
 // Example of fontmanager-redux objects:
 // {
 //     path: '/Library/Fonts/Arial.ttf',
@@ -46,11 +44,11 @@ import { shell } from 'electron'
 // }
 
 export default {
-  data () {
+  data() {
     this.defaultValue = this.value
     return {
       fontFamilies: [],
-      selectValue: this.value
+      selectValue: this.value,
     }
   },
   props: {
@@ -60,12 +58,12 @@ export default {
     more: String,
     disable: {
       type: Boolean,
-      default: false
+      default: false,
     },
     onlyMonospace: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
 
   watch: {
@@ -74,40 +72,42 @@ export default {
         this.defaultValue = value
         this.selectValue = value
       }
-    }
+    },
   },
 
   methods: {
-    querySearch (queryString, callback) {
+    querySearch(queryString, callback) {
       const fontFamilies = this.fontFamilies
-      const results = queryString && this.defaultValue !== queryString
-        ? fontFamilies.filter(f => f.toLowerCase().indexOf(queryString.toLowerCase()) === 0)
-        : fontFamilies
+      const results =
+        queryString && this.defaultValue !== queryString
+          ? fontFamilies.filter((f) => f.toLowerCase().indexOf(queryString.toLowerCase()) === 0)
+          : fontFamilies
       callback(results)
     },
 
-    handleSelect (value) {
+    handleSelect(value) {
       if (/^[^\s]+((-|\s)*[^\s])*$/.test(value)) {
         this.selectValue = value
         this.onChange(value)
       }
     },
 
-    handleMoreClick () {
+    handleMoreClick() {
       if (typeof this.more === 'string') {
-        shell.openExternal(this.more)
+        window.api.shell.openExternal(this.more)
       }
-    }
+    },
   },
-  mounted () {
+  mounted() {
     // Delay load native library because it's not needed for the editor and causes a delay.
     const fontManager = require('fontmanager-redux')
     const { onlyMonospace } = this
-    const buf = fontManager.getAvailableFontsSync()
-      .filter(f => f.family && (!onlyMonospace || (onlyMonospace && f.monospace)))
-      .map(f => f.family)
+    const buf = fontManager
+      .getAvailableFontsSync()
+      .filter((f) => f.family && (!onlyMonospace || (onlyMonospace && f.monospace)))
+      .map((f) => f.family)
     this.fontFamilies = [...new Set(buf)].sort((a, b) => a.localeCompare(b))
-  }
+  },
 }
 </script>
 

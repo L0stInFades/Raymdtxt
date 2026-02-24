@@ -113,5 +113,5 @@ export default new Map([
   ['tabs.switch-to-eighth', 'Ctrl+8'],
   ['tabs.switch-to-ninth', 'Ctrl+9'],
   ['tabs.switch-to-tenth', 'Ctrl+0'],
-  ['file.quick-open', 'Command+P']
+  ['file.quick-open', 'Command+P'],
 ])

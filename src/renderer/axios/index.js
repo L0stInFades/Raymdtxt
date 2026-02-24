@@ -1,10 +1,7 @@
 import axios from 'axios'
-import adapter from 'axios/lib/adapters/http'
 
-axios.defaults.adapter = adapter
-
-const http = axios.create({
-  adapter
-})
+// Use the default XHR adapter (browser-native).
+// The old http adapter required nodeIntegration: true which is no longer supported.
+const http = axios.create()
 
 export default http

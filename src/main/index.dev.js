@@ -8,11 +8,11 @@
 require('dotenv').config()
 
 // Install `vue-devtools`
-require('electron').app.on('ready', () => {
+require('electron').app.whenReady().then(() => {
   const { default: installExtension, VUEJS_DEVTOOLS } = require('electron-devtools-installer')
   installExtension(VUEJS_DEVTOOLS)
     .then(() => {})
-    .catch(err => {
+    .catch((err) => {
       console.log('Unable to install `vue-devtools`: \n', err)
     })
 })

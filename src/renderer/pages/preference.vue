@@ -22,32 +22,32 @@ import { DEFAULT_STYLE } from '@/config'
 import { isOsx } from '@/util'
 
 export default {
-  data () {
+  data() {
     this.isOsx = isOsx
     return {}
   },
   mixins: [loadingPageMixins],
   components: {
     TitleBar,
-    SideBar
+    SideBar,
   },
   computed: {
     ...mapState({
-      theme: state => state.preferences.theme,
-      titleBarStyle: state => state.preferences.titleBarStyle
+      theme: (state) => state.preferences.theme,
+      titleBarStyle: (state) => state.preferences.titleBarStyle,
     }),
-    showCustomTitleBar () {
+    showCustomTitleBar() {
       return this.titleBarStyle === 'custom' && !this.isOsx
-    }
+    },
   },
   watch: {
-    theme: function (value, oldValue) {
+    theme: (value, oldValue) => {
       if (value !== oldValue) {
         addThemeStyle(value)
       }
-    }
+    },
   },
-  created () {
+  created() {
     this.$nextTick(() => {
       const state = global.marktext.initialState || DEFAULT_STYLE
       addThemeStyle(state.theme)
@@ -55,7 +55,7 @@ export default {
       this.$store.dispatch('ASK_FOR_USER_PREFERENCE')
       this.hideLoadingPage()
     })
-  }
+  },
 }
 </script>
 

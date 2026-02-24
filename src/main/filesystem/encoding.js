@@ -13,14 +13,14 @@ const CED_ICONV_ENCODINGS = {
   // Map ASCII to UTF-8
   'ASCII-7-bit': 'utf8',
   ASCII: 'utf8',
-  MACINTOSH: 'utf8'
+  MACINTOSH: 'utf8',
 }
 
 // Byte Order Mark's to detect endianness and encoding.
 const BOM_ENCODINGS = {
-  utf8: [0xEF, 0xBB, 0xBF],
-  utf16be: [0xFE, 0xFF],
-  utf16le: [0xFF, 0xFE]
+  utf8: [0xef, 0xbb, 0xbf],
+  utf16be: [0xfe, 0xff],
+  utf16le: [0xff, 0xfe],
 }
 
 const checkSequence = (buffer, sequence) => {

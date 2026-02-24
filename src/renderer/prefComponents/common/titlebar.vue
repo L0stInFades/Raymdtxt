@@ -11,19 +11,18 @@
 </template>
 
 <script>
-import { getCurrentWindow } from '@electron/remote'
 import { closePath } from '../../assets/window-controls.js'
 
 export default {
-  data () {
+  data() {
     this.windowIconClose = closePath
     return {}
   },
   methods: {
-    handleCloseClick () {
-      getCurrentWindow().close()
-    }
-  }
+    handleCloseClick() {
+      if (window.api) window.api.window.close()
+    },
+  },
 }
 </script>
 

@@ -28,36 +28,36 @@ import bus from '../../bus'
 import { mapState } from 'vuex'
 
 export default {
-  data () {
+  data() {
     return {
       showRename: false,
-      tempName: ''
+      tempName: '',
     }
   },
-  created () {
+  created() {
     this.$nextTick(() => {
       bus.$on('rename', this.handleRename)
     })
   },
-  beforeDestroy () {
+  beforeDestroy() {
     bus.$off('rename', this.handleRename)
   },
   computed: {
     ...mapState({
-      filename: state => state.editor.currentFile.filename
-    })
+      filename: (state) => state.editor.currentFile.filename,
+    }),
   },
   methods: {
-    handleRename () {
+    handleRename() {
       this.showRename = true
       this.tempName = this.filename
       this.$refs.search.focus()
     },
-    confirm () {
+    confirm() {
       this.$store.dispatch('RENAME', this.tempName)
       this.showRename = false
-    }
-  }
+    },
+  },
 }
 </script>
 

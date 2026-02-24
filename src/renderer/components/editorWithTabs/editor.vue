@@ -73,8 +73,7 @@
 </template>
 
 <script>
-import { shell } from 'electron'
-import path from 'path'
+import path from 'node:path'
 import log from 'electron-log'
 import { mapState } from 'vuex'
 // import ViewImage from 'view-image'
@@ -115,7 +114,7 @@ const STANDAR_Y = 320
 
 export default {
   components: {
-    Search
+    Search,
   },
 
   props: {
@@ -123,60 +122,60 @@ export default {
     cursor: Object,
     textDirection: {
       type: String,
-      required: true
+      required: true,
     },
-    platform: String
+    platform: String,
   },
 
   computed: {
     ...mapState({
-      preferences: state => state.preferences,
-      preferLooseListItem: state => state.preferences.preferLooseListItem,
-      autoPairBracket: state => state.preferences.autoPairBracket,
-      autoPairMarkdownSyntax: state => state.preferences.autoPairMarkdownSyntax,
-      autoPairQuote: state => state.preferences.autoPairQuote,
-      bulletListMarker: state => state.preferences.bulletListMarker,
-      orderListDelimiter: state => state.preferences.orderListDelimiter,
-      tabSize: state => state.preferences.tabSize,
-      listIndentation: state => state.preferences.listIndentation,
-      frontmatterType: state => state.preferences.frontmatterType,
-      superSubScript: state => state.preferences.superSubScript,
-      footnote: state => state.preferences.footnote,
-      isHtmlEnabled: state => state.preferences.isHtmlEnabled,
-      isGitlabCompatibilityEnabled: state => state.preferences.isGitlabCompatibilityEnabled,
-      lineHeight: state => state.preferences.lineHeight,
-      fontSize: state => state.preferences.fontSize,
-      codeFontSize: state => state.preferences.codeFontSize,
-      codeFontFamily: state => state.preferences.codeFontFamily,
-      codeBlockLineNumbers: state => state.preferences.codeBlockLineNumbers,
-      trimUnnecessaryCodeBlockEmptyLines: state => state.preferences.trimUnnecessaryCodeBlockEmptyLines,
-      editorFontFamily: state => state.preferences.editorFontFamily,
-      hideQuickInsertHint: state => state.preferences.hideQuickInsertHint,
-      hideLinkPopup: state => state.preferences.hideLinkPopup,
-      autoCheck: state => state.preferences.autoCheck,
-      editorLineWidth: state => state.preferences.editorLineWidth,
-      imageInsertAction: state => state.preferences.imageInsertAction,
-      imagePreferRelativeDirectory: state => state.preferences.imagePreferRelativeDirectory,
-      imageRelativeDirectoryName: state => state.preferences.imageRelativeDirectoryName,
-      imageFolderPath: state => state.preferences.imageFolderPath,
-      theme: state => state.preferences.theme,
-      sequenceTheme: state => state.preferences.sequenceTheme,
-      hideScrollbar: state => state.preferences.hideScrollbar,
-      spellcheckerEnabled: state => state.preferences.spellcheckerEnabled,
-      spellcheckerNoUnderline: state => state.preferences.spellcheckerNoUnderline,
-      spellcheckerLanguage: state => state.preferences.spellcheckerLanguage,
+      preferences: (state) => state.preferences,
+      preferLooseListItem: (state) => state.preferences.preferLooseListItem,
+      autoPairBracket: (state) => state.preferences.autoPairBracket,
+      autoPairMarkdownSyntax: (state) => state.preferences.autoPairMarkdownSyntax,
+      autoPairQuote: (state) => state.preferences.autoPairQuote,
+      bulletListMarker: (state) => state.preferences.bulletListMarker,
+      orderListDelimiter: (state) => state.preferences.orderListDelimiter,
+      tabSize: (state) => state.preferences.tabSize,
+      listIndentation: (state) => state.preferences.listIndentation,
+      frontmatterType: (state) => state.preferences.frontmatterType,
+      superSubScript: (state) => state.preferences.superSubScript,
+      footnote: (state) => state.preferences.footnote,
+      isHtmlEnabled: (state) => state.preferences.isHtmlEnabled,
+      isGitlabCompatibilityEnabled: (state) => state.preferences.isGitlabCompatibilityEnabled,
+      lineHeight: (state) => state.preferences.lineHeight,
+      fontSize: (state) => state.preferences.fontSize,
+      codeFontSize: (state) => state.preferences.codeFontSize,
+      codeFontFamily: (state) => state.preferences.codeFontFamily,
+      codeBlockLineNumbers: (state) => state.preferences.codeBlockLineNumbers,
+      trimUnnecessaryCodeBlockEmptyLines: (state) => state.preferences.trimUnnecessaryCodeBlockEmptyLines,
+      editorFontFamily: (state) => state.preferences.editorFontFamily,
+      hideQuickInsertHint: (state) => state.preferences.hideQuickInsertHint,
+      hideLinkPopup: (state) => state.preferences.hideLinkPopup,
+      autoCheck: (state) => state.preferences.autoCheck,
+      editorLineWidth: (state) => state.preferences.editorLineWidth,
+      imageInsertAction: (state) => state.preferences.imageInsertAction,
+      imagePreferRelativeDirectory: (state) => state.preferences.imagePreferRelativeDirectory,
+      imageRelativeDirectoryName: (state) => state.preferences.imageRelativeDirectoryName,
+      imageFolderPath: (state) => state.preferences.imageFolderPath,
+      theme: (state) => state.preferences.theme,
+      sequenceTheme: (state) => state.preferences.sequenceTheme,
+      hideScrollbar: (state) => state.preferences.hideScrollbar,
+      spellcheckerEnabled: (state) => state.preferences.spellcheckerEnabled,
+      spellcheckerNoUnderline: (state) => state.preferences.spellcheckerNoUnderline,
+      spellcheckerLanguage: (state) => state.preferences.spellcheckerLanguage,
 
-      currentFile: state => state.editor.currentFile,
-      projectTree: state => state.project.projectTree,
+      currentFile: (state) => state.editor.currentFile,
+      projectTree: (state) => state.project.projectTree,
 
       // edit modes
-      typewriter: state => state.preferences.typewriter,
-      focus: state => state.preferences.focus,
-      sourceCode: state => state.preferences.sourceCode
-    })
+      typewriter: (state) => state.preferences.typewriter,
+      focus: (state) => state.preferences.focus,
+      sourceCode: (state) => state.preferences.sourceCode,
+    }),
   },
 
-  data () {
+  data() {
     this.defaultFontFamily = DEFAULT_EDITOR_FONT_FAMILY
     this.CloseIcon = CloseIcon
 
@@ -189,8 +188,8 @@ export default {
       imageViewerVisible: false,
       tableChecker: {
         rows: 4,
-        columns: 3
-      }
+        columns: 3,
+      },
     }
   },
 
@@ -223,7 +222,7 @@ export default {
       const { editor } = this
       if (value !== oldValue && editor) {
         editor.setOptions({
-          preferLooseListItem: value
+          preferLooseListItem: value,
         })
       }
     },
@@ -239,15 +238,21 @@ export default {
       if (value !== oldValue && this.editor) {
         // Agreement：Any black series theme needs to contain dark `word`.
         if (/dark/i.test(value)) {
-          this.editor.setOptions({
-            mermaidTheme: 'dark',
-            vegaTheme: 'dark'
-          }, true)
+          this.editor.setOptions(
+            {
+              mermaidTheme: 'dark',
+              vegaTheme: 'dark',
+            },
+            true,
+          )
         } else {
-          this.editor.setOptions({
-            mermaidTheme: 'default',
-            vegaTheme: 'latimes'
-          }, true)
+          this.editor.setOptions(
+            {
+              mermaidTheme: 'default',
+              vegaTheme: 'latimes',
+            },
+            true,
+          )
         }
       }
     },
@@ -308,7 +313,7 @@ export default {
       }
     },
 
-    editorLineWidth: function (value, oldValue) {
+    editorLineWidth: (value, oldValue) => {
       if (value !== oldValue) {
         setEditorWidth(value)
       }
@@ -375,7 +380,7 @@ export default {
         addCommonStyle({
           codeFontSize: value,
           codeFontFamily: this.codeFontFamily,
-          hideScrollbar: this.hideScrollbar
+          hideScrollbar: this.hideScrollbar,
         })
       }
     },
@@ -392,7 +397,7 @@ export default {
         addCommonStyle({
           codeFontSize: this.codeFontSize,
           codeFontFamily: value,
-          hideScrollbar: this.hideScrollbar
+          hideScrollbar: this.hideScrollbar,
         })
       }
     },
@@ -402,7 +407,7 @@ export default {
         addCommonStyle({
           codeFontSize: this.codeFontSize,
           codeFontFamily: this.codeFontFamily,
-          hideScrollbar: value
+          hideScrollbar: value,
         })
       }
     },
@@ -440,18 +445,18 @@ export default {
       if (value && value !== oldValue) {
         this.scrollToCursor(0)
         // Hide float tools if needed.
-        this.editor && this.editor.hideAllFloatTools()
+        this.editor?.hideAllFloatTools()
       }
     },
 
     sourceCode: function (value, oldValue) {
       if (value && value !== oldValue) {
-        this.editor && this.editor.hideAllFloatTools()
+        this.editor?.hideAllFloatTools()
       }
-    }
+    },
   },
 
-  created () {
+  created() {
     this.$nextTick(() => {
       this.printer = new Printer()
       const ele = this.$refs.editor
@@ -483,7 +488,7 @@ export default {
         spellcheckerEnabled,
         spellcheckerLanguage,
         hideLinkPopup,
-        autoCheck
+        autoCheck,
       } = this
 
       // use muya UI plugins
@@ -494,14 +499,14 @@ export default {
       Muya.use(ImagePathPicker)
       Muya.use(ImageSelector, {
         unsplashAccessKey: process.env.UNSPLASH_ACCESS_KEY,
-        photoCreatorClick: this.photoCreatorClick
+        photoCreatorClick: this.photoCreatorClick,
       })
       Muya.use(Transformer)
       Muya.use(ImageToolbar)
       Muya.use(FormatPicker)
       Muya.use(FrontMenu)
       Muya.use(LinkTools, {
-        jumpClick: this.jumpClick
+        jumpClick: this.jumpClick,
       })
       Muya.use(FootnoteTool)
       Muya.use(TableBarTools)
@@ -534,22 +539,22 @@ export default {
         imageAction: this.imageAction.bind(this),
         imagePathPicker: this.imagePathPicker.bind(this),
         clipboardFilePath: guessClipboardFilePath,
-        imagePathAutoComplete: this.imagePathAutoComplete.bind(this)
+        imagePathAutoComplete: this.imagePathAutoComplete.bind(this),
       }
 
       if (/dark/i.test(theme)) {
         Object.assign(options, {
           mermaidTheme: 'dark',
-          vegaTheme: 'dark'
+          vegaTheme: 'dark',
         })
       } else {
         Object.assign(options, {
           mermaidTheme: 'default',
-          vegaTheme: 'latimes'
+          vegaTheme: 'latimes',
         })
       }
 
-      const { container } = this.editor = new Muya(ele, options)
+      const { container } = (this.editor = new Muya(ele, options))
 
       // Create spell check wrapper and enable spell checking if preferred.
       this.spellchecker = new SpellChecker(spellcheckerEnabled, spellcheckerLanguage)
@@ -593,7 +598,7 @@ export default {
       bus.$on('open-command-spellchecker-switch-language', this.openSpellcheckerLanguageCommand)
       bus.$on('replace-misspelling', this.replaceMisspelling)
 
-      this.editor.on('change', changes => {
+      this.editor.on('change', (changes) => {
         // WORKAROUND: "id: 'muya'"
         this.$store.dispatch('LISTEN_FOR_CONTENT_CHANGE', Object.assign(changes, { id: 'muya' }))
       })
@@ -631,7 +636,7 @@ export default {
       //   this.setImageViewerVisible(true)
       // })
 
-      this.editor.on('selectionChange', changes => {
+      this.editor.on('selectionChange', (changes) => {
         const { y } = changes.cursorCoords
         if (this.typewriter) {
           const startPosition = container.scrollTop
@@ -654,7 +659,7 @@ export default {
         this.$store.dispatch('SELECTION_CHANGE', changes)
       })
 
-      this.editor.on('selectionFormats', formats => {
+      this.editor.on('selectionFormats', (formats) => {
         this.$store.dispatch('SELECTION_FORMATS', formats)
       })
 
@@ -665,35 +670,32 @@ export default {
   },
   methods: {
     photoCreatorClick: (url) => {
-      shell.openExternal(url)
+      window.api.shell.openExternal(url)
     },
 
-    jumpClick (linkInfo) {
+    jumpClick(linkInfo) {
       const { href } = linkInfo
       this.$store.dispatch('FORMAT_LINK_CLICK', { data: { href }, dirname: window.DIRNAME })
     },
 
-    async imagePathAutoComplete (src) {
+    async imagePathAutoComplete(src) {
       const files = await this.$store.dispatch('ASK_FOR_IMAGE_AUTO_PATH', src)
-      return files.map(f => {
+      return files.map((f) => {
         const iconClass = f.type === 'directory' ? 'icon-folder' : 'icon-image'
         return Object.assign(f, { iconClass, text: f.file + (f.type === 'directory' ? '/' : '') })
       })
     },
 
-    async imageAction (image, id, alt = '') {
+    async imageAction(image, id, alt = '') {
       // TODO(Refactor): Refactor this method.
       const {
         imageInsertAction,
         imageFolderPath,
         imagePreferRelativeDirectory,
         imageRelativeDirectoryName,
-        preferences
+        preferences,
       } = this
-      const {
-        filename,
-        pathname
-      } = this.currentFile
+      const { filename, pathname } = this.currentFile
 
       // Save an image relative to the file if the relative image directory include the filename variable.
       // The image is save relative to the root folder without a variable.
@@ -712,10 +714,10 @@ export default {
         }
       }
 
-      const getResolvedImagePath = imagePath => {
+      const getResolvedImagePath = (imagePath) => {
         const replacement = isTabSavedOnDisk
-          // Filename w/o extension
-          ? filename.replace(/\.[^/.]+$/, '')
+          ? // Filename w/o extension
+            filename.replace(/\.[^/.]+$/, '')
           : ''
         return imagePath.replace(/\${filename}/g, replacement)
       }
@@ -731,7 +733,7 @@ export default {
             notice.notify({
               title: 'Upload Image',
               type: 'warning',
-              message: err
+              message: err,
             })
             destImagePath = await moveImageToFolder(pathname, image, resolvedImageFolderPath)
           }
@@ -740,7 +742,12 @@ export default {
         case 'folder': {
           destImagePath = await moveImageToFolder(pathname, image, resolvedImageFolderPath)
           if (isTabSavedOnDisk && imagePreferRelativeDirectory) {
-            destImagePath = await moveToRelativeFolder(relativeBasePath, resolvedImageRelativeDirectoryName, pathname, destImagePath)
+            destImagePath = await moveToRelativeFolder(
+              relativeBasePath,
+              resolvedImageRelativeDirectoryName,
+              pathname,
+              destImagePath,
+            )
           }
           break
         }
@@ -754,7 +761,12 @@ export default {
 
             // Respect user preferences if tab exists on disk.
             if (isTabSavedOnDisk && imagePreferRelativeDirectory) {
-              destImagePath = await moveToRelativeFolder(relativeBasePath, resolvedImageRelativeDirectoryName, pathname, destImagePath)
+              destImagePath = await moveToRelativeFolder(
+                relativeBasePath,
+                resolvedImageRelativeDirectoryName,
+                pathname,
+                destImagePath,
+              )
             }
           }
           break
@@ -765,27 +777,27 @@ export default {
         bus.$emit('image-action', {
           id,
           result: destImagePath,
-          alt
+          alt,
         })
       }
       return destImagePath
     },
 
-    imagePathPicker () {
+    imagePathPicker() {
       return this.$store.dispatch('ASK_FOR_IMAGE_PATH')
     },
 
-    keyup (event) {
+    keyup(event) {
       if (event.key === 'Escape') {
         this.setImageViewerVisible(false)
       }
     },
 
-    setImageViewerVisible (status) {
+    setImageViewerVisible(status) {
       this.imageViewerVisible = status
     },
 
-    switchSpellcheckLanguage (languageCode) {
+    switchSpellcheckLanguage(languageCode) {
       const { spellchecker } = this
       const { isEnabled } = spellchecker
 
@@ -794,60 +806,61 @@ export default {
         throw new Error('Cannot switch language because spell checker is disabled!')
       }
 
-      spellchecker.switchLanguage(languageCode)
-        .then(langCode => {
+      spellchecker
+        .switchLanguage(languageCode)
+        .then((langCode) => {
           if (!langCode) {
             // Unable to switch language due to missing dictionary. The spell checker is now in an invalid state.
             notice.notify({
               title: 'Spelling',
               type: 'warning',
-              message: `Unable to switch to language "${languageCode}". Requested language dictionary is missing.`
+              message: `Unable to switch to language "${languageCode}". Requested language dictionary is missing.`,
             })
           }
         })
-        .catch(error => {
+        .catch((error) => {
           log.error(`Error while switching to language "${languageCode}":`)
           log.error(error)
 
           notice.notify({
             title: 'Spelling',
             type: 'error',
-            message: `Error while switching to "${languageCode}": ${error.message}`
+            message: `Error while switching to "${languageCode}": ${error.message}`,
           })
         })
     },
 
-    handleInvalidateImageCache () {
+    handleInvalidateImageCache() {
       if (this.editor) {
         this.editor.invalidateImageCache()
       }
     },
 
-    openSpellcheckerLanguageCommand () {
+    openSpellcheckerLanguageCommand() {
       if (!isOsx) {
         bus.$emit('show-command-palette', this.switchLanguageCommand)
       }
     },
 
-    replaceMisspelling ({ word, replacement }) {
+    replaceMisspelling({ word, replacement }) {
       if (this.editor) {
         this.editor._replaceCurrentWordInlineUnsafe(word, replacement)
       }
     },
 
-    handleUndo () {
+    handleUndo() {
       if (this.editor) {
         this.editor.undo()
       }
     },
 
-    handleRedo () {
+    handleRedo() {
       if (this.editor) {
         this.editor.redo()
       }
     },
 
-    handleSelectAll () {
+    handleSelectAll() {
       if (this.sourceCode) {
         return
       }
@@ -864,35 +877,35 @@ export default {
     },
 
     // Custom copyAsMarkdown copyAsHtml pasteAsPlainText
-    handleCopyPaste (type) {
+    handleCopyPaste(type) {
       if (this.editor) {
         this.editor[type]()
       }
     },
 
-    insertImage (src) {
+    insertImage(src) {
       if (!this.sourceCode) {
-        this.editor && this.editor.insertImage({ src })
+        this.editor?.insertImage({ src })
       }
     },
 
-    handleSearch (value, opt) {
+    handleSearch(value, opt) {
       const searchMatches = this.editor.search(value, opt)
       this.$store.dispatch('SEARCH', searchMatches)
       this.scrollToHighlight()
     },
 
-    handReplace (value, opt) {
+    handReplace(value, opt) {
       const searchMatches = this.editor.replace(value, opt)
       this.$store.dispatch('SEARCH', searchMatches)
     },
 
-    handleUploadedImage (url, deletionUrl) {
+    handleUploadedImage(url, deletionUrl) {
       this.insertImage(url)
       this.$store.dispatch('SHOW_IMAGE_DELETION_URL', deletionUrl)
     },
 
-    scrollToCursor (duration = 300) {
+    scrollToCursor(duration = 300) {
       this.$nextTick(() => {
         const { container } = this.editor
         const { y } = this.editor.getSelection().cursorCoords
@@ -900,15 +913,15 @@ export default {
       })
     },
 
-    scrollToHighlight () {
+    scrollToHighlight() {
       return this.scrollToElement('.ag-highlight')
     },
 
-    scrollToHeader (slug) {
+    scrollToHeader(slug) {
       return this.scrollToElement(`#${slug}`)
     },
 
-    scrollToElement (selector) {
+    scrollToElement(selector) {
       // Scroll to search highlight word
       const { container } = this.editor
       const anchor = document.querySelector(selector)
@@ -919,20 +932,14 @@ export default {
       }
     },
 
-    handleFindAction (action) {
+    handleFindAction(action) {
       const searchMatches = this.editor.find(action)
       this.$store.dispatch('SEARCH', searchMatches)
       this.scrollToHighlight()
     },
 
-    async handleExport (options) {
-      const {
-        type,
-        header,
-        footer,
-        headerFooterStyled,
-        htmlTitle
-      } = options
+    async handleExport(options) {
+      const { type, header, footer, headerFooterStyled, htmlTitle } = options
 
       if (!/^pdf|print|styledHtml$/.test(type)) {
         throw new Error(`Invalid type to export: "${type}".`)
@@ -948,7 +955,7 @@ export default {
               title: htmlTitle || '',
               printOptimization: false,
               extraCss,
-              toc: htmlToc
+              toc: htmlToc,
             })
             this.$store.dispatch('EXPORT', { type, content })
           } catch (err) {
@@ -956,7 +963,7 @@ export default {
             notice.notify({
               title: `Printing/Exporting ${htmlTitle || 'html'} failed`,
               type: 'error',
-              message: err.message || 'There is something wrong when exporting.'
+              message: err.message || 'There is something wrong when exporting.',
             })
           }
           break
@@ -966,7 +973,10 @@ export default {
           try {
             const { pageSize, pageSizeWidth, pageSizeHeight, isLandscape } = options
             const pageOptions = {
-              pageSize, pageSizeWidth, pageSizeHeight, isLandscape
+              pageSize,
+              pageSizeWidth,
+              pageSizeHeight,
+              isLandscape,
             }
 
             const html = await this.editor.exportStyledHTML({
@@ -976,7 +986,7 @@ export default {
               toc: htmlToc,
               header,
               footer,
-              headerFooterStyled
+              headerFooterStyled,
             })
             this.printer.renderMarkdown(html, true)
             this.$store.dispatch('EXPORT', { type, pageOptions })
@@ -985,7 +995,7 @@ export default {
             notice.notify({
               title: 'Printing/Exporting failed',
               type: 'error',
-              message: `There is something wrong when export ${htmlTitle || 'PDF'}.`
+              message: `There is something wrong when export ${htmlTitle || 'PDF'}.`,
             })
             this.handlePrintServiceClearup()
           }
@@ -1001,7 +1011,7 @@ export default {
               toc: htmlToc,
               header,
               footer,
-              headerFooterStyled
+              headerFooterStyled,
             })
             this.printer.renderMarkdown(html, true)
             this.$store.dispatch('PRINT_RESPONSE')
@@ -1010,7 +1020,7 @@ export default {
             notice.notify({
               title: 'Printing/Exporting failed',
               type: 'error',
-              message: `There is something wrong when print ${htmlTitle || ''}.`
+              message: `There is something wrong when print ${htmlTitle || ''}.`,
             })
             this.handlePrintServiceClearup()
           }
@@ -1019,11 +1029,11 @@ export default {
       }
     },
 
-    handlePrintServiceClearup () {
+    handlePrintServiceClearup() {
       this.printer.clearup()
     },
 
-    handleEditParagraph (type) {
+    handleEditParagraph(type) {
       if (type === 'table') {
         this.tableChecker = { rows: 4, columns: 3 }
         this.dialogTableVisible = true
@@ -1036,7 +1046,7 @@ export default {
     },
 
     // handle `duplicate`, `delete`, `create paragraph below`
-    handleParagraph (type) {
+    handleParagraph(type) {
       const { editor } = this
       if (editor) {
         switch (type) {
@@ -1055,17 +1065,17 @@ export default {
       }
     },
 
-    handleInlineFormat (type) {
-      this.editor && this.editor.format(type)
+    handleInlineFormat(type) {
+      this.editor?.format(type)
     },
 
-    handleDialogTableConfirm () {
+    handleDialogTableConfirm() {
       this.dialogTableVisible = false
-      this.editor && this.editor.createTable(this.tableChecker)
+      this.editor?.createTable(this.tableChecker)
     },
 
     // listen for `open-single-file` event, it will call this method only when open a new file.
-    setMarkdownToEditor ({ id, markdown, cursor }) {
+    setMarkdownToEditor({ id, markdown, cursor }) {
       const { editor } = this
       if (editor) {
         editor.clearHistory()
@@ -1078,7 +1088,7 @@ export default {
     },
 
     // listen for markdown change form source mode or change tabs etc
-    handleFileChange ({ id, markdown, cursor, renderCursor, history }) {
+    handleFileChange({ id, markdown, cursor, renderCursor, history }) {
       const { editor } = this
       this.$nextTick(() => {
         if (editor) {
@@ -1097,26 +1107,26 @@ export default {
       })
     },
 
-    handleInsertParagraph (location) {
+    handleInsertParagraph(location) {
       const { editor } = this
-      editor && editor.insertParagraph(location)
+      editor?.insertParagraph(location)
     },
 
-    blurEditor () {
+    blurEditor() {
       this.editor.blur(false, true)
     },
 
-    focusEditor () {
+    focusEditor() {
       this.editor.focus()
     },
 
-    handleScreenShot () {
+    handleScreenShot() {
       if (this.editor) {
         document.execCommand('paste')
       }
-    }
+    },
   },
-  beforeDestroy () {
+  beforeDestroy() {
     bus.$off('file-loaded', this.setMarkdownToEditor)
     bus.$off('invalidate-image-cache', this.handleInvalidateImageCache)
     bus.$off('undo', this.handleUndo)
@@ -1151,7 +1161,7 @@ export default {
 
     this.editor.destroy()
     this.editor = null
-  }
+  },
 }
 </script>
 

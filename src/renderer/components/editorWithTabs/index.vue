@@ -33,43 +33,43 @@ export default {
   props: {
     markdown: {
       type: String,
-      required: true
+      required: true,
     },
     cursor: {
-      validator (value) {
+      validator(value) {
         return typeof value === 'object'
       },
-      required: true
+      required: true,
     },
     sourceCode: {
       type: Boolean,
-      required: true
+      required: true,
     },
     showTabBar: {
       type: Boolean,
-      required: true
+      required: true,
     },
     textDirection: {
       type: String,
-      required: true
+      required: true,
     },
     platform: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   components: {
     Tabs,
     Editor,
     SourceCode,
-    TabNotifications
+    TabNotifications,
   },
   computed: {
     ...mapState({
-      showSideBar: state => state.layout.showSideBar,
-      sideBarWidth: state => state.layout.sideBarWidth
-    })
-  }
+      showSideBar: (state) => state.layout.showSideBar,
+      sideBarWidth: (state) => state.layout.sideBarWidth,
+    }),
+  },
 }
 </script>
 

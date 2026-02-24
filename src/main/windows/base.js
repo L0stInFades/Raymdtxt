@@ -1,4 +1,4 @@
-import EventEmitter from 'events'
+import EventEmitter from 'node:events'
 import { isLinux } from '../config'
 
 /**
@@ -14,21 +14,21 @@ import { isLinux } from '../config'
 export const WindowType = {
   BASE: 'base', // You shold never create a `BASE` window.
   EDITOR: 'editor',
-  SETTINGS: 'settings'
+  SETTINGS: 'settings',
 }
 
 export const WindowLifecycle = {
   NONE: 0,
   LOADING: 1,
   READY: 2,
-  QUITTED: 3
+  QUITTED: 3,
 }
 
 class BaseWindow extends EventEmitter {
   /**
    * @param {Accessor} accessor The application accessor for application instances.
    */
-  constructor (accessor) {
+  constructor(accessor) {
     super()
 
     this._accessor = accessor
@@ -38,7 +38,7 @@ class BaseWindow extends EventEmitter {
     this.type = WindowType.BASE
   }
 
-  bringToFront () {
+  bringToFront() {
     const { browserWindow: win } = this
     if (win.isMinimized()) win.restore()
     if (!win.isVisible()) win.show()
@@ -49,11 +49,11 @@ class BaseWindow extends EventEmitter {
     }
   }
 
-  reload () {
+  reload() {
     this.browserWindow.reload()
   }
 
-  destroy () {
+  destroy() {
     this.lifecycle = WindowLifecycle.QUITTED
     this.emit('window-closed')
 
@@ -67,22 +67,17 @@ class BaseWindow extends EventEmitter {
 
   // --- private ---------------------------------
 
-  _buildUrlWithSettings (windowId, env, userPreference) {
+  _buildUrlWithSettings(windowId, env, userPreference) {
     // NOTE: Only send absolutely necessary values. Full settings are delay loaded.
     const { type } = this
     const { debug, paths } = env
-    const {
-      codeFontFamily,
-      codeFontSize,
-      hideScrollbar,
-      theme,
-      titleBarStyle
-    } = userPreference.getAll()
+    const { codeFontFamily, codeFontSize, hideScrollbar, theme, titleBarStyle } = userPreference.getAll()
 
     /* eslint-disable */
-    const baseUrl = process.env.NODE_ENV === 'development'
-      ? 'http://localhost:9091'
-      : `file://${__dirname}/index.html`
+    const baseUrl =
+      process.env.NODE_ENV === 'development'
+        ? process.env.ELECTRON_RENDERER_URL || 'http://localhost:5173'
+        : `file://${__dirname}/index.html`
     /* eslint-enable */
 
     const url = new URL(baseUrl)
@@ -101,11 +96,11 @@ class BaseWindow extends EventEmitter {
     return url
   }
 
-  _buildUrlString (windowId, env, userPreference) {
+  _buildUrlString(windowId, env, userPreference) {
     return this._buildUrlWithSettings(windowId, env, userPreference).toString()
   }
 
-  _getPreferredBackgroundColor (theme) {
+  _getPreferredBackgroundColor(theme) {
     // Hardcode the theme background color and show the window direct for the fastet window ready time.
     // Later with custom themes we need the background color (e.g. from meta information) and wait
     // that the window is loaded and then pass theme data to the renderer.
@@ -120,7 +115,6 @@ class BaseWindow extends EventEmitter {
         return '#f7f7f7'
       case 'one-dark':
         return '#282c34'
-      case 'light':
       default:
         return '#ffffff'
     }

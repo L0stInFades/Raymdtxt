@@ -1,10 +1,9 @@
-import { ipcRenderer } from 'electron'
 import { ENCODING_NAME_MAP, getEncodingName } from 'common/encoding'
 import { delay } from '@/util'
 import bus from '../bus'
 
 class FileEncodingCommand {
-  constructor (editorState) {
+  constructor(editorState) {
     this.id = 'file.change-encoding'
     this.description = 'File: Change Encoding'
     this.placeholder = 'Select an option'
@@ -29,7 +28,7 @@ class FileEncodingCommand {
       this.subcommandSelectedIndex = 0
       this.subcommands.push({
         id: `${encoding}-bom`,
-        description: `${getEncodingName(encodingObj)} - current`
+        description: `${getEncodingName(encodingObj)} - current`,
       })
     }
 
@@ -38,7 +37,7 @@ class FileEncodingCommand {
       const isTabEncoding = !isBom && key === encoding
       const item = {
         id: key,
-        description: isTabEncoding ? `${value} - current` : value
+        description: isTabEncoding ? `${value} - current` : value,
       }
       if (isTabEncoding) {
         // Highlight current encoding and set it as first entry.
@@ -57,10 +56,10 @@ class FileEncodingCommand {
     bus.$emit('show-command-palette', this)
   }
 
-  executeSubcommand = async id => {
+  executeSubcommand = async (id) => {
     // NOTE: We support UTF-BOM encodings but don't allow to set them.
     if (!id.endsWith('-bom')) {
-      ipcRenderer.emit('mt::set-file-encoding', null, id)
+      window.api.localEmit('mt::set-file-encoding', id)
     }
   }
 

@@ -1,5 +1,5 @@
 // Copy from https://github.com/utatti/simple-pandoc/blob/master/index.js
-import { spawn } from 'child_process'
+import { spawn } from 'node:child_process'
 import commandExists from 'command-exists'
 import { isFile2 } from 'common/filesystem'
 
@@ -16,19 +16,20 @@ const pandoc = (from, to, ...args) => {
   const command = getCommand()
   const option = ['-s', from, '-t', to].concat(args)
 
-  const converter = () => new Promise((resolve, reject) => {
-    const proc = spawn(command, option)
-    proc.on('error', reject)
-    let data = ''
-    proc.stdout.on('data', chunk => {
-      data += chunk.toString()
+  const converter = () =>
+    new Promise((resolve, reject) => {
+      const proc = spawn(command, option)
+      proc.on('error', reject)
+      let data = ''
+      proc.stdout.on('data', (chunk) => {
+        data += chunk.toString()
+      })
+      proc.stdout.on('end', () => resolve(data))
+      proc.stdout.on('error', reject)
+      proc.stdin.end()
     })
-    proc.stdout.on('end', () => resolve(data))
-    proc.stdout.on('error', reject)
-    proc.stdin.end()
-  })
 
-  converter.stream = srcStream => {
+  converter.stream = (srcStream) => {
     const proc = spawn(command, option)
     srcStream.pipe(proc.stdin)
     return proc.stdout

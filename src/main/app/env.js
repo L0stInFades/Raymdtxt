@@ -1,16 +1,16 @@
-import path from 'path'
+import path from 'node:path'
 import AppPaths, { ensureAppDirectoriesSync } from './paths'
 
 let envId = 0
 
 const patchEnvPath = () => {
   if (process.platform === 'darwin') {
-    process.env.PATH += (process.env.PATH.endsWith(path.delimiter) ? '' : path.delimiter) + '/Library/TeX/texbin'
+    process.env.PATH += `${process.env.PATH.endsWith(path.delimiter) ? '' : path.delimiter}/Library/TeX/texbin`
   }
 }
 
 export class AppEnvironment {
-  constructor (options) {
+  constructor(options) {
     this._id = envId++
     this._appPaths = new AppPaths(options.userDataPath)
     this._debug = !!options.debug
@@ -25,49 +25,49 @@ export class AppEnvironment {
    *
    * @returns {number} Returns an unique identifier.
    */
-  get id () {
+  get id() {
     return this._id
   }
 
   /**
    * @returns {AppPaths}
    */
-  get paths () {
+  get paths() {
     return this._appPaths
   }
 
   /**
    * @returns {boolean}
    */
-  get debug () {
+  get debug() {
     return this._debug
   }
 
   /**
    * @returns {boolean}
    */
-  get isDevMode () {
+  get isDevMode() {
     return this._isDevMode
   }
 
   /**
    * @returns {boolean}
    */
-  get verbose () {
+  get verbose() {
     return this._verbose
   }
 
   /**
    * @returns {boolean}
    */
-  get safeMode () {
+  get safeMode() {
     return this._safeMode
   }
 
   /**
    * @returns {boolean}
    */
-  get disableSpellcheck () {
+  get disableSpellcheck() {
     return this._disableSpellcheck
   }
 }
@@ -78,7 +78,7 @@ export class AppEnvironment {
  * @param {arg.Result} args The parsed application arguments.
  * @returns {AppEnvironment} The current (global) environment.
  */
-const setupEnvironment = args => {
+const setupEnvironment = (args) => {
   patchEnvPath()
 
   const isDevMode = process.env.NODE_ENV !== 'production'
@@ -94,7 +94,7 @@ const setupEnvironment = args => {
     verbose,
     safeMode,
     userDataPath,
-    disableSpellcheck
+    disableSpellcheck,
   })
 
   ensureAppDirectoriesSync(appEnvironment.paths)

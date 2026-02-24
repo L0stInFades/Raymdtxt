@@ -1,7 +1,7 @@
 import { shell } from 'electron'
-import fs from 'fs'
-import fsPromises from 'fs/promises'
-import path from 'path'
+import fs from 'node:fs'
+import fsPromises from 'node:fs/promises'
+import path from 'node:path'
 import log from 'electron-log'
 import { electronLocalshortcut, isValidElectronAccelerator } from '@hfelix/electron-localshortcut'
 import { isFile2 } from 'common/filesystem'
@@ -17,7 +17,7 @@ class Keybindings {
    * @param {CommandManager} commandManager The command manager instance.
    * @param {AppEnvironment} appEnvironment The application environment instance.
    */
-  constructor (commandManager, appEnvironment) {
+  constructor(commandManager, appEnvironment) {
     const { userDataPath } = appEnvironment.paths
     this.configPath = path.join(userDataPath, 'keybindings.json')
     this.commandManager = commandManager
@@ -38,7 +38,7 @@ class Keybindings {
     this._loadLocalKeybindings()
   }
 
-  getAccelerator (id) {
+  getAccelerator(id) {
     const name = this.keys.get(id)
     if (!name) {
       return null
@@ -46,7 +46,7 @@ class Keybindings {
     return name
   }
 
-  registerAccelerator (win, accelerator, callback) {
+  registerAccelerator(win, accelerator, callback) {
     if (!win || !accelerator || !callback) {
       throw new Error(`addKeyHandler: invalid arguments (accelerator="${accelerator}").`)
     }
@@ -61,11 +61,11 @@ class Keybindings {
     })
   }
 
-  unregisterAccelerator (win, accelerator) {
+  unregisterAccelerator(win, accelerator) {
     electronLocalshortcut.unregister(win, accelerator)
   }
 
-  registerEditorKeyHandlers (win) {
+  registerEditorKeyHandlers(win) {
     for (const [id, accelerator] of this.keys) {
       if (accelerator && accelerator.length > 1) {
         this.registerAccelerator(win, accelerator, () => {
@@ -75,16 +75,15 @@ class Keybindings {
     }
   }
 
-  openConfigInFileManager () {
+  openConfigInFileManager() {
     const { configPath } = this
     if (!isFile2(configPath)) {
       fs.writeFileSync(configPath, '{\n\n\n}\n', 'utf-8')
     }
-    shell.openPath(configPath)
-      .catch(err => console.error(err))
+    shell.openPath(configPath).catch((err) => console.error(err))
   }
 
-  getDefaultKeybindings () {
+  getDefaultKeybindings() {
     if (isOsx) {
       return keybindingsDarwin
     } else if (isLinux) {
@@ -98,7 +97,7 @@ class Keybindings {
    *
    * @returns {Map<String, String>} User key bindings.
    */
-  getUserKeybindings () {
+  getUserKeybindings() {
     return this.userKeybindings
   }
 
@@ -108,14 +107,14 @@ class Keybindings {
    * @param {Map<String, String>} userKeybindings New user key bindings.
    * @returns {Promise<Boolean>}
    */
-  async setUserKeybindings (userKeybindings) {
+  async setUserKeybindings(userKeybindings) {
     this.userKeybindings = new Map(userKeybindings)
     return this._saveUserKeybindings()
   }
 
   // --- private --------------------------------
 
-  _prepareKeyMapper () {
+  _prepareKeyMapper() {
     // Update the key mapper to prevent problems on non-US keyboards.
     const { layout, keymap } = getKeyboardInfo()
     electronLocalshortcut.setKeyboardLayout(layout, keymap)
@@ -129,7 +128,7 @@ class Keybindings {
     })
   }
 
-  async _saveUserKeybindings () {
+  async _saveUserKeybindings() {
     const { configPath, userKeybindings } = this
     try {
       const userKeybindingJson = JSON.stringify(Object.fromEntries(userKeybindings), null, 2)
@@ -140,7 +139,7 @@ class Keybindings {
     }
   }
 
-  _loadLocalKeybindings () {
+  _loadLocalKeybindings() {
     if (global.MARKTEXT_SAFE_MODE || !isFile2(this.configPath)) {
       return
     }
@@ -222,7 +221,7 @@ class Keybindings {
     this.userKeybindings = userAccelerators
   }
 
-  _loadUserKeybindingsFromDisk () {
+  _loadUserKeybindingsFromDisk() {
     try {
       const obj = JSON.parse(fs.readFileSync(this.configPath, 'utf8'))
       if (typeof obj !== 'object') {

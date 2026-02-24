@@ -1,4 +1,3 @@
-import { ipcRenderer } from 'electron'
 import { delay } from '@/util'
 import bus from '../bus'
 
@@ -6,20 +5,23 @@ const crlfDescription = 'Carriage return and line feed (CRLF)'
 const lfDescription = 'Line feed (LF)'
 
 class LineEndingCommand {
-  constructor (editorState) {
+  constructor(editorState) {
     this.id = 'file.line-ending'
     this.description = 'File: Change Line Ending'
     this.placeholder = 'Select an option'
 
-    this.subcommands = [{
-      id: 'file.line-ending-crlf',
-      description: crlfDescription,
-      value: 'crlf'
-    }, {
-      id: 'file.line-ending-lf',
-      description: lfDescription,
-      value: 'lf'
-    }]
+    this.subcommands = [
+      {
+        id: 'file.line-ending-crlf',
+        description: crlfDescription,
+        value: 'crlf',
+      },
+      {
+        id: 'file.line-ending-lf',
+        description: lfDescription,
+        value: 'lf',
+      },
+    ]
     this.subcommandSelectedIndex = -1
 
     // Reference to editor state.
@@ -46,7 +48,7 @@ class LineEndingCommand {
   }
 
   executeSubcommand = async (_, value) => {
-    ipcRenderer.emit('mt::set-line-ending', null, value)
+    window.api.localEmit('mt::set-line-ending', value)
   }
 
   unload = () => {}

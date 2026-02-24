@@ -23,14 +23,14 @@ export default {
   props: {
     file: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
   },
   computed: {
     ...mapState({
-      currentFile: state => state.editor.currentFile
-    })
-  }
+      currentFile: (state) => state.editor.currentFile,
+    }),
+  },
 }
 </script>
 

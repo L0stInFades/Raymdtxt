@@ -30,7 +30,6 @@
 
 <script>
 import { mapState } from 'vuex'
-import { shell } from 'electron'
 import Bool from '@/prefComponents/common/bool'
 import Compound from '@/prefComponents/common/compound'
 import TextBox from '@/prefComponents/common/textBox'
@@ -39,45 +38,44 @@ export default {
   components: {
     Bool,
     Compound,
-    TextBox
+    TextBox,
   },
-  data () {
-    return {
-    }
+  data() {
+    return {}
   },
   computed: {
     ...mapState({
-      imageFolderPath: state => state.preferences.imageFolderPath,
-      imagePreferRelativeDirectory: state => state.preferences.imagePreferRelativeDirectory,
-      imageRelativeDirectoryName: state => state.preferences.imageRelativeDirectoryName
+      imageFolderPath: (state) => state.preferences.imageFolderPath,
+      imagePreferRelativeDirectory: (state) => state.preferences.imagePreferRelativeDirectory,
+      imageRelativeDirectoryName: (state) => state.preferences.imageRelativeDirectoryName,
     }),
     imageInsertAction: {
       get: function () {
         return this.$store.state.preferences.imageInsertAction
-      }
+      },
     },
     folderPathPlaceholder: {
       get: function () {
         return this.$store.state.preferences.imageFolderPath || ''
-      }
+      },
     },
     relativeDirectoryNamePlaceholder: {
       get: function () {
         return this.$store.state.preferences.imageRelativeDirectoryName || 'assets'
-      }
-    }
+      },
+    },
   },
   methods: {
-    openImageFolder () {
-      shell.openPath(this.imageFolderPath)
+    openImageFolder() {
+      window.api.shell.openPath(this.imageFolderPath)
     },
-    modifyImageFolderPath (value) {
+    modifyImageFolderPath(value) {
       return this.$store.dispatch('SET_IMAGE_FOLDER_PATH', value)
     },
-    onSelectChange (type, value) {
+    onSelectChange(type, value) {
       this.$store.dispatch('SET_SINGLE_PREFERENCE', { type, value })
-    }
-  }
+    },
+  },
 }
 </script>
 

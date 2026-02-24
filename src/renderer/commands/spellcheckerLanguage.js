@@ -6,7 +6,7 @@ import { getLanguageName } from '@/spellchecker/languageMap'
 
 // Command to switch the spellchecker language
 class SpellcheckerLanguageCommand {
-  constructor (spellchecker) {
+  constructor(spellchecker) {
     this.id = 'spellchecker.switch-language'
     this.description = 'Spelling: Switch language'
     this.placeholder = 'Select a language to switch to'
@@ -20,15 +20,15 @@ class SpellcheckerLanguageCommand {
 
   run = async () => {
     const langs = await SpellChecker.getAvailableDictionaries()
-    this.subcommands = langs.map(lang => {
+    this.subcommands = langs.map((lang) => {
       return {
         id: `spellchecker.switch-language-id-${lang}`,
         description: getLanguageName(lang),
-        value: lang
+        value: lang,
       }
     })
     const currentLanguage = this.spellchecker.lang
-    this.subcommandSelectedIndex = this.subcommands.findIndex(cmd => cmd.value === currentLanguage)
+    this.subcommandSelectedIndex = this.subcommands.findIndex((cmd) => cmd.value === currentLanguage)
   }
 
   execute = async () => {
@@ -37,15 +37,15 @@ class SpellcheckerLanguageCommand {
     bus.$emit('show-command-palette', this)
   }
 
-  executeSubcommand = async id => {
-    const command = this.subcommands.find(cmd => cmd.id === id)
+  executeSubcommand = async (id) => {
+    const command = this.subcommands.find((cmd) => cmd.id === id)
     if (this.spellchecker.isEnabled) {
       bus.$emit('switch-spellchecker-language', command.value)
     } else {
       notice.notify({
         title: 'Spelling',
         type: 'warning',
-        message: 'Cannot change language because spellchecker is disabled.'
+        message: 'Cannot change language because spellchecker is disabled.',
       })
     }
   }

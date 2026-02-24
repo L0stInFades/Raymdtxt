@@ -67,25 +67,24 @@
 </template>
 
 <script>
-import { shell } from 'electron'
 import bus from '../../bus'
 
 export default {
-  data () {
+  data() {
     return {
       showTweetDialog: false,
       value: '',
-      selectedFace: 'smile'
+      selectedFace: 'smile',
     }
   },
-  created () {
+  created() {
     bus.$on('tweetDialog', this.showDialog)
   },
-  beforeDestroy () {
+  beforeDestroy() {
     bus.$off('tweetDialog', this.showDialog)
   },
   methods: {
-    showDialog () {
+    showDialog() {
       this.showTweetDialog = true
       this.value = ''
       bus.$emit('editor-blur')
@@ -93,13 +92,13 @@ export default {
         this.$refs.textarea.focus()
       })
     },
-    faceClick (name) {
+    faceClick(name) {
       this.selectedFace = name
     },
-    reportViaGithub () {
-      shell.openExternal('https://github.com/marktext/marktext/issues/new')
+    reportViaGithub() {
+      window.api.shell.openExternal('https://github.com/marktext/marktext/issues/new')
     },
-    reportViaTwitter () {
+    reportViaTwitter() {
       const { value, selectedFace } = this
       if (!value) return
       const origin = 'https://twitter.com/intent/tweet'
@@ -107,15 +106,19 @@ export default {
       const params = {
         via: 'marktextme',
         url: encodeURI('https://github.com/marktext/marktext/'),
-        text: value
+        text: value,
       }
 
       if (selectedFace === 'smile') params.hashtags = 'happyMarkText'
 
-      shell.openExternal(`${origin}?${Object.keys(params).map(key => `${key}=${params[key]}`).join('&')}`)
+      window.api.shell.openExternal(
+        `${origin}?${Object.keys(params)
+          .map((key) => `${key}=${params[key]}`)
+          .join('&')}`,
+      )
       this.showTweetDialog = false
-    }
-  }
+    },
+  },
 }
 </script>
 

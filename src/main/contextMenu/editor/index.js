@@ -8,13 +8,24 @@ import {
   PASTE_AS_PLAIN_TEXT,
   SEPARATOR,
   INSERT_BEFORE,
-  INSERT_AFTER
+  INSERT_AFTER,
 } from './menuItems'
 import spellcheckMenuBuilder from './spellcheck'
 
-const CONTEXT_ITEMS = [INSERT_BEFORE, INSERT_AFTER, SEPARATOR, CUT, COPY, PASTE, SEPARATOR, COPY_AS_MARKDOWN, COPY_AS_HTML, PASTE_AS_PLAIN_TEXT]
+const CONTEXT_ITEMS = [
+  INSERT_BEFORE,
+  INSERT_AFTER,
+  SEPARATOR,
+  CUT,
+  COPY,
+  PASTE,
+  SEPARATOR,
+  COPY_AS_MARKDOWN,
+  COPY_AS_HTML,
+  PASTE_AS_PLAIN_TEXT,
+]
 
-const isInsideEditor = params => {
+const isInsideEditor = (params) => {
   const { isEditable, editFlags, inputFieldType } = params
   // WORKAROUND for Electron#32102: `params.spellcheckEnabled` is always false. Try to detect the editor container via other information.
   return isEditable && inputFieldType === 'none' && !!editFlags.canEditRichly
@@ -36,17 +47,19 @@ export const showEditorContextMenu = (win, event, params, isSpellcheckerEnabled)
     const menu = new Menu()
     if (isSpellcheckerEnabled) {
       const spellingSubmenu = spellcheckMenuBuilder(isMisspelled, misspelledWord, dictionarySuggestions)
-      menu.append(new MenuItem({
-        label: 'Spelling...',
-        submenu: spellingSubmenu
-      }))
+      menu.append(
+        new MenuItem({
+          label: 'Spelling...',
+          submenu: spellingSubmenu,
+        }),
+      )
       menu.append(new MenuItem(SEPARATOR))
     }
 
-    [CUT, COPY, COPY_AS_HTML, COPY_AS_MARKDOWN].forEach(item => {
+    ;[CUT, COPY, COPY_AS_HTML, COPY_AS_MARKDOWN].forEach((item) => {
       item.enabled = canCopy
     })
-    CONTEXT_ITEMS.forEach(item => {
+    CONTEXT_ITEMS.forEach((item) => {
       menu.append(new MenuItem(item))
     })
     menu.popup([{ window: win, x: event.clientX, y: event.clientY }])

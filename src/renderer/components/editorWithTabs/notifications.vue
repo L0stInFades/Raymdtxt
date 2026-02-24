@@ -34,25 +34,25 @@
 import { mapState } from 'vuex'
 
 export default {
-  data () {
+  data() {
     return {}
   },
   computed: {
     ...mapState({
-      currentFile: state => state.editor.currentFile,
-      showSideBar: state => state.layout.showSideBar,
-      sideBarWidth: state => state.layout.sideBarWidth
+      currentFile: (state) => state.editor.currentFile,
+      showSideBar: (state) => state.layout.showSideBar,
+      sideBarWidth: (state) => state.layout.sideBarWidth,
     }),
-    currentNotification () {
+    currentNotification() {
       const notifications = this.currentFile.notifications
       if (!notifications || notifications.length === 0) {
         return null
       }
       return notifications[0]
-    }
+    },
   },
   methods: {
-    handleClick (status) {
+    handleClick(status) {
       const notifications = this.currentFile.notifications
       if (!notifications || notifications.length === 0) {
         console.error('notifications::handleClick: Cannot find notification on stack.')
@@ -64,8 +64,8 @@ export default {
       if (action) {
         action(status)
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

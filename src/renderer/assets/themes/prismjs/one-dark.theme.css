@@ -28,7 +28,7 @@ SOFTWARE.
 
 code[class*="language-"],
 pre.ag-paragraph {
-  color: #ABB2BF;
+  color: #abb2bf;
   /*font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;*/
   text-align: left;
   white-space: pre;
@@ -61,8 +61,8 @@ pre.ag-paragraph {
 
 /* Inline Code */
 :not(pre) > code[class*="language-"] {
-  padding: .1em;
-  border-radius: .3em;
+  padding: 0.1em;
+  border-radius: 0.3em;
   white-space: normal;
 }
 
@@ -70,7 +70,7 @@ pre.ag-paragraph {
 .token.prolog,
 .token.doctype,
 .token.cdata {
-  color: #5C6370;
+  color: #5c6370;
 }
 
 .token.punctuation {

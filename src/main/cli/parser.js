@@ -27,7 +27,7 @@ const parseArgs = (argv = null, permissive = true) => {
     '-h': '--help',
     '--verbose': arg.COUNT,
     '-v': '--verbose',
-    '--version': Boolean
+    '--version': Boolean,
   }
   return arg(spec, { argv, permissive })
 }

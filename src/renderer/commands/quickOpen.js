@@ -1,15 +1,14 @@
-import path from 'path'
-import { ipcRenderer } from 'electron'
+import path from 'node:path'
 import { isChildOfDirectory, hasMarkdownExtension, MARKDOWN_INCLUSIONS } from '../../common/filesystem/paths'
 import bus from '../bus'
 import { delay } from '@/util'
 import FileSearcher from '@/node/fileSearcher'
 
-const SPECIAL_CHARS = /[\[\]\\^$.\|\?\*\+\(\)\/]{1}/g // eslint-disable-line no-useless-escape
+const SPECIAL_CHARS = /[[\]\\^$.|?*+()/]{1}/g // eslint-disable-line no-useless-escape
 
 // The quick open command
 class QuickOpenCommand {
-  constructor (rootState) {
+  constructor(rootState) {
     this.id = 'file.quick-open'
     this.description = 'File: Quick Open'
     this.placeholder = 'Search file to open'
@@ -26,7 +25,7 @@ class QuickOpenCommand {
     this._cancelFn = null
   }
 
-  search = async query => {
+  search = async (query) => {
     // Show opened files when no query given.
     if (!query) {
       return this.subcommands
@@ -55,10 +54,10 @@ class QuickOpenCommand {
     }
 
     this.subcommands = _editorState.tabs
-      .map(t => t.pathname)
+      .map((t) => t.pathname)
       // Filter untitled tabs
-      .filter(t => !!t)
-      .map(pathname => {
+      .filter((t) => !!t)
+      .map((pathname) => {
         const item = { id: pathname }
         Object.assign(item, this._getPath(pathname))
         return item
@@ -71,9 +70,9 @@ class QuickOpenCommand {
     bus.$emit('show-command-palette', this)
   }
 
-  executeSubcommand = async id => {
+  executeSubcommand = async (id) => {
     const { windowId } = global.marktext.env
-    ipcRenderer.send('mt::open-file-by-window-id', windowId, id)
+    window.api.ipc.send('mt::open-file-by-window-id', windowId, id)
   }
 
   unload = () => {
@@ -82,7 +81,7 @@ class QuickOpenCommand {
 
   // --- private ------------------------------------------
 
-  _doSearch = query => {
+  _doSearch = (query) => {
     this._cancelFn = null
     const { _editorState, _folderState } = this
     const isRootDirOpened = !!_folderState.projectTree
@@ -98,65 +97,65 @@ class QuickOpenCommand {
 
     // Add files that are not in the current root directory but opened.
     if (tabsAvailable) {
-      const re = new RegExp(query.replace(SPECIAL_CHARS, p => {
-        if (p === '*') return '.*'
-        return p === '\\' ? '\\\\' : `\\${p}`
-      }), 'i')
+      const re = new RegExp(
+        query.replace(SPECIAL_CHARS, (p) => {
+          if (p === '*') return '.*'
+          return p === '\\' ? '\\\\' : `\\${p}`
+        }),
+        'i',
+      )
 
       for (const tab of _editorState.tabs) {
         const { pathname } = tab
-        if (pathname && re.test(pathname) &&
-          (!rootPath || !isChildOfDirectory(rootPath, pathname))
-        ) {
+        if (pathname && re.test(pathname) && (!rootPath || !isChildOfDirectory(rootPath, pathname))) {
           searchResult.push(pathname)
         }
       }
     }
 
     if (!isRootDirOpened) {
-      return searchResult
-        .map(pathname => {
-          return {
-            id: pathname,
-            description: pathname,
-            title: pathname
-          }
-        })
+      return searchResult.map((pathname) => {
+        return {
+          id: pathname,
+          description: pathname,
+          title: pathname,
+        }
+      })
     }
 
     // Search root directory on disk.
     return new Promise((resolve, reject) => {
       let canceled = false
-      const promises = this._directorySearcher.search([rootPath], '', {
-        didMatch: result => {
-          if (canceled) return
-          searchResult.push(result)
-        },
-        didSearchPaths: numPathsFound => {
-          // Cancel when more than 30 files were found. User should specify the search query.
-          if (!canceled && numPathsFound > 30) {
-            canceled = true
-            if (promises.cancel) {
-              promises.cancel()
+      const promises = this._directorySearcher
+        .search([rootPath], '', {
+          didMatch: (result) => {
+            if (canceled) return
+            searchResult.push(result)
+          },
+          didSearchPaths: (numPathsFound) => {
+            // Cancel when more than 30 files were found. User should specify the search query.
+            if (!canceled && numPathsFound > 30) {
+              canceled = true
+              if (promises.cancel) {
+                promises.cancel()
+              }
             }
-          }
-        },
+          },
 
-        // Only search markdown files that contain the query string.
-        inclusions: this._getInclusions(query)
-      })
+          // Only search markdown files that contain the query string.
+          inclusions: this._getInclusions(query),
+        })
         .then(() => {
           this._cancelFn = null
           resolve(
-            searchResult
-              .map(pathname => {
-                const item = { id: pathname }
-                Object.assign(item, this._getPath(pathname))
-                return item
-              })
+            searchResult.map((pathname) => {
+              const item = { id: pathname }
+              Object.assign(item, this._getPath(pathname))
+              return item
+            }),
           )
         })
-        .catch(error => {
+        .catch((error) => {
           this._cancelFn = null
           reject(error)
         })
@@ -171,7 +170,7 @@ class QuickOpenCommand {
     })
   }
 
-  _getInclusions = query => {
+  _getInclusions = (query) => {
     // NOTE: This will fail on `foo.m` because we search for `foo.m.md`.
     if (hasMarkdownExtension(query)) {
       return [`*${query}`]
@@ -179,12 +178,12 @@ class QuickOpenCommand {
 
     const inclusions = []
     for (let i = 0; i < MARKDOWN_INCLUSIONS.length; ++i) {
-      inclusions[i] = `*${query}` + MARKDOWN_INCLUSIONS[i]
+      inclusions[i] = `*${query}${MARKDOWN_INCLUSIONS[i]}`
     }
     return inclusions
   }
 
-  _getPath = pathname => {
+  _getPath = (pathname) => {
     const rootPath = this._folderState.projectTree.pathname
     if (!isChildOfDirectory(rootPath, pathname)) {
       return { title: pathname, description: pathname }

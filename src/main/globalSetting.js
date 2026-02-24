@@ -1,4 +1,4 @@
-import path from 'path'
+import path from 'node:path'
 
 // Set `__static` path to static files in production.
 if (process.env.NODE_ENV !== 'development') {

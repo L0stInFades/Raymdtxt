@@ -33,36 +33,36 @@ import bus from '../../bus'
 export default {
   mixins: [fileMixins],
   name: 'file',
-  data () {
+  data() {
     return {
-      newName: ''
+      newName: '',
     }
   },
   props: {
     file: {
       type: Object,
-      required: true
+      required: true,
     },
     depth: {
       type: Number,
-      required: true
-    }
+      required: true,
+    },
   },
   components: {
-    FileIcon
+    FileIcon,
   },
   computed: {
     ...mapState({
-      renameCache: state => state.project.renameCache,
-      activeItem: state => state.project.activeItem,
-      clipboard: state => state.project.clipboard,
-      currentFile: state => state.editor.currentFile,
-      tabs: state => state.editor.tabs
-    })
+      renameCache: (state) => state.project.renameCache,
+      activeItem: (state) => state.project.activeItem,
+      clipboard: (state) => state.project.clipboard,
+      currentFile: (state) => state.editor.currentFile,
+      tabs: (state) => state.editor.tabs,
+    }),
   },
-  created () {
+  created() {
     this.$nextTick(() => {
-      this.$refs.file.addEventListener('contextmenu', event => {
+      this.$refs.file.addEventListener('contextmenu', (event) => {
         event.preventDefault()
         this.$store.dispatch('CHANGE_ACTIVE_ITEM', this.file)
         showContextMenu(event, !!this.clipboard)
@@ -72,8 +72,8 @@ export default {
     })
   },
   methods: {
-    noop () {},
-    focusRenameInput () {
+    noop() {},
+    focusRenameInput() {
       this.$nextTick(() => {
         if (this.$refs.renameInput) {
           this.$refs.renameInput.focus()
@@ -81,13 +81,13 @@ export default {
         }
       })
     },
-    rename () {
+    rename() {
       const { newName } = this
       if (newName) {
         this.$store.dispatch('RENAME_IN_SIDEBAR', newName)
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

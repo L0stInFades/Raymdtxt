@@ -27,26 +27,26 @@ import bus from '../../bus'
 import EmptyIcon from '@/assets/icons/undraw_toc_empty.svg'
 
 export default {
-  data () {
+  data() {
     this.EmptyIcon = EmptyIcon
     return {
       defaultProps: {
         children: 'children',
-        label: 'label'
-      }
+        label: 'label',
+      },
     }
   },
   computed: {
     ...mapState({
-      toc: state => state.editor.toc,
-      wordWrapInToc: state => state.preferences.wordWrapInToc
-    })
+      toc: (state) => state.editor.toc,
+      wordWrapInToc: (state) => state.preferences.wordWrapInToc,
+    }),
   },
   methods: {
-    handleClick ({ slug }) {
+    handleClick({ slug }) {
       bus.$emit('scroll-to-header', slug)
-    }
-  }
+    },
+  },
 }
 </script>
 

@@ -1,6 +1,6 @@
 // TODO: Remove information from other vue source files into this file.
 
-export const isValidService = name => {
+export const isValidService = (name) => {
   return name !== 'none' && services.hasOwnProperty(name)
 }
 
@@ -13,7 +13,7 @@ const services = {
     tosUrl: '',
 
     // Set to true to always allow to change to this dummy service
-    agreedToLegalNotices: true
+    agreedToLegalNotices: true,
   },
 
   // Real services
@@ -24,7 +24,7 @@ const services = {
     tosUrl: 'https://github.com/PicGo/PicGo-Core',
 
     // Currently a non-persistent value
-    agreedToLegalNotices: true
+    agreedToLegalNotices: true,
   },
 
   github: {
@@ -34,7 +34,7 @@ const services = {
     tosUrl: 'https://github.com/site/terms',
 
     // Currently a non-persistent value
-    agreedToLegalNotices: false
+    agreedToLegalNotices: false,
   },
 
   cliScript: {
@@ -42,8 +42,8 @@ const services = {
     isGdprCompliant: true,
     privacyUrl: '',
     tosUrl: '',
-    agreedToLegalNotices: true
-  }
+    agreedToLegalNotices: true,
+  },
 }
 
 export default services

@@ -10,11 +10,11 @@ export default {
     name: {
       type: String,
       required: true,
-      default: 'mock.md'
-    }
+      default: 'mock.md',
+    },
   },
   computed: {
-    className () {
+    className() {
       let classNames = fileIcons.getClassByName(this.name ? this.name : 'mock.md')
 
       if (!classNames) {
@@ -22,8 +22,8 @@ export default {
         classNames = fileIcons.getClassByName('mock.md')
       }
       return classNames.split(/\s/)
-    }
-  }
+    },
+  },
 }
 </script>
 

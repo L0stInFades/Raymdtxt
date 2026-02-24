@@ -35,46 +35,45 @@
 
 <script>
 import bus from '@/bus'
-import { ipcRenderer } from 'electron'
 import importIcon from '@/assets/icons/import_file.svg'
 
 export default {
-  data () {
+  data() {
     this.importIcon = importIcon
     return {
       showImport: false,
-      isOver: false
+      isOver: false,
     }
   },
-  created () {
+  created() {
     bus.$on('importDialog', this.showDialog)
   },
-  beforeDestroy () {
+  beforeDestroy() {
     bus.$off('importDialog', this.showDialog)
   },
   methods: {
-    showDialog (boolean) {
+    showDialog(boolean) {
       if (boolean !== this.showImport) {
         this.showImport = boolean
       }
     },
-    dragOverHandler (e) {
+    dragOverHandler(_e) {
       this.isOver = true
     },
-    dragLeaveHandler (e) {
+    dragLeaveHandler(_e) {
       this.isOver = false
     },
-    dropHandler (e) {
+    dropHandler(e) {
       e.preventDefault()
       if (e.dataTransfer.files) {
         const fileList = []
         for (const file of e.dataTransfer.files) {
           fileList.push(file.path)
         }
-        ipcRenderer.send('mt::window::drop', fileList)
+        window.api.ipc.send('mt::window::drop', fileList)
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

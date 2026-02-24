@@ -56,35 +56,35 @@ import Toc from './toc.vue'
 import { mapState } from 'vuex'
 
 export default {
-  data () {
+  data() {
     this.sideBarIcons = sideBarIcons
     this.sideBarBottomIcons = sideBarBottomIcons
     return {
       openedFiles: [],
-      sideBarViewWidth: 280
+      sideBarViewWidth: 280,
     }
   },
   components: {
     Tree,
     SideBarSearch,
-    Toc
+    Toc,
   },
   computed: {
     ...mapState({
-      rightColumn: state => state.layout.rightColumn,
-      showSideBar: state => state.layout.showSideBar,
-      projectTree: state => state.project.projectTree,
-      sideBarWidth: state => state.layout.sideBarWidth,
-      tabs: state => state.editor.tabs
+      rightColumn: (state) => state.layout.rightColumn,
+      showSideBar: (state) => state.layout.showSideBar,
+      projectTree: (state) => state.project.projectTree,
+      sideBarWidth: (state) => state.layout.sideBarWidth,
+      tabs: (state) => state.editor.tabs,
     }),
-    finalSideBarWidth () {
+    finalSideBarWidth() {
       const { showSideBar, rightColumn, sideBarViewWidth } = this
       if (!showSideBar) return 0
       if (rightColumn === '') return 45
       return sideBarViewWidth < 220 ? 220 : sideBarViewWidth
-    }
+    },
   },
-  created () {
+  created() {
     this.$nextTick(() => {
       const dragBar = this.$refs.dragBar
       let startX = 0
@@ -93,19 +93,19 @@ export default {
 
       this.sideBarViewWidth = sideBarWidth
 
-      const mouseUpHandler = event => {
+      const mouseUpHandler = (_event) => {
         document.removeEventListener('mousemove', mouseMoveHandler, false)
         document.removeEventListener('mouseup', mouseUpHandler, false)
         this.$store.dispatch('CHANGE_SIDE_BAR_WIDTH', sideBarWidth < 220 ? 220 : sideBarWidth)
       }
 
-      const mouseMoveHandler = event => {
+      const mouseMoveHandler = (event) => {
         const offset = event.clientX - startX
         sideBarWidth = startWidth + offset
         this.sideBarViewWidth = sideBarWidth
       }
 
-      const mouseDownHandler = event => {
+      const mouseDownHandler = (event) => {
         startX = event.clientX
         startWidth = +this.sideBarWidth
         document.addEventListener('mousemove', mouseMoveHandler, false)
@@ -116,7 +116,7 @@ export default {
     })
   },
   methods: {
-    handleLeftIconClick (name) {
+    handleLeftIconClick(name) {
       if (this.rightColumn === name) {
         this.$store.commit('SET_LAYOUT', { rightColumn: '' })
         this.$store.dispatch('CHANGE_SIDE_BAR_WIDTH', this.finalSideBarWidth)
@@ -129,12 +129,12 @@ export default {
         }
       }
     },
-    handleLeftBottomClick (name) {
+    handleLeftBottomClick(name) {
       if (name === 'settings') {
         this.$store.dispatch('OPEN_SETTING_WINDOW')
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

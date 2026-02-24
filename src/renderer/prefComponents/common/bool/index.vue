@@ -26,12 +26,10 @@
 </template>
 
 <script>
-import { shell } from 'electron'
-
 export default {
-  data () {
+  data() {
     return {
-      status: this.bool
+      status: this.bool,
     }
   },
   props: {
@@ -43,26 +41,26 @@ export default {
     detailedDescription: String,
     disable: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   watch: {
     bool: function (value, oldValue) {
       if (value !== oldValue) {
         this.status = value
       }
-    }
+    },
   },
   methods: {
-    handleMoreClick () {
+    handleMoreClick() {
       if (typeof this.more === 'string') {
-        shell.openExternal(this.more)
+        window.api.shell.openExternal(this.more)
       }
     },
-    handleSwitchChange (value) {
+    handleSwitchChange(value) {
       this.onChange(value)
-    }
-  }
+    },
+  },
 }
 </script>
 

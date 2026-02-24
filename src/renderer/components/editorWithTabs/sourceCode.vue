@@ -20,25 +20,25 @@ export default {
     cursor: Object,
     textDirection: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
 
   computed: {
     ...mapState({
-      theme: state => state.preferences.theme,
-      sourceCode: state => state.preferences.sourceCode,
-      currentTab: state => state.editor.currentFile
-    })
+      theme: (state) => state.preferences.theme,
+      sourceCode: (state) => state.preferences.sourceCode,
+      currentTab: (state) => state.editor.currentFile,
+    }),
   },
 
-  data () {
+  data() {
     return {
       contentState: null,
       editor: null,
       commitTimer: null,
       viewDestroyed: false,
-      tabId: null
+      tabId: null,
     }
   },
 
@@ -48,10 +48,10 @@ export default {
       if (value !== oldValue && editor) {
         setTextDirection(editor, value)
       }
-    }
+    },
   },
 
-  created () {
+  created() {
     this.$nextTick(() => {
       // TODO: Should we load markdown from the tab or mapped vue property?
       const { id } = this.currentTab
@@ -70,13 +70,13 @@ export default {
         // solution would be to set a fixed height like in #791 but then the scrollbar is not on
         // the right side. Please also see CodeMirror#1104.
         viewportMargin: Infinity,
-        lineNumberFormatter (line) {
+        lineNumberFormatter(line) {
           if (line % 10 === 0 || line === 1) {
             return line
           } else {
             return ''
           }
-        }
+        },
       }
 
       // Set theme
@@ -87,7 +87,7 @@ export default {
       }
 
       // Init CodeMirror
-      const editor = this.editor = codeMirror(container, codeMirrorConfig)
+      const editor = (this.editor = codeMirror(container, codeMirrorConfig))
 
       bus.$on('file-loaded', this.handleFileChange)
       bus.$on('invalidate-image-cache', this.handleInvalidateImageCache)
@@ -98,7 +98,7 @@ export default {
       setMode(editor, 'markdown')
       this.listenChange()
 
-      editor.on('contextmenu', (cm, event) => {
+      editor.on('contextmenu', (_cm, event) => {
         // Make sure no context menu is shown in source-code mode because we have to handle
         // Muyas menu by Electron.
         event.preventDefault()
@@ -106,7 +106,7 @@ export default {
       })
 
       // NOTE: Cursor may be not null but the inner values are.
-      if (cursor && cursor.anchor && cursor.focus) {
+      if (cursor?.anchor && cursor.focus) {
         const { anchor, focus } = cursor
         editor.setSelection(anchor, focus, { scroll: true }) // Scroll the focus into view.
       } else {
@@ -115,7 +115,7 @@ export default {
       this.tabId = id
     })
   },
-  beforeDestroy () {
+  beforeDestroy() {
     // NOTE: Clear timer and manually commit changes. After mode switching and cleanup may follow
     // further key inputs, so ignore all inputs.
     this.viewDestroyed = true
@@ -132,13 +132,13 @@ export default {
     bus.$emit('file-changed', { id: this.tabId, markdown, cursor, renderCursor: true })
   },
   methods: {
-    handleImageAction ({ id, result, alt }) {
+    handleImageAction({ id, result, alt }) {
       const { editor } = this
       const value = editor.getValue()
       const focus = editor.getCursor('focus')
       const anchor = editor.getCursor('anchor')
       const lines = value.split('\n')
-      const index = lines.findIndex(line => line.indexOf(id) > 0)
+      const index = lines.findIndex((line) => line.indexOf(id) > 0)
 
       if (index > -1) {
         const oldLine = lines[index]
@@ -152,11 +152,11 @@ export default {
         }
         const range = {
           start: match.index,
-          end: match.index + match[1].length
+          end: match.index + match[1].length,
         }
         const delta = alt.length + result.length + 5 - match[1].length
 
-        const adjust = pointer => {
+        const adjust = (pointer) => {
           if (!pointer) {
             return
           }
@@ -181,9 +181,9 @@ export default {
         }
       }
     },
-    listenChange () {
+    listenChange() {
       const { editor } = this
-      editor.on('cursorActivity', cm => {
+      editor.on('cursorActivity', (cm) => {
         const { cursor, markdown } = this.getMarkdownAndCursor(cm)
         // Attention: the cursor may be `{focus: null, anchor: null}` when press `backspace`
         const wordCount = getWordCount(markdown)
@@ -202,7 +202,7 @@ export default {
       })
     },
     // Another tab was selected - only listen to get changes but don't set history or other things.
-    handleFileChange ({ id, markdown, cursor }) {
+    handleFileChange({ id, markdown, cursor }) {
       this.prepareTabSwitch()
 
       const { editor } = this
@@ -219,11 +219,11 @@ export default {
       this.tabId = id
     },
     // Get markdown and cursor from CodeMirror.
-    getMarkdownAndCursor (cm) {
+    getMarkdownAndCursor(cm) {
       let focus = cm.getCursor('head')
       let anchor = cm.getCursor('anchor')
       const markdown = cm.getValue()
-      const convertToMuyaCursor = cursor => {
+      const convertToMuyaCursor = (cursor) => {
         const line = cm.getLine(cursor.line)
         const preLine = cm.getLine(cursor.line - 1)
         const nextLine = cm.getLine(cursor.line + 1)
@@ -243,7 +243,7 @@ export default {
       return { cursor: { focus, anchor }, markdown }
     },
     // Commit changes from old tab. Problem: tab was already switched, so commit changes with old tab id.
-    prepareTabSwitch () {
+    prepareTabSwitch() {
       if (this.commitTimer) clearTimeout(this.commitTimer)
       if (this.tabId) {
         const { editor } = this
@@ -253,13 +253,13 @@ export default {
       }
     },
 
-    handleSelectAll () {
+    handleSelectAll() {
       if (!this.sourceCode) {
         return
       }
 
       const { editor } = this
-      if (editor && editor.hasFocus()) {
+      if (editor?.hasFocus()) {
         this.editor.execCommand('selectAll')
       } else {
         const activeElement = document.activeElement
@@ -270,12 +270,12 @@ export default {
       }
     },
 
-    handleInvalidateImageCache () {
+    handleInvalidateImageCache() {
       if (this.editor) {
         this.editor.invalidateImageCache()
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

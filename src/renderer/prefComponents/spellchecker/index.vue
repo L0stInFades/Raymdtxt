@@ -61,7 +61,6 @@
 </template>
 
 <script>
-import { ipcRenderer } from 'electron'
 import log from 'electron-log'
 import { mapState } from 'vuex'
 import Compound from '../common/compound'
@@ -78,91 +77,94 @@ export default {
     Bool,
     Compound,
     CurSelect,
-    Separator
+    Separator,
   },
-  data () {
+  data() {
     this.isOsx = isOsx
     return {
       availableDictionaries: [],
       wordsInCustomDictionary: [],
-      errorMessage: ''
+      errorMessage: '',
     }
   },
   computed: {
     ...mapState({
-      spellcheckerEnabled: state => state.preferences.spellcheckerEnabled,
-      spellcheckerNoUnderline: state => state.preferences.spellcheckerNoUnderline,
-      spellcheckerLanguage: state => state.preferences.spellcheckerLanguage
-    })
+      spellcheckerEnabled: (state) => state.preferences.spellcheckerEnabled,
+      spellcheckerNoUnderline: (state) => state.preferences.spellcheckerNoUnderline,
+      spellcheckerLanguage: (state) => state.preferences.spellcheckerLanguage,
+    }),
   },
-  mounted () {
+  mounted() {
     if (!isOsx) {
-      this.getAvailableDictionaries()
-        .then(dicts => {
-          this.availableDictionaries = dicts
-        })
+      this.getAvailableDictionaries().then((dicts) => {
+        this.availableDictionaries = dicts
+      })
 
-      ipcRenderer.invoke('mt::spellchecker-get-custom-dictionary-words')
-        .then(words => {
-          this.wordsInCustomDictionary = words.map(word => { return { word } })
+      window.api.ipc.invoke('mt::spellchecker-get-custom-dictionary-words').then((words) => {
+        this.wordsInCustomDictionary = words.map((word) => {
+          return { word }
         })
+      })
     }
   },
   methods: {
-    async getAvailableDictionaries () {
+    async getAvailableDictionaries() {
       const dictionaries = await SpellChecker.getAvailableDictionaries()
-      return dictionaries.map(selectedItem => {
+      return dictionaries.map((selectedItem) => {
         return {
           value: selectedItem,
-          label: getLanguageName(selectedItem)
+          label: getLanguageName(selectedItem),
         }
       })
     },
-    async ensureDictLanguage (lang) {
+    async ensureDictLanguage(lang) {
       if (!this.spellchecker) {
         this.spellchecker = new SpellChecker(true, 'en-US')
       }
       await this.spellchecker.switchLanguage(lang)
     },
 
-    handleSpellcheckerLanguage (languageCode) {
+    handleSpellcheckerLanguage(languageCode) {
       this.ensureDictLanguage(languageCode)
         .then(() => {
           this.onSelectChange('spellcheckerLanguage', languageCode)
         })
-        .catch(error => {
+        .catch((error) => {
           log.error(error)
           notice.notify({
             title: 'Failed to switch language',
             type: 'error',
-            message: error.message
+            message: error.message,
           })
         })
     },
-    handleSpellcheckerEnabled (isEnabled) {
+    handleSpellcheckerEnabled(isEnabled) {
       this.onSelectChange('spellcheckerEnabled', isEnabled)
     },
-    onSelectChange (type, value) {
+    onSelectChange(type, value) {
       this.$store.dispatch('SET_SINGLE_PREFERENCE', { type, value })
     },
-    handleDeleteClick (selectedItem) {
+    handleDeleteClick(selectedItem) {
       if (selectedItem && typeof selectedItem.word === 'string') {
-        ipcRenderer.invoke('mt::spellchecker-remove-word', selectedItem.word)
-          .then(success => {
+        window.api.ipc
+          .invoke('mt::spellchecker-remove-word', selectedItem.word)
+          .then((success) => {
             if (success) {
-              this.wordsInCustomDictionary = this.wordsInCustomDictionary.filter(item => item.word !== selectedItem.word)
+              this.wordsInCustomDictionary = this.wordsInCustomDictionary.filter(
+                (item) => item.word !== selectedItem.word,
+              )
             } else {
               notice.notify({
                 title: 'Failed to remove custom word',
                 type: 'error',
-                message: 'An unexpected error occurred while saving.'
+                message: 'An unexpected error occurred while saving.',
               })
             }
           })
-          .catch(error => log.error(error))
+          .catch((error) => log.error(error))
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

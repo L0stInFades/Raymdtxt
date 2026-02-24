@@ -1,24 +1,31 @@
+import path from 'node:path'
+
 export const isOsx = process.platform === 'darwin'
 export const isWindows = process.platform === 'win32'
 export const isLinux = process.platform === 'linux'
+
+// Resolve preload script path. Both main.js and preload.js are output to the
+// same directory (dist/electron/), so __dirname reliably points to preload.js.
+const preloadPath = path.join(__dirname, 'preload.js')
 
 export const editorWinOptions = Object.freeze({
   minWidth: 550,
   minHeight: 350,
   webPreferences: {
-    contextIsolation: false,
+    preload: preloadPath,
+    contextIsolation: true,
     // WORKAROUND: We cannot enable spellcheck if it was disabled during
     // renderer startup due to a bug in Electron (Electron#32755). We'll
     // enable it always and set the HTML spelling attribute to false.
     spellcheck: true,
-    nodeIntegration: true,
-    webSecurity: false
+    nodeIntegration: false,
+    webSecurity: false,
   },
   useContentSize: true,
   show: true,
   frame: false,
   titleBarStyle: 'hiddenInset',
-  zoomFactor: 1.0
+  zoomFactor: 1.0,
 })
 
 export const preferencesWinOptions = Object.freeze({
@@ -27,11 +34,12 @@ export const preferencesWinOptions = Object.freeze({
   width: 950,
   height: 650,
   webPreferences: {
-    contextIsolation: false,
+    preload: preloadPath,
+    contextIsolation: true,
     // Always true to access native spellchecker.
     spellcheck: true,
-    nodeIntegration: true,
-    webSecurity: false
+    nodeIntegration: false,
+    webSecurity: false,
   },
   fullscreenable: false,
   fullscreen: false,
@@ -41,7 +49,7 @@ export const preferencesWinOptions = Object.freeze({
   frame: false,
   thickFrame: !isOsx,
   titleBarStyle: 'hiddenInset',
-  zoomFactor: 1.0
+  zoomFactor: 1.0,
 })
 
 export const PANDOC_EXTENSIONS = Object.freeze([
@@ -58,16 +66,14 @@ export const PANDOC_EXTENSIONS = Object.freeze([
   'dokuwiki',
   'textile',
   'opml',
-  'epub'
+  'epub',
 ])
 
-export const BLACK_LIST = Object.freeze([
-  '$RECYCLE.BIN'
-])
+export const BLACK_LIST = Object.freeze(['$RECYCLE.BIN'])
 
 export const EXTENSION_HASN = Object.freeze({
   styledHtml: '.html',
-  pdf: '.pdf'
+  pdf: '.pdf',
 })
 
 export const TITLE_BAR_HEIGHT = isOsx ? 21 : 32
@@ -77,4 +83,5 @@ export const CRLF_LINE_ENDING_REG = /\r\n/
 
 export const GITHUB_REPO_URL = 'https://github.com/marktext/marktext'
 // copy from muya
-export const URL_REG = /^http(s)?:\/\/([a-z0-9\-._~]+\.[a-z]{2,}|[0-9.]+|localhost|\[[a-f0-9.:]+\])(:[0-9]{1,5})?(\/[\S]+)?/i
+export const URL_REG =
+  /^http(s)?:\/\/([a-z0-9\-._~]+\.[a-z]{2,}|[0-9.]+|localhost|\[[a-f0-9.:]+\])(:[0-9]{1,5})?(\/[\S]+)?/i

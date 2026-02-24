@@ -127,12 +127,7 @@ import Bool from '../common/bool'
 import Separator from '../common/separator'
 import { isOsx } from '@/util'
 
-import {
-  titleBarStyleOptions,
-  zoomOptions,
-  fileSortByOptions,
-  languageOptions
-} from './config'
+import { titleBarStyleOptions, zoomOptions, fileSortByOptions, languageOptions } from './config'
 
 export default {
   components: {
@@ -140,9 +135,9 @@ export default {
     Bool,
     Range,
     CurSelect,
-    Separator
+    Separator,
   },
-  data () {
+  data() {
     this.titleBarStyleOptions = titleBarStyleOptions
     this.zoomOptions = zoomOptions
     this.fileSortByOptions = fileSortByOptions
@@ -152,17 +147,17 @@ export default {
   },
   computed: {
     ...mapState({
-      autoSave: state => state.preferences.autoSave,
-      autoSaveDelay: state => state.preferences.autoSaveDelay,
-      titleBarStyle: state => state.preferences.titleBarStyle,
-      defaultDirectoryToOpen: state => state.preferences.defaultDirectoryToOpen,
-      openFilesInNewWindow: state => state.preferences.openFilesInNewWindow,
-      openFolderInNewWindow: state => state.preferences.openFolderInNewWindow,
-      zoom: state => state.preferences.zoom,
-      hideScrollbar: state => state.preferences.hideScrollbar,
-      wordWrapInToc: state => state.preferences.wordWrapInToc,
-      fileSortBy: state => state.preferences.fileSortBy,
-      language: state => state.preferences.language
+      autoSave: (state) => state.preferences.autoSave,
+      autoSaveDelay: (state) => state.preferences.autoSaveDelay,
+      titleBarStyle: (state) => state.preferences.titleBarStyle,
+      defaultDirectoryToOpen: (state) => state.preferences.defaultDirectoryToOpen,
+      openFilesInNewWindow: (state) => state.preferences.openFilesInNewWindow,
+      openFolderInNewWindow: (state) => state.preferences.openFolderInNewWindow,
+      zoom: (state) => state.preferences.zoom,
+      hideScrollbar: (state) => state.preferences.hideScrollbar,
+      wordWrapInToc: (state) => state.preferences.wordWrapInToc,
+      fileSortBy: (state) => state.preferences.fileSortBy,
+      language: (state) => state.preferences.language,
     }),
     startUpAction: {
       get: function () {
@@ -171,17 +166,17 @@ export default {
       set: function (value) {
         const type = 'startUpAction'
         this.$store.dispatch('SET_SINGLE_PREFERENCE', { type, value })
-      }
-    }
+      },
+    },
   },
   methods: {
-    onSelectChange (type, value) {
+    onSelectChange(type, value) {
       this.$store.dispatch('SET_SINGLE_PREFERENCE', { type, value })
     },
-    selectDefaultDirectoryToOpen () {
+    selectDefaultDirectoryToOpen() {
       this.$store.dispatch('SELECT_DEFAULT_DIRECTORY_TO_OPEN')
-    }
-  }
+    },
+  },
 }
 </script>
 

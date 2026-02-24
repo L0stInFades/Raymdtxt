@@ -1,9 +1,8 @@
-import path from 'path'
-import { ipcRenderer } from 'electron'
+import path from 'node:path'
 import log from 'electron-log'
 import RendererPaths from './node/paths'
 
-let exceptionLogger = s => console.error(s)
+let exceptionLogger = (s) => console.error(s)
 
 const configureLogger = () => {
   const { debug, paths, windowId } = global.marktext.env
@@ -41,38 +40,32 @@ const parseUrlArgs = () => {
       codeFontSize,
       hideScrollbar,
       theme,
-      titleBarStyle
-    }
+      titleBarStyle,
+    },
   }
 }
 
 const bootstrapRenderer = () => {
   // Register renderer exception handler
-  window.addEventListener('error', event => {
+  window.addEventListener('error', (event) => {
     if (event.error) {
       const { message, name, stack } = event.error
       const copy = {
         message,
         name,
-        stack
+        stack,
       }
 
       exceptionLogger(event.error)
 
       // Pass exception to main process exception handler to show a error dialog.
-      ipcRenderer.send('mt::handle-renderer-error', copy)
+      window.api.ipc.send('mt::handle-renderer-error', copy)
     } else {
       console.error(event)
     }
   })
 
-  const {
-    debug,
-    initialState,
-    userDataPath,
-    windowId,
-    type
-  } = parseUrlArgs()
+  const { debug, initialState, userDataPath, windowId, type } = parseUrlArgs()
   const paths = new RendererPaths(userDataPath)
   const marktext = {
     initialState,
@@ -80,9 +73,9 @@ const bootstrapRenderer = () => {
       debug,
       paths,
       windowId,
-      type
+      type,
     },
-    paths
+    paths,
   }
   global.marktext = marktext
 

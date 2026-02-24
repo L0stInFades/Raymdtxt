@@ -17,15 +17,15 @@
 import ContentIcon from '@/assets/icons/undraw_content.svg'
 
 export default {
-  data () {
+  data() {
     this.ContentIcon = ContentIcon
     return {}
   },
   methods: {
-    newFile () {
+    newFile() {
       this.$store.dispatch('NEW_UNTITLED_TAB', {})
-    }
-  }
+    },
+  },
 }
 </script>
 

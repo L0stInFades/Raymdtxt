@@ -123,7 +123,7 @@ import FindWordIcon from '@/assets/icons/searchIcons/iconWord.svg'
 import FindRegexIcon from '@/assets/icons/searchIcons/iconRegex.svg'
 
 export default {
-  data () {
+  data() {
     this.FindCaseIcon = FindCaseIcon
     this.FindWordIcon = FindWordIcon
     this.FindRegexIcon = FindRegexIcon
@@ -135,7 +135,7 @@ export default {
       type: 'search',
       searchValue: '',
       replaceValue: '',
-      searchErrorMsg: ''
+      searchErrorMsg: '',
     }
   },
 
@@ -146,30 +146,30 @@ export default {
       if (value && value !== oldValue.value) {
         this.searchValue = value
       }
-    }
+    },
   },
 
   computed: {
     ...mapState({
-      searchMatches: state => state.editor.currentFile.searchMatches
+      searchMatches: (state) => state.editor.currentFile.searchMatches,
     }),
-    highlightIndex () {
+    highlightIndex() {
       if (this.searchMatches) {
         return this.searchMatches.index
       } else {
         return -1
       }
     },
-    highlightCount () {
+    highlightCount() {
       if (this.searchMatches) {
         return this.searchMatches.matches.length
       } else {
         return 0
       }
-    }
+    },
   },
 
-  created () {
+  created() {
     bus.$on('find', this.listenFind)
     bus.$on('replace', this.listenReplace)
     bus.$on('findNext', this.listenFindNext)
@@ -178,7 +178,7 @@ export default {
     document.addEventListener('keyup', this.docKeyup)
   },
 
-  beforeDestroy () {
+  beforeDestroy() {
     bus.$off('find', this.listenFind)
     bus.$off('replace', this.listenReplace)
     bus.$off('findNext', this.listenFindNext)
@@ -188,12 +188,12 @@ export default {
   },
 
   methods: {
-    toggleCtrl (ctrl) {
+    toggleCtrl(ctrl) {
       this[ctrl] = !this[ctrl]
       this.search()
     },
 
-    listenFind () {
+    listenFind() {
       this.showSearch = true
       this.type = 'search'
       this.$nextTick(() => {
@@ -204,38 +204,38 @@ export default {
       })
     },
 
-    listenReplace () {
+    listenReplace() {
       this.showSearch = true
       this.type = 'replace'
     },
 
-    listenFindNext () {
+    listenFindNext() {
       this.find('next')
     },
 
-    listenFindPrev () {
+    listenFindPrev() {
       this.find('prev')
     },
 
-    docKeyup (event) {
+    docKeyup(event) {
       if (event.key === 'Escape') {
         this.emptySearch(true)
       }
     },
 
-    docClick () {
+    docClick() {
       if (!this.showSearch) return
       this.emptySearch(true)
     },
 
-    emptySearch (selectHighlight = false) {
+    emptySearch(selectHighlight = false) {
       this.showSearch = false
-      const searchValue = this.searchValue = ''
+      const searchValue = (this.searchValue = '')
       this.replaceValue = ''
       bus.$emit('searchValue', searchValue, { selectHighlight })
     },
 
-    toggleSearchType () {
+    toggleSearchType() {
       this.type = this.type === 'search' ? 'replace' : 'search'
     },
 
@@ -243,11 +243,11 @@ export default {
      * Find the previous or next search result.
      * action: prev or next
      */
-    find (action) {
+    find(action) {
       bus.$emit('find-action', action)
     },
 
-    search (event) {
+    search(event) {
       if (event && event.key === 'Escape') {
         return
       }
@@ -263,7 +263,7 @@ export default {
           // eslint-disable-next-line no-new
           new RegExp(searchValue)
           this.searchErrorMsg = ''
-        } catch (err) {
+        } catch (_err) {
           this.searchErrorMsg = `Invalid regular expression: /${searchValue}/.`
           return
         }
@@ -274,7 +274,7 @@ export default {
             throw new Error()
           }
           this.searchErrorMsg = ''
-        } catch (err) {
+        } catch (_err) {
           this.searchErrorMsg = `RegExp: /${searchValue}/ match empty string.`
           return
         }
@@ -282,22 +282,22 @@ export default {
       bus.$emit('searchValue', searchValue, {
         isCaseSensitive,
         isWholeWord,
-        isRegexp
+        isRegexp,
       })
     },
 
-    replace (isSingle = true) {
+    replace(isSingle = true) {
       const { replaceValue, isCaseSensitive, isWholeWord, isRegexp } = this
       bus.$emit('replaceValue', replaceValue, {
         isSingle,
         isCaseSensitive,
         isWholeWord,
-        isRegexp
+        isRegexp,
       })
     },
 
-    noop () {}
-  }
+    noop() {},
+  },
 }
 </script>
 
