@@ -4,7 +4,7 @@ import { downcode } from './urlify'
  * Slugger generates header id
  */
 
-function Slugger () {
+function Slugger() {
   this.seen = {}
   this.downcodeUnicode = true
 }
@@ -19,7 +19,7 @@ Slugger.prototype.slug = function (value) {
     .toLowerCase()
     .trim()
     // remove html tags
-    .replace(/<[!\/a-z].*?>/ig, '') // eslint-disable-line no-useless-escape
+    .replace(/<[!/a-z].*?>/gi, '') // eslint-disable-line no-useless-escape
     // remove unwanted chars
     .replace(/[\u2000-\u206F\u2E00-\u2E7F\\'!"#$%&()*+,./:;<=>?@[\]^`{|}~]/g, '')
     .replace(/\s/g, '-')
@@ -28,7 +28,7 @@ Slugger.prototype.slug = function (value) {
     const originalSlug = slug
     do {
       this.seen[originalSlug]++
-      slug = originalSlug + '-' + this.seen[originalSlug]
+      slug = `${originalSlug}-${this.seen[originalSlug]}`
     } while (this.seen.hasOwnProperty(slug))
   }
   this.seen[slug] = 0

@@ -6,11 +6,11 @@ import { URL_REG, IMAGE_EXT_REG } from '../config'
 const GHOST_ID = 'mu-dragover-ghost'
 const GHOST_HEIGHT = 3
 
-const dragDropCtrl = ContentState => {
+const dragDropCtrl = (ContentState) => {
   ContentState.prototype.hideGhost = function () {
     this.dropAnchor = null
     const ghost = document.querySelector(`#${GHOST_ID}`)
-    ghost && ghost.remove()
+    ghost?.remove()
   }
   /**
    * create the ghost element.
@@ -39,7 +39,7 @@ const dragDropCtrl = ContentState => {
       const position = verticalPositionInRect(event, rect)
       this.dropAnchor = {
         position,
-        anchor
+        anchor,
       }
       // create ghost
       ghost = document.querySelector(`#${GHOST_ID}`)
@@ -52,7 +52,7 @@ const dragDropCtrl = ContentState => {
       Object.assign(ghost.style, {
         width: `${rect.width}px`,
         left: `${rect.left}px`,
-        top: position === 'up' ? `${rect.top - GHOST_HEIGHT}px` : `${rect.top + rect.height}px`
+        top: position === 'up' ? `${rect.top - GHOST_HEIGHT}px` : `${rect.top + rect.height}px`,
       })
     }
   }
@@ -66,9 +66,9 @@ const dragDropCtrl = ContentState => {
 
     if (event.dataTransfer.types.includes('text/uri-list')) {
       const items = Array.from(event.dataTransfer.items)
-      const hasUriItem = items.some(i => i.type === 'text/uri-list')
-      const hasTextItem = items.some(i => i.type === 'text/plain')
-      const hasHtmlItem = items.some(i => i.type === 'text/html')
+      const hasUriItem = items.some((i) => i.type === 'text/uri-list')
+      const hasTextItem = items.some((i) => i.type === 'text/plain')
+      const hasHtmlItem = items.some((i) => i.type === 'text/html')
       if (hasUriItem && hasHtmlItem && !hasTextItem) {
         this.createGhost(event)
         event.dataTransfer.dropEffect = 'copy'
@@ -87,7 +87,7 @@ const dragDropCtrl = ContentState => {
     }
   }
 
-  ContentState.prototype.dragleaveHandler = function (event) {
+  ContentState.prototype.dragleaveHandler = function (_event) {
     return this.hideGhost()
   }
 
@@ -99,7 +99,7 @@ const dragDropCtrl = ContentState => {
     if (event.dataTransfer.items.length) {
       for (const item of event.dataTransfer.items) {
         if (item.kind === 'string' && item.type === 'text/uri-list') {
-          item.getAsString(async str => {
+          item.getAsString(async (str) => {
             if (URL_REG.test(str) && dropAnchor) {
               let isImage = false
               if (IMAGE_EXT_REG.test(str)) {
@@ -122,7 +122,7 @@ const dragDropCtrl = ContentState => {
               const offset = 0
               this.cursor = {
                 start: { key, offset },
-                end: { key, offset }
+                end: { key, offset },
               }
               this.render()
               this.muya.eventCenter.dispatch('stateChange')
@@ -137,7 +137,7 @@ const dragDropCtrl = ContentState => {
       for (const file of event.dataTransfer.files) {
         fileList.push(file)
       }
-      const image = fileList.find(file => /image/.test(file.type))
+      const image = fileList.find((file) => /image/.test(file.type))
       if (image && dropAnchor) {
         const { name, path } = image
         const id = `loading-${getUniqueId()}`
@@ -154,7 +154,7 @@ const dragDropCtrl = ContentState => {
         const offset = 0
         this.cursor = {
           start: { key, offset },
-          end: { key, offset }
+          end: { key, offset },
         }
         this.render()
 
@@ -170,7 +170,7 @@ const dragDropCtrl = ContentState => {
             const imageInfo = getImageInfo(imageWrapper)
             this.replaceImage(imageInfo, {
               alt: name,
-              src: newSrc
+              src: newSrc,
             })
           }
         } catch (error) {

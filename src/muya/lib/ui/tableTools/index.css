@@ -21,12 +21,12 @@
   font-size: 13px;
 }
 
-.ag-table-bar-tools li.item[data-label=remove] {
+.ag-table-bar-tools li.item[data-label="remove"] {
   margin-top: 10px;
 }
 
-.ag-table-bar-tools li.item[data-label=remove]::before {
-  content: '';
+.ag-table-bar-tools li.item[data-label="remove"]::before {
+  content: "";
   width: calc(100% - 16px);
   position: absolute;
   height: 1px;

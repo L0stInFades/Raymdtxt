@@ -1,4 +1,4 @@
-const linkCtrl = ContentState => {
+const linkCtrl = (ContentState) => {
   /**
    * Change a link into text.
    */
@@ -16,7 +16,7 @@ const linkCtrl = ContentState => {
         break
       case 'text': {
         const match = /^\[(.+?)\]/.exec(token.raw)
-        if (match && match[1]) {
+        if (match?.[1]) {
           anchor = match[1]
         }
         break
@@ -30,12 +30,12 @@ const linkCtrl = ContentState => {
     this.cursor = {
       start: {
         key,
-        offset: token.range.start
+        offset: token.range.start,
       },
       end: {
         key,
-        offset: +token.range.start + anchor.length
-      }
+        offset: +token.range.start + anchor.length,
+      },
     }
 
     this.singleRender(block)

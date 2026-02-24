@@ -10,13 +10,13 @@ const INLINE_UPDATE_FRAGMENTS = [
   '(?:^|\n) {0,3}(>).+', // Block quote
   '^( {4,})', // Indent code **match from beginning**
   '^(\\[\\^[^\\^\\[\\]\\s]+?(?<!\\\\)\\]: )', // Footnote **match from beginning**
-  '(?:^|\n) {0,3}((?:\\* *\\* *\\*|- *- *-|_ *_ *_)[ \\*\\-\\_]*)$' // Thematic break
+  '(?:^|\n) {0,3}((?:\\* *\\* *\\*|- *- *-|_ *_ *_)[ \\*\\-\\_]*)$', // Thematic break
 ]
 
 const INLINE_UPDATE_REG = new RegExp(INLINE_UPDATE_FRAGMENTS.join('|'), 'i')
 
-const updateCtrl = ContentState => {
-  ContentState.prototype.checkSameMarkerOrDelimiter = function (list, markerOrDelimiter) {
+const updateCtrl = (ContentState) => {
+  ContentState.prototype.checkSameMarkerOrDelimiter = (list, markerOrDelimiter) => {
     if (!/ol|ul/.test(list.type)) return false
     return list.children[0].bulletMarkerOrDelimiter === markerOrDelimiter
   }
@@ -32,27 +32,23 @@ const updateCtrl = ContentState => {
 
     for (const token of tokenizer(startBlock.text, {
       labels,
-      options: this.muya.options
+      options: this.muya.options,
     })) {
       if (NO_NEED_TOKEN_REG.test(token.type)) continue
       const { start, end } = token.range
       const textLen = startBlock.text.length
-      if (
-        conflict([Math.max(0, start - 1), Math.min(textLen, end + 1)], [startOffset, startOffset])
-      ) {
+      if (conflict([Math.max(0, start - 1), Math.min(textLen, end + 1)], [startOffset, startOffset])) {
         return true
       }
     }
     for (const token of tokenizer(endBlock.text, {
       labels,
-      options: this.muya.options
+      options: this.muya.options,
     })) {
       if (NO_NEED_TOKEN_REG.test(token.type)) continue
       const { start, end } = token.range
       const textLen = endBlock.text.length
-      if (
-        conflict([Math.max(0, start - 1), Math.min(textLen, end + 1)], [endOffset, endOffset])
-      ) {
+      if (conflict([Math.max(0, start - 1), Math.min(textLen, end + 1)], [endOffset, endOffset])) {
         return true
       }
     }
@@ -79,14 +75,12 @@ const updateCtrl = ContentState => {
       block = this.getParent(block)
     }
     const listItem = this.getParent(block)
-    const [
-      match, bullet, tasklist, order, atxHeader,
-      setextHeader, blockquote, indentCode, footnote, hr
-    ] = text.match(INLINE_UPDATE_REG) || []
+    const [_match, bullet, tasklist, order, atxHeader, setextHeader, blockquote, indentCode, footnote, hr] =
+      text.match(INLINE_UPDATE_REG) || []
     const { footnote: isSupportFootnote } = this.muya.options
 
     switch (true) {
-      case (!!hr && new Set(hr.split('').filter(i => /\S/.test(i))).size === 1):
+      case !!hr && new Set(hr.split('').filter((i) => /\S/.test(i))).size === 1:
         return this.updateThematicBreak(block, hr, line)
 
       case !!bullet:
@@ -113,15 +107,13 @@ const updateCtrl = ContentState => {
 
       case !!footnote && block.type === 'p' && !block.parent && isSupportFootnote:
         return this.updateFootnote(block, line)
-
-      case !match:
       default:
         return this.updateToParagraph(block, line)
     }
   }
 
   // Thematic break
-  ContentState.prototype.updateThematicBreak = function (block, marker, line) {
+  ContentState.prototype.updateThematicBreak = function (block, _marker, line) {
     // If the block is already thematic break, no need to update.
     if (block.type === 'hr') return null
     const text = line.text
@@ -132,7 +124,7 @@ const updateCtrl = ContentState => {
     let thematicLineHasPushed = false
     for (const l of lines) {
       /* eslint-disable no-useless-escape */
-      if (/ {0,3}(?:\* *\* *\*|- *- *-|_ *_ *_)[ \*\-\_]*$/.test(l) && !thematicLineHasPushed) {
+      if (/ {0,3}(?:\* *\* *\*|- *- *-|_ *_ *_)[ *\-_]*$/.test(l) && !thematicLineHasPushed) {
         /* eslint-enable no-useless-escape */
         thematicLine = l
         thematicLineHasPushed = true
@@ -146,7 +138,7 @@ const updateCtrl = ContentState => {
     const thematicBlock = this.createBlock('hr')
     const thematicLineBlock = this.createBlock('span', {
       text: thematicLine,
-      functionType: 'thematicBreakLine'
+      functionType: 'thematicBreakLine',
     })
     this.appendChild(thematicBlock, thematicLineBlock)
     this.insertBefore(thematicBlock, block)
@@ -167,7 +159,7 @@ const updateCtrl = ContentState => {
     const endOffset = end.offset - preParagraphLength
     this.cursor = {
       start: { key, offset: startOffset },
-      end: { key, offset: endOffset }
+      end: { key, offset: endOffset },
     }
     return thematicBlock
   }
@@ -223,7 +215,7 @@ const updateCtrl = ContentState => {
 
     let bulletMarkerOrDelimiter
     if (type === 'order') {
-      bulletMarkerOrDelimiter = (cleanMarker && cleanMarker.length >= 2) ? cleanMarker.slice(-1) : '.'
+      bulletMarkerOrDelimiter = cleanMarker && cleanMarker.length >= 2 ? cleanMarker.slice(-1) : '.'
     } else {
       const { bulletListMarker } = this.muya.options
       bulletMarkerOrDelimiter = marker ? marker.charAt(0) : bulletListMarker
@@ -240,31 +232,25 @@ const updateCtrl = ContentState => {
     ) {
       this.appendChild(preSibling, newListItemBlock)
       const partChildren = nextSibling.children.splice(0)
-      partChildren.forEach(b => this.appendChild(preSibling, b))
+      partChildren.forEach((b) => this.appendChild(preSibling, b))
       this.removeBlock(nextSibling)
       this.removeBlock(block)
-      const isLooseListItem = preSibling.children.some(c => c.isLooseListItem)
-      preSibling.children.forEach(c => (c.isLooseListItem = isLooseListItem))
-    } else if (
-      preSibling &&
-      this.checkSameMarkerOrDelimiter(preSibling, bulletMarkerOrDelimiter)
-    ) {
+      const isLooseListItem = preSibling.children.some((c) => c.isLooseListItem)
+      preSibling.children.forEach((c) => (c.isLooseListItem = isLooseListItem))
+    } else if (preSibling && this.checkSameMarkerOrDelimiter(preSibling, bulletMarkerOrDelimiter)) {
       this.appendChild(preSibling, newListItemBlock)
       this.removeBlock(block)
-      const isLooseListItem = preSibling.children.some(c => c.isLooseListItem)
-      preSibling.children.forEach(c => (c.isLooseListItem = isLooseListItem))
-    } else if (
-      nextSibling &&
-      this.checkSameMarkerOrDelimiter(nextSibling, bulletMarkerOrDelimiter)
-    ) {
+      const isLooseListItem = preSibling.children.some((c) => c.isLooseListItem)
+      preSibling.children.forEach((c) => (c.isLooseListItem = isLooseListItem))
+    } else if (nextSibling && this.checkSameMarkerOrDelimiter(nextSibling, bulletMarkerOrDelimiter)) {
       this.insertBefore(newListItemBlock, nextSibling.children[0])
       this.removeBlock(block)
-      const isLooseListItem = nextSibling.children.some(c => c.isLooseListItem)
-      nextSibling.children.forEach(c => (c.isLooseListItem = isLooseListItem))
+      const isLooseListItem = nextSibling.children.some((c) => c.isLooseListItem)
+      nextSibling.children.forEach((c) => (c.isLooseListItem = isLooseListItem))
     } else {
       // Create a new list when changing list type, bullet or list delimiter
       const listBlock = this.createBlock(wrapperTag, {
-        listType: type
+        listType: type,
       })
 
       if (wrapperTag === 'ol') {
@@ -286,12 +272,12 @@ const updateCtrl = ContentState => {
     this.cursor = {
       start: {
         key,
-        offset: Math.max(0, startOffset - delta)
+        offset: Math.max(0, startOffset - delta),
       },
       end: {
         key,
-        offset: Math.max(0, endOffset - delta)
-      }
+        offset: Math.max(0, endOffset - delta),
+      },
     }
     if (TASK_LIST_REG.test(listItemText)) {
       const [, , tasklist, , , ,] = listItemText.match(INLINE_UPDATE_REG) || [] // eslint-disable-line comma-spacing
@@ -301,13 +287,13 @@ const updateCtrl = ContentState => {
     }
   }
 
-  ContentState.prototype.updateTaskListItem = function (block, type, marker = '') {
+  ContentState.prototype.updateTaskListItem = function (block, _type, marker = '') {
     const { preferLooseListItem } = this.muya.options
     const parent = this.getParent(block)
     const grandpa = this.getParent(parent)
     const checked = /\[x\]\s/i.test(marker) // use `i` flag to ignore upper case or lower case
     const checkbox = this.createBlock('input', {
-      checked
+      checked,
     })
     const { start, end } = this.cursor
 
@@ -321,19 +307,21 @@ const updateCtrl = ContentState => {
       grandpa.listType = 'task'
     } else if (this.isFirstChild(parent) || this.isLastChild(parent)) {
       taskListWrapper = this.createBlock('ul', {
-        listType: 'task'
+        listType: 'task',
       })
 
-      this.isFirstChild(parent) ? this.insertBefore(taskListWrapper, grandpa) : this.insertAfter(taskListWrapper, grandpa)
+      this.isFirstChild(parent)
+        ? this.insertBefore(taskListWrapper, grandpa)
+        : this.insertAfter(taskListWrapper, grandpa)
       this.removeBlock(parent)
       this.appendChild(taskListWrapper, parent)
     } else {
       taskListWrapper = this.createBlock('ul', {
-        listType: 'task'
+        listType: 'task',
       })
 
       const bulletListWrapper = this.createBlock('ul', {
-        listType: 'bullet'
+        listType: 'bullet',
       })
 
       let preSibling = this.getPreSibling(parent)
@@ -357,12 +345,12 @@ const updateCtrl = ContentState => {
     this.cursor = {
       start: {
         key: start.key,
-        offset: Math.max(0, start.offset - marker.length)
+        offset: Math.max(0, start.offset - marker.length),
       },
       end: {
         key: end.key,
-        offset: Math.max(0, end.offset - marker.length)
-      }
+        offset: Math.max(0, end.offset - marker.length),
+      },
     }
     return taskListWrapper || grandpa
   }
@@ -393,11 +381,11 @@ const updateCtrl = ContentState => {
     }
 
     const atxBlock = this.createBlock(newType, {
-      headingStyle
+      headingStyle,
     })
     const atxLineBlock = this.createBlock('span', {
       text: atxLine,
-      functionType: 'atxLine'
+      functionType: 'atxLine',
     })
     this.appendChild(atxBlock, atxLineBlock)
     this.insertBefore(atxBlock, block)
@@ -416,7 +404,7 @@ const updateCtrl = ContentState => {
     const key = atxBlock.children[0].key
     this.cursor = {
       start: { key, offset: start.offset },
-      end: { key, offset: end.offset }
+      end: { key, offset: end.offset },
     }
     return atxBlock
   }
@@ -446,11 +434,11 @@ const updateCtrl = ContentState => {
 
     const setextBlock = this.createBlock(newType, {
       headingStyle,
-      marker
+      marker,
     })
     const setextLineBlock = this.createBlock('span', {
       text: setextLines.join('\n'),
-      functionType: 'paragraphContent'
+      functionType: 'paragraphContent',
     })
     this.appendChild(setextBlock, setextLineBlock)
     this.insertBefore(setextBlock, block)
@@ -467,7 +455,7 @@ const updateCtrl = ContentState => {
 
     this.cursor = {
       start: { key, offset },
-      end: { key, offset }
+      end: { key, offset },
     }
 
     return setextBlock
@@ -493,14 +481,14 @@ const updateCtrl = ContentState => {
     let quoteParagraphBlock
     if (/^h\d/.test(block.type)) {
       quoteParagraphBlock = this.createBlock(block.type, {
-        headingStyle: block.headingStyle
+        headingStyle: block.headingStyle,
       })
       if (block.headingStyle === 'setext') {
         quoteParagraphBlock.marker = block.marker
       }
       const headerContent = this.createBlock('span', {
         text: quoteLines.join('\n'),
-        functionType: block.headingStyle === 'setext' ? 'paragraphContent' : 'atxLine'
+        functionType: block.headingStyle === 'setext' ? 'paragraphContent' : 'atxLine',
       })
       this.appendChild(quoteParagraphBlock, headerContent)
     } else {
@@ -523,7 +511,7 @@ const updateCtrl = ContentState => {
 
     this.cursor = {
       start: { key, offset: Math.max(0, start.offset - 1) },
-      end: { key, offset: Math.max(0, end.offset - 1) }
+      end: { key, offset: Math.max(0, end.offset - 1) },
     }
     return quoteBlock
   }
@@ -531,14 +519,14 @@ const updateCtrl = ContentState => {
   ContentState.prototype.updateIndentCode = function (block, line) {
     const lang = ''
     const codeBlock = this.createBlock('code', {
-      lang
+      lang,
     })
     const inputBlock = this.createBlock('span', {
-      functionType: 'languageInput'
+      functionType: 'languageInput',
     })
     const preBlock = this.createBlock('pre', {
       functionType: 'indentcode',
-      lang
+      lang,
     })
 
     const text = line ? line.text : block.text
@@ -559,7 +547,7 @@ const updateCtrl = ContentState => {
     const codeContent = this.createBlock('span', {
       text: codeLines.join('\n'),
       functionType: 'codeContent',
-      lang
+      lang,
     })
 
     this.appendChild(codeBlock, codeContent)
@@ -569,7 +557,7 @@ const updateCtrl = ContentState => {
 
     if (paragraphLines.length > 0 && line) {
       const newLine = this.createBlock('span', {
-        text: paragraphLines.join('\n')
+        text: paragraphLines.join('\n'),
       })
       this.insertBefore(newLine, line)
       this.removeBlock(line)
@@ -581,7 +569,7 @@ const updateCtrl = ContentState => {
     const { start, end } = this.cursor
     this.cursor = {
       start: { key, offset: start.offset - 4 },
-      end: { key, offset: end.offset - 4 }
+      end: { key, offset: end.offset - 4 },
     }
     return preBlock
   }
@@ -600,7 +588,7 @@ const updateCtrl = ContentState => {
       const key = newBlock.children[0].key
       this.cursor = {
         start: { key, offset: start.offset },
-        end: { key, offset: end.offset }
+        end: { key, offset: end.offset },
       }
       return block
     }

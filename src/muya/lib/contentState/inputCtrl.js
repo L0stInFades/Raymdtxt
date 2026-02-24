@@ -11,9 +11,9 @@ const BRACKET_HASH = {
   '*': '*',
   _: '_',
   '"': '"',
-  '\'': '\'',
+  "'": "'",
   $: '$',
-  '~': '~'
+  '~': '~',
 }
 
 const BACK_HASH = {
@@ -23,17 +23,17 @@ const BACK_HASH = {
   '*': '*',
   _: '_',
   '"': '"',
-  '\'': '\'',
+  "'": "'",
   $: '$',
-  '~': '~'
+  '~': '~',
 }
 
 // TODO: refactor later.
 let renderCodeBlockTimer = null
 
-const inputCtrl = ContentState => {
+const inputCtrl = (ContentState) => {
   // Input @ to quick insert paragraph
-  ContentState.prototype.checkQuickInsert = function (block) {
+  ContentState.prototype.checkQuickInsert = (block) => {
     const { type, text, functionType } = block
     if (type !== 'span' || functionType !== 'paragraphContent') return false
     return /^@\S*$/.test(text)
@@ -46,9 +46,9 @@ const inputCtrl = ContentState => {
 
     const tokens = tokenizer(text, {
       hasBeginRules: false,
-      options: this.muya.options
+      options: this.muya.options,
     })
-    return tokens.filter(t => t.type === type).some(t => offset >= t.range.start && offset <= t.range.end)
+    return tokens.filter((t) => t.type === type).some((t) => offset >= t.range.start && offset <= t.range.end)
   }
 
   ContentState.prototype.checkNotSameToken = function (functionType, oldText, text) {
@@ -57,10 +57,10 @@ const inputCtrl = ContentState => {
     }
 
     const oldTokens = tokenizer(oldText, {
-      options: this.muya.options
+      options: this.muya.options,
     })
     const tokens = tokenizer(text, {
-      options: this.muya.options
+      options: this.muya.options,
     })
 
     const oldCache = {}
@@ -120,7 +120,7 @@ const inputCtrl = ContentState => {
       const offset = block.text.length
       this.cursor = {
         start: { key, offset },
-        end: { key, offset }
+        end: { key, offset },
       }
       this.singleRender(block)
       return this.inputHandler(event, true)
@@ -151,8 +151,12 @@ const inputCtrl = ContentState => {
         } else {
           this.removeBlocks(startBlock, endBlock)
         }
-      } else if (startBlock.functionType === 'paragraphContent' &&
-        start.key === end.key && oldStart.key === start.key && oldEnd.key !== end.key) {
+      } else if (
+        startBlock.functionType === 'paragraphContent' &&
+        start.key === end.key &&
+        oldStart.key === start.key &&
+        oldEnd.key !== end.key
+      ) {
         // GH#2269: The end block will lose all soft-lines when removing multiple paragraphs and `oldEnd`
         //          includes soft-line breaks. The normal text from `oldEnd` is moved into the `start`
         //          block but the remaining soft-lines (separated by \n) not. We have to append the
@@ -177,11 +181,7 @@ const inputCtrl = ContentState => {
 
     // auto pair (not need to auto pair in math block)
     if (block && (block.text !== text || notEqual)) {
-      if (
-        start.key === end.key &&
-        start.offset === end.offset &&
-        event.type === 'input'
-      ) {
+      if (start.key === end.key && start.offset === end.offset && event.type === 'input') {
         const { offset } = start
         const { autoPairBracket, autoPairMarkdownSyntax, autoPairQuote } = this.muya.options
         const inputChar = text.charAt(+offset - 1)
@@ -204,15 +204,13 @@ const inputCtrl = ContentState => {
           }
           /* eslint-disable no-useless-escape */
         } else if (
-          (event.inputType.indexOf('delete') === -1) &&
-          (inputChar === postInputChar) &&
-          (
-            (autoPairQuote && /[']{1}/.test(inputChar)) ||
+          event.inputType.indexOf('delete') === -1 &&
+          inputChar === postInputChar &&
+          ((autoPairQuote && /[']{1}/.test(inputChar)) ||
             (autoPairQuote && /["]{1}/.test(inputChar)) ||
-            (autoPairBracket && /[\}\]\)]{1}/.test(inputChar)) ||
+            (autoPairBracket && /[}\])]{1}/.test(inputChar)) ||
             (autoPairMarkdownSyntax && /[$]{1}/.test(inputChar)) ||
-            (autoPairMarkdownSyntax && /[*$`~_]{1}/.test(inputChar)) && /[_*~]{1}/.test(prePreInputChar)
-          )
+            (autoPairMarkdownSyntax && /[*$`~_]{1}/.test(inputChar) && /[_*~]{1}/.test(prePreInputChar)))
         ) {
           needRender = true
           text = text.substring(0, offset) + text.substring(offset + 1)
@@ -225,10 +223,18 @@ const inputCtrl = ContentState => {
             // Issue 2566: Do not complete markdown syntax if the previous character is
             // alphanumeric.
             !/\\/.test(preInputChar) &&
-            ((autoPairQuote && /[']{1}/.test(inputChar) && !(/[\S]{1}/.test(postInputChar)) && !(/[a-zA-Z\d]{1}/.test(preInputChar))) ||
-              (autoPairQuote && /["]{1}/.test(inputChar) && !(/[\S]{1}/.test(postInputChar))) ||
-              (autoPairBracket && /[\{\[\(]{1}/.test(inputChar) && !(/[\S]{1}/.test(postInputChar))) ||
-              (block.functionType !== 'codeContent' && !isInInlineMath && !isInInlineCode && autoPairMarkdownSyntax && !/[a-z0-9]{1}/i.test(preInputChar) && /[*$`~_]{1}/.test(inputChar)))
+            ((autoPairQuote &&
+              /[']{1}/.test(inputChar) &&
+              !/[\S]{1}/.test(postInputChar) &&
+              !/[a-zA-Z\d]{1}/.test(preInputChar)) ||
+              (autoPairQuote && /["]{1}/.test(inputChar) && !/[\S]{1}/.test(postInputChar)) ||
+              (autoPairBracket && /[{[(]{1}/.test(inputChar) && !/[\S]{1}/.test(postInputChar)) ||
+              (block.functionType !== 'codeContent' &&
+                !isInInlineMath &&
+                !isInInlineCode &&
+                autoPairMarkdownSyntax &&
+                !/[a-z0-9]{1}/i.test(preInputChar) &&
+                /[*$`~_]{1}/.test(inputChar)))
           ) {
             needRender = true
             text = BRACKET_HASH[event.data]
@@ -237,12 +243,7 @@ const inputCtrl = ContentState => {
           }
           /* eslint-enable no-useless-escape */
           // Delete the last `*` of `**` when you insert one space between `**` to create a bullet list.
-          if (
-            /\s/.test(event.data) &&
-            /^\* /.test(text) &&
-            preInputChar === '*' &&
-            postInputChar === '*'
-          ) {
+          if (/\s/.test(event.data) && /^\* /.test(text) && preInputChar === '*' && postInputChar === '*') {
             text = text.substring(0, offset) + text.substring(offset + 1)
             needRender = true
           }
@@ -289,19 +290,22 @@ const inputCtrl = ContentState => {
     const rect = paragraph.getBoundingClientRect()
     const checkQuickInsert = this.checkQuickInsert(block)
     const reference = this.getPositionReference()
-    reference.getBoundingClientRect = function () {
+    reference.getBoundingClientRect = () => {
       const { x, y, left, top, height, bottom } = rect
 
-      return Object.assign({}, {
-        left,
-        x,
-        top,
-        y,
-        bottom,
-        height,
-        width: 0,
-        right: left
-      })
+      return Object.assign(
+        {},
+        {
+          left,
+          x,
+          top,
+          y,
+          bottom,
+          height,
+          width: 0,
+          right: left,
+        },
+      )
     }
 
     this.muya.eventCenter.dispatch('muya-quick-insert', reference, block, !!checkQuickInsert)

@@ -1,4 +1,4 @@
-const coreApi = ContentState => {
+const coreApi = (ContentState) => {
   /**
    * Replace the word range with the given replacement.
    *
@@ -37,13 +37,13 @@ const coreApi = ContentState => {
     // Update cursor
     if (setCursor) {
       const cursor = Object.assign({}, wordStart, {
-        offset: left + replacement.length
+        offset: left + replacement.length,
       })
       line.start = cursor
       line.end = cursor
       this.cursor = {
         start: cursor,
-        end: cursor
+        end: cursor,
       }
     }
 

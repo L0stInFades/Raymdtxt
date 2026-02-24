@@ -1,17 +1,12 @@
 import './index.css'
 
-const CIRCLES = [
-  'top-left',
-  'top-right',
-  'bottom-left',
-  'bottom-right'
-]
+const CIRCLES = ['top-left', 'top-right', 'bottom-left', 'bottom-right']
 
 const CIRCLE_RADIO = 6
 
 class Transformer {
   static pluginName = 'transformer'
-  constructor (muya, options) {
+  constructor(muya, options) {
     this.muya = muya
     this.options = options
     this.reference = null
@@ -22,15 +17,15 @@ class Transformer {
     this.eventId = []
     this.lastScrollTop = null
     this.resizing = false
-    const container = this.container = document.createElement('div')
+    const container = (this.container = document.createElement('div'))
     container.classList.add('ag-transformer')
     document.body.appendChild(container)
     this.listen()
   }
 
-  listen () {
+  listen() {
     const { eventCenter, container } = this.muya
-    const scrollHandler = event => {
+    const scrollHandler = (event) => {
       if (typeof this.lastScrollTop !== 'number') {
         this.lastScrollTop = event.target.scrollTop
         return
@@ -54,11 +49,11 @@ class Transformer {
     })
 
     eventCenter.attachDOMEvent(container, 'scroll', scrollHandler)
-    eventCenter.attachDOMEvent(this.container, 'dragstart', event => event.preventDefault())
+    eventCenter.attachDOMEvent(this.container, 'dragstart', (event) => event.preventDefault())
     eventCenter.attachDOMEvent(document.body, 'mousedown', this.mouseDown)
   }
 
-  render () {
+  render() {
     const { eventCenter } = this.muya
     if (this.status) {
       this.hide()
@@ -70,8 +65,8 @@ class Transformer {
     eventCenter.dispatch('muya-float', this, true)
   }
 
-  createElements () {
-    CIRCLES.forEach(c => {
+  createElements() {
+    CIRCLES.forEach((c) => {
       const circle = document.createElement('div')
       circle.classList.add('circle')
       circle.classList.add(c)
@@ -80,9 +75,9 @@ class Transformer {
     })
   }
 
-  update () {
+  update() {
     const rect = this.reference.getBoundingClientRect()
-    CIRCLES.forEach(c => {
+    CIRCLES.forEach((c) => {
       const circle = this.container.querySelector(`.${c}`)
 
       switch (c) {
@@ -140,13 +135,13 @@ class Transformer {
         break
     }
     // Image width/height attribute must be an integer.
-    width = parseInt(width)
+    width = parseInt(width, 10)
     this.width = width
     image.setAttribute('width', width)
     this.update()
   }
 
-  mouseUp = (event) => {
+  mouseUp = (_event) => {
     const { eventCenter } = this.muya
     if (this.eventId.length) {
       for (const id of this.eventId) {
@@ -164,10 +159,10 @@ class Transformer {
     this.movingAnchor = null
   }
 
-  hide () {
+  hide() {
     const { eventCenter } = this.muya
     const circles = this.container.querySelectorAll('.circle')
-    Array.from(circles).forEach(c => c.remove())
+    Array.from(circles).forEach((c) => c.remove())
     this.status = false
     eventCenter.dispatch('muya-float', this, false)
   }

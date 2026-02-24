@@ -46,7 +46,7 @@
 }
 
 .ag-image-toolbar li.item div.tooltip::before {
-  content: '';
+  content: "";
   width: 7px;
   height: 7px;
   display: block;
@@ -75,7 +75,7 @@
 }
 
 .ag-image-toolbar li.item:first-of-type:before {
-  content: '';
+  content: "";
   width: 1px;
   position: absolute;
   height: 16px;
@@ -90,7 +90,7 @@
 }
 
 .ag-image-toolbar li.item:last-of-type:before {
-  content: '';
+  content: "";
   width: 1px;
   position: absolute;
   height: 16px;
@@ -111,14 +111,14 @@
   width: 100%;
   overflow: hidden;
   color: var(--iconColor);
-  transition: all .25s ease-in-out;
+  transition: all 0.25s ease-in-out;
 }
 
-.ag-image-toolbar li.item .icon-wrapper i.icon > i[class^=icon-] {
+.ag-image-toolbar li.item .icon-wrapper i.icon > i[class^="icon-"] {
   display: inline-block;
   width: 100%;
   height: 100%;
-  filter: drop-shadow(16px 0 currentColor); 
+  filter: drop-shadow(16px 0 currentColor);
   position: relative;
   left: -16px;
 }

@@ -61,5 +61,5 @@ export default {
   referenceLink,
   referenceImage,
   superSubScript,
-  footnoteIdentifier
+  footnoteIdentifier,
 }

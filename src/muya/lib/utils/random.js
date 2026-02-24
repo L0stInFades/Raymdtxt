@@ -3,4 +3,4 @@ let id = 0
 
 export const getUniqueId = () => `${ID_PREFIX}${id++}`
 
-export const getLongUniqueId = () => `${getUniqueId()}-${(+new Date()).toString(32)}`
+export const getLongUniqueId = () => `${getUniqueId()}-${(Date.now()).toString(32)}`

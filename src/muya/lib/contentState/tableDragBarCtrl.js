@@ -2,13 +2,13 @@ const calculateAspects = (tableId, barType) => {
   const table = document.querySelector(`#${tableId}`)
   if (barType === 'bottom') {
     const firstRow = table.querySelector('tr')
-    return Array.from(firstRow.children).map(cell => cell.clientWidth)
+    return Array.from(firstRow.children).map((cell) => cell.clientWidth)
   } else {
-    return Array.from(table.querySelectorAll('tr')).map(row => row.clientHeight)
+    return Array.from(table.querySelectorAll('tr')).map((row) => row.clientHeight)
   }
 }
 
-export const getAllTableCells = tableId => {
+export const getAllTableCells = (tableId) => {
   const table = document.querySelector(`#${tableId}`)
   const rows = table.querySelectorAll('tr')
   const cells = []
@@ -57,7 +57,7 @@ const getDragCells = (tableId, barType, index) => {
   return dragCells
 }
 
-const tableDragBarCtrl = ContentState => {
+const tableDragBarCtrl = (ContentState) => {
   ContentState.prototype.handleMouseDown = function (event) {
     event.preventDefault()
     const { eventCenter } = this.muya
@@ -76,7 +76,7 @@ const tableDragBarCtrl = ContentState => {
       dragCells: getDragCells(tableId, barType, index),
       cells: getAllTableCells(tableId),
       aspects,
-      offset: 0
+      offset: 0,
     }
 
     for (const row of this.dragInfo.cells) {
@@ -98,7 +98,7 @@ const tableDragBarCtrl = ContentState => {
     }
     const { barType } = this.dragInfo
     const attrName = barType === 'bottom' ? 'clientX' : 'clientY'
-    const offset = this.dragInfo.offset = event[attrName] - this.dragInfo[attrName]
+    const offset = (this.dragInfo.offset = event[attrName] - this.dragInfo[attrName])
     if (Math.abs(offset) < 5) {
       return
     }
@@ -109,7 +109,7 @@ const tableDragBarCtrl = ContentState => {
     this.setSwitchStyle()
   }
 
-  ContentState.prototype.handleMouseUp = function (event) {
+  ContentState.prototype.handleMouseUp = function (_event) {
     const { eventCenter } = this.muya
     for (const id of this.dragEventIds) {
       eventCenter.detachDOMEvent(id)
@@ -341,12 +341,12 @@ const tableDragBarCtrl = ContentState => {
         this.cursor = {
           start: {
             key,
-            offset: start.offset
+            offset: start.offset,
           },
           end: {
             key,
-            offset: end.offset
-          }
+            offset: end.offset,
+          },
         }
         return this.singleRender(table)
       } else {

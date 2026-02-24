@@ -13,10 +13,10 @@ const adjustOffset = (offset, block, event) => {
   return offset
 }
 
-const arrowCtrl = ContentState => {
+const arrowCtrl = (ContentState) => {
   ContentState.prototype.findNextRowCell = function (cell) {
     if (cell.functionType !== 'cellContent') {
-      throw new Error(`block with type ${cell && cell.type} is not a table cell`)
+      throw new Error(`block with type ${cell?.type} is not a table cell`)
     }
     const thOrTd = this.getParent(cell)
     const row = this.closest(cell, 'tr')
@@ -24,7 +24,7 @@ const arrowCtrl = ContentState => {
     const column = row.children.indexOf(thOrTd)
     if (rowContainer.type === 'thead') {
       const tbody = this.getNextSibling(rowContainer)
-      if (tbody && tbody.children.length) {
+      if (tbody?.children.length) {
         return tbody.children[0].children[column].children[0]
       }
     } else if (rowContainer.type === 'tbody') {
@@ -38,7 +38,7 @@ const arrowCtrl = ContentState => {
 
   ContentState.prototype.findPrevRowCell = function (cell) {
     if (cell.functionType !== 'cellContent') {
-      throw new Error(`block with type ${cell && cell.type} is not a table cell`)
+      throw new Error(`block with type ${cell?.type} is not a table cell`)
     }
     const thOrTd = this.getParent(cell)
     const row = this.closest(cell, 'tr')
@@ -70,7 +70,7 @@ const arrowCtrl = ContentState => {
         case EVENT_KEYS.ArrowLeft: {
           this.cursor = {
             start: { key, offset: start },
-            end: { key, offset: start }
+            end: { key, offset: start },
           }
           break
         }
@@ -78,7 +78,7 @@ const arrowCtrl = ContentState => {
         case EVENT_KEYS.ArrowRight: {
           this.cursor = {
             start: { key, offset: end },
-            end: { key, offset: end }
+            end: { key, offset: end },
           }
           break
         }
@@ -102,7 +102,12 @@ const arrowCtrl = ContentState => {
     }
 
     // fix #101
-    if (event.key === EVENT_KEYS.ArrowRight && node && node.classList && node.classList.contains(CLASS_OR_ID.AG_MATH_TEXT)) {
+    if (
+      event.key === EVENT_KEYS.ArrowRight &&
+      node &&
+      node.classList &&
+      node.classList.contains(CLASS_OR_ID.AG_MATH_TEXT)
+    ) {
       const { right } = selection.getCaretOffsets(node)
       if (right === 0 && start.key === end.key && start.offset === end.offset) {
         // It's not recommended to use such lower API, but it's work well.
@@ -111,10 +116,7 @@ const arrowCtrl = ContentState => {
     }
 
     // Just do nothing if the cursor is not collapsed or `shiftKey` pressed
-    if (
-      (start.key === end.key && start.offset !== end.offset) ||
-      start.key !== end.key || event.shiftKey
-    ) {
+    if ((start.key === end.key && start.offset !== end.offset) || start.key !== end.key || event.shiftKey) {
       return
     }
 
@@ -151,37 +153,28 @@ const arrowCtrl = ContentState => {
       if (activeBlock) {
         event.preventDefault()
         event.stopPropagation()
-        let offset = activeBlock.type === 'p'
-          ? 0
-          : (event.key === EVENT_KEYS.ArrowUp
-            ? activeBlock.text.length
-            : 0)
+        let offset = activeBlock.type === 'p' ? 0 : event.key === EVENT_KEYS.ArrowUp ? activeBlock.text.length : 0
 
         offset = adjustOffset(offset, activeBlock, event)
 
-        const key = activeBlock.type === 'p'
-          ? activeBlock.children[0].key
-          : activeBlock.key
+        const key = activeBlock.type === 'p' ? activeBlock.children[0].key : activeBlock.key
 
         this.cursor = {
           start: {
             key,
-            offset
+            offset,
           },
           end: {
             key,
-            offset
-          }
+            offset,
+          },
         }
 
         return this.partialRender()
       }
     }
 
-    if (
-      (event.key === EVENT_KEYS.ArrowUp) ||
-      (event.key === EVENT_KEYS.ArrowLeft && start.offset === 0)
-    ) {
+    if (event.key === EVENT_KEYS.ArrowUp || (event.key === EVENT_KEYS.ArrowLeft && start.offset === 0)) {
       event.preventDefault()
       event.stopPropagation()
       if (!preBlock) return
@@ -189,12 +182,12 @@ const arrowCtrl = ContentState => {
       const offset = preBlock.text.length
       this.cursor = {
         start: { key, offset },
-        end: { key, offset }
+        end: { key, offset },
       }
 
       return this.partialRender()
     } else if (
-      (event.key === EVENT_KEYS.ArrowDown) ||
+      event.key === EVENT_KEYS.ArrowDown ||
       (event.key === EVENT_KEYS.ArrowRight && start.offset === block.text.length)
     ) {
       event.preventDefault()
@@ -212,7 +205,7 @@ const arrowCtrl = ContentState => {
       const offset = adjustOffset(0, nextBlock || newBlock, event)
       this.cursor = {
         start: { key, offset },
-        end: { key, offset }
+        end: { key, offset },
       }
 
       return this.partialRender()

@@ -4,7 +4,7 @@ import { HAS_TEXT_BLOCK_REG, CLASS_OR_ID } from '../config'
 import { getParentCheckBox } from '../utils/getParentCheckBox'
 import { cumputeCheckboxStatus } from '../utils/cumputeCheckBoxStatus'
 
-const clickCtrl = ContentState => {
+const clickCtrl = (ContentState) => {
   ContentState.prototype.clickHandler = function (event) {
     const { eventCenter } = this.muya
     const { target } = event
@@ -39,7 +39,7 @@ const clickCtrl = ContentState => {
           const offset = 0
           this.cursor = {
             start: { key, offset },
-            end: { key, offset }
+            end: { key, offset },
           }
 
           return this.render()
@@ -63,12 +63,12 @@ const clickCtrl = ContentState => {
         const frontIcon = target.closest('.ag-front-icon')
         const rect = frontIcon.getBoundingClientRect()
         const reference = {
-          getBoundingClientRect () {
+          getBoundingClientRect() {
             return rect
           },
           clientWidth: rect.width,
           clientHeight: rect.height,
-          id: currentBlock.key
+          id: currentBlock.key,
         }
         this.selectedBlock = currentBlock
         eventCenter.dispatch('muya-front-menu', { reference, outmostBlock: currentBlock, startBlock, endBlock })
@@ -86,17 +86,17 @@ const clickCtrl = ContentState => {
 
     // link-format-click
     let parentNode = inlineNode
-    while (parentNode !== null && parentNode.classList.contains(CLASS_OR_ID.AG_INLINE_RULE)) {
+    while (parentNode?.classList.contains(CLASS_OR_ID.AG_INLINE_RULE)) {
       if (parentNode.tagName === 'A') {
         const formatType = 'link' // auto link or []() link
         const data = {
           text: inlineNode.textContent,
-          href: parentNode.getAttribute('href') || ''
+          href: parentNode.getAttribute('href') || '',
         }
         eventCenter.dispatch('format-click', {
           event,
           formatType,
-          data
+          data,
         })
         break
       } else {
@@ -143,7 +143,7 @@ const clickCtrl = ContentState => {
         eventCenter.dispatch('format-click', {
           event,
           formatType,
-          data
+          data,
         })
       }
     }
@@ -171,10 +171,7 @@ const clickCtrl = ContentState => {
     }
 
     // change active status when paragraph changed
-    if (
-      start.key !== this.cursor.start.key ||
-      end.key !== this.cursor.end.key
-    ) {
+    if (start.key !== this.cursor.start.key || end.key !== this.cursor.end.key) {
       needRender = true
     }
 

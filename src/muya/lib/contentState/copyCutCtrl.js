@@ -5,7 +5,7 @@ import { getSanitizeHtml } from '../utils/exportHtml'
 import ExportMarkdown from '../utils/exportMarkdown'
 import marked from '../parser/marked'
 
-const copyCutCtrl = ContentState => {
+const copyCutCtrl = (ContentState) => {
   ContentState.prototype.docCutHandler = function (event) {
     const { selectedTableCells } = this
     if (selectedTableCells) {
@@ -23,7 +23,7 @@ const copyCutCtrl = ContentState => {
       const { key, token } = selectedImage
       this.deleteImage({
         key,
-        token
+        token,
       })
       this.selectedImage = null
       return
@@ -40,7 +40,7 @@ const copyCutCtrl = ContentState => {
     }
     this.cursor = {
       start,
-      end: start
+      end: start,
     }
     this.checkInlineUpdate(startBlock)
     this.partialRender()
@@ -59,7 +59,7 @@ const copyCutCtrl = ContentState => {
         const selectedText = text.substring(start.offset, end.offset)
         return {
           html: marked(selectedText, this.muya.options),
-          text: selectedText
+          text: selectedText,
         }
       }
     }
@@ -75,7 +75,7 @@ const copyCutCtrl = ContentState => {
       .${CLASS_OR_ID.AG_COPY_REMOVE},
       .${CLASS_OR_ID.AG_LANGUAGE_INPUT},
       .${CLASS_OR_ID.AG_HTML_TAG} br,
-      .${CLASS_OR_ID.AG_FRONT_ICON}`
+      .${CLASS_OR_ID.AG_FRONT_ICON}`,
     )
 
     for (const e of removedElements) {
@@ -89,7 +89,7 @@ const copyCutCtrl = ContentState => {
       if (firstChild && firstChild.nodeName !== 'INPUT') {
         const originItem = document.querySelector(`#${item.id}`)
         let checked = false
-        if (originItem && originItem.firstElementChild && originItem.firstElementChild.nodeName === 'INPUT') {
+        if (originItem?.firstElementChild && originItem.firstElementChild.nodeName === 'INPUT') {
           checked = originItem.firstElementChild.checked
         }
 
@@ -139,7 +139,7 @@ const copyCutCtrl = ContentState => {
       code.${CLASS_OR_ID.AG_INLINE_RULE},
       strong.${CLASS_OR_ID.AG_INLINE_RULE},
       em.${CLASS_OR_ID.AG_INLINE_RULE},
-      del.${CLASS_OR_ID.AG_INLINE_RULE}`
+      del.${CLASS_OR_ID.AG_INLINE_RULE}`,
     )
     for (const e of inlineRuleElements) {
       const span = document.createElement('span')
@@ -154,7 +154,7 @@ const copyCutCtrl = ContentState => {
       l.replaceWith(span)
     }
 
-    const codefense = wrapper.querySelectorAll('pre[data-role$=\'code\']')
+    const codefense = wrapper.querySelectorAll("pre[data-role$='code']")
     for (const cf of codefense) {
       const id = cf.id
       const block = this.getBlock(id)
@@ -173,7 +173,7 @@ const copyCutCtrl = ContentState => {
       }
     }
 
-    const htmlBlock = wrapper.querySelectorAll('figure[data-role=\'HTML\']')
+    const htmlBlock = wrapper.querySelectorAll("figure[data-role='HTML']")
     for (const hb of htmlBlock) {
       const codeContent = hb.querySelector('.ag-code-content')
       const pre = document.createElement('pre')
@@ -235,7 +235,7 @@ const copyCutCtrl = ContentState => {
 
           rowWrapper.push({
             text: cell.text,
-            align: cell.align
+            align: cell.align,
           })
         }
         tableContents.push(rowWrapper)
@@ -250,7 +250,7 @@ const copyCutCtrl = ContentState => {
       } else {
         // Copy as markdown table
         const figureBlock = this.createBlock('figure', {
-          functionType: 'table'
+          functionType: 'table',
         })
         const table = this.createTableInFigure({ rows: row, columns: column }, tableContents)
         this.appendChild(figureBlock, table)
@@ -299,11 +299,14 @@ const copyCutCtrl = ContentState => {
       case 'copyAsHtml': {
         if (text.length > 0) {
           event.clipboardData.setData('text/html', '')
-          event.clipboardData.setData('text/plain', getSanitizeHtml(text, {
-            superSubScript: this.muya.options.superSubScript,
-            footnote: this.muya.options.footnote,
-            isGitlabCompatibilityEnabled: this.muya.options.isGitlabCompatibilityEnabled
-          }))
+          event.clipboardData.setData(
+            'text/plain',
+            getSanitizeHtml(text, {
+              superSubScript: this.muya.options.superSubScript,
+              footnote: this.muya.options.footnote,
+              isGitlabCompatibilityEnabled: this.muya.options.isGitlabCompatibilityEnabled,
+            }),
+          )
         }
         break
       }

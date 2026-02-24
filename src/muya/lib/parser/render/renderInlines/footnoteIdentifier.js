@@ -1,6 +1,6 @@
 import { CLASS_OR_ID } from '../../../config'
 
-export default function footnoteIdentifier (h, cursor, block, token, outerClass) {
+export default function footnoteIdentifier(h, cursor, block, token, outerClass) {
   const className = this.getClassName(outerClass, block, token, cursor)
   const { marker } = token
   const { start, end } = token.range
@@ -12,12 +12,16 @@ export default function footnoteIdentifier (h, cursor, block, token, outerClass)
   return [
     h(`sup#noteref-${token.content}.${CLASS_OR_ID.AG_INLINE_FOOTNOTE_IDENTIFIER}.${CLASS_OR_ID.AG_INLINE_RULE}`, [
       h(`span.${className}.${CLASS_OR_ID.AG_REMOVE}`, startMarker),
-      h('a', {
-        attrs: {
-          spellcheck: 'false'
-        }
-      }, content),
-      h(`span.${className}.${CLASS_OR_ID.AG_REMOVE}`, endMarker)
-    ])
+      h(
+        'a',
+        {
+          attrs: {
+            spellcheck: 'false',
+          },
+        },
+        content,
+      ),
+      h(`span.${className}.${CLASS_OR_ID.AG_REMOVE}`, endMarker),
+    ]),
   ]
 }

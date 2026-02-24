@@ -4,8 +4,8 @@ import { deepClone } from '../utils'
 // Source: https://github.com/Microsoft/vscode/blob/master/src/vs/editor/common/model/wordHelper.ts
 // /(-?\d*\.\d\w*)|([^\`\~\!\@\#\$\%\^\&\*\(\)\-\=\+\[\{\]\}\\\|\;\:\'\"\,\.\<\>\/\?\s]+)/
 /* eslint-disable no-useless-escape */
-const WORD_SEPARATORS = /(?:[`~!@#$%^&*()-=+[{\]}\\|;:'",\.<>\/?\s])/g
-const WORD_DEFINITION = /(?:-?\d*\.\d\w*)|(?:[^`~!@#$%^&*()-=+[{\]}\\|;:'",\.<>\/?\s]+)/g
+const WORD_SEPARATORS = /(?:[`~!@#$%^&*()-=+[{\]}\\|;:'",.<>/?\s])/g
+const WORD_DEFINITION = /(?:-?\d*\.\d\w*)|(?:[^`~!@#$%^&*()-=+[{\]}\\|;:'",.<>/?\s]+)/g
 /* eslint-enable no-useless-escape */
 
 /**
@@ -32,10 +32,15 @@ export const offsetToWordCursor = (lineCursor, left, right) => {
  *
  * @param {*} selection The preview editor selection range.
  */
-export const validateLineCursor = selection => {
+export const validateLineCursor = (selection) => {
   // Validate selection range.
-  if (!selection && !selection.start && !selection.start.hasOwnProperty('offset') &&
-    !selection.end && !selection.end.hasOwnProperty('offset')) {
+  if (
+    !selection &&
+    !selection.start &&
+    !selection.start.hasOwnProperty('offset') &&
+    !selection.end &&
+    !selection.end.hasOwnProperty('offset')
+  ) {
     return false
   }
 
@@ -46,14 +51,12 @@ export const validateLineCursor = selection => {
   }
 
   // Don't correct words in code blocks or editors for HTML, LaTex and diagrams.
-  if (startCursor.block.functionType === 'codeContent' &&
-    startCursor.block.lang !== undefined) {
+  if (startCursor.block.functionType === 'codeContent' && startCursor.block.lang !== undefined) {
     return false
   }
 
   // Don't correct words in code blocks or pre elements such as language identifier.
-  if (selection.affiliation && selection.affiliation.length === 1 &&
-    selection.affiliation[0].type === 'pre') {
+  if (selection.affiliation && selection.affiliation.length === 1 && selection.affiliation[0].type === 'pre') {
     return false
   }
   return true
@@ -78,7 +81,8 @@ export const extractWord = (text, offset) => {
   WORD_DEFINITION.lastIndex = text.lastIndexOf(' ', offset - 1) + 1
   let match = null
   let left = -1
-  while (match = WORD_DEFINITION.exec(text)) { // eslint-disable-line
+  while ((match = WORD_DEFINITION.exec(text))) {
+    // eslint-disable-line
     if (match && match.index <= offset) {
       if (WORD_DEFINITION.lastIndex > offset) {
         left = match.index
@@ -108,12 +112,12 @@ export const extractWord = (text, offset) => {
     return {
       left,
       right: text.length,
-      word: text.slice(left)
+      word: text.slice(left),
     }
   }
   return {
     left,
     right: right,
-    word: text.slice(left, right)
+    word: text.slice(left, right),
   }
 }

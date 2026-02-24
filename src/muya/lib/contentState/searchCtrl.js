@@ -4,7 +4,7 @@ import { defaultSearchOption } from '../config'
 const matchString = (text, value, options) => {
   const { isCaseSensitive, isWholeWord, isRegexp } = options
   /* eslint-disable no-useless-escape */
-  const SPECIAL_CHAR_REG = /[\[\]\\^$.\|\?\*\+\(\)\/]{1}/g
+  const SPECIAL_CHAR_REG = /[[\]\\^$.|?*+()/]{1}/g
   /* eslint-enable no-useless-escape */
   let SEARCH_REG = null
   let regStr = value
@@ -28,18 +28,18 @@ const matchString = (text, value, options) => {
     // Add try catch expression because not all string can generate a valid RegExp. for example `\`.
     SEARCH_REG = new RegExp(regStr, flag)
     return execAll(SEARCH_REG, text)
-  } catch (err) {
+  } catch (_err) {
     return []
   }
 }
 
-const searchCtrl = ContentState => {
-  ContentState.prototype.buildRegexValue = function (match, value) {
+const searchCtrl = (ContentState) => {
+  ContentState.prototype.buildRegexValue = (match, value) => {
     const groups = value.match(/(?<!\\)\$\d/g)
 
     if (Array.isArray(groups) && groups.length) {
       for (const group of groups) {
-        const index = parseInt(group.replace(/^\$/, ''))
+        const index = parseInt(group.replace(/^\$/, ''), 10)
         if (index === 0) {
           value = value.replace(group, match.match)
         } else if (index > 0 && index <= match.subMatches.length) {
@@ -92,16 +92,16 @@ const searchCtrl = ContentState => {
       noHistory: true,
       start: {
         key,
-        offset: start
+        offset: start,
       },
       end: {
         key,
-        offset: end
-      }
+        offset: end,
+      },
     }
   }
 
-  ContentState.prototype.find = function (action/* prev next */) {
+  ContentState.prototype.find = function (action /* prev next */) {
     let { matches, index } = this.searchMatches
     const len = matches.length
     if (!len) return
@@ -118,21 +118,23 @@ const searchCtrl = ContentState => {
     const options = Object.assign({}, defaultSearchOption, opt)
     const { highlightIndex } = options
     const { blocks } = this
-    const travel = blocks => {
+    const travel = (blocks) => {
       for (const block of blocks) {
         let { text, key } = block
 
         if (text && typeof text === 'string') {
           const strMatches = matchString(text, value, options)
-          matches.push(...strMatches.map(({ index, match, subMatches }) => {
-            return {
-              key,
-              start: index,
-              end: index + match.length,
-              match,
-              subMatches
-            }
-          }))
+          matches.push(
+            ...strMatches.map(({ index, match, subMatches }) => {
+              return {
+                key,
+                start: index,
+                end: index + match.length,
+                match,
+                subMatches,
+              }
+            }),
+          )
         }
         if (block.children.length) {
           travel(block.children)

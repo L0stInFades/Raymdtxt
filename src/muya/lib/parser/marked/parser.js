@@ -8,7 +8,7 @@ import defaultOptions from './options'
  * Parsing & Compiling
  */
 
-function Parser (options) {
+function Parser(options) {
   this.tokens = []
   this.token = null
   this.footnotes = null
@@ -30,7 +30,7 @@ Parser.prototype.parse = function (src) {
   this.inlineText = new InlineLexer(
     src.links,
     src.footnotes,
-    Object.assign({}, this.options, { renderer: new TextRenderer() })
+    Object.assign({}, this.options, { renderer: new TextRenderer() }),
   )
   this.tokens = src.reverse()
   this.footnotes = src.footnotes
@@ -67,7 +67,7 @@ Parser.prototype.parseText = function () {
   let body = this.token.text
 
   while (this.peek().type === 'text') {
-    body += '\n' + this.next().text
+    body += `\n${this.next().text}`
   }
 
   return this.inline.output(body)
@@ -94,7 +94,7 @@ Parser.prototype.tok = function () {
         this.token.depth,
         unescape(this.inlineText.output(this.token.text)),
         this.slugger,
-        this.token.headingStyle
+        this.token.headingStyle,
       )
     }
     case 'multiplemath': {
@@ -116,12 +116,10 @@ Parser.prototype.tok = function () {
       // header
       cell = ''
       for (i = 0; i < this.token.header.length; i++) {
-        cell += this.renderer.tablecell(
-          this.inline.output(this.token.header[i]), {
-            header: true,
-            align: this.token.align[i]
-          }
-        )
+        cell += this.renderer.tablecell(this.inline.output(this.token.header[i]), {
+          header: true,
+          align: this.token.align[i],
+        })
       }
       header += this.renderer.tablerow(cell)
 
@@ -130,12 +128,10 @@ Parser.prototype.tok = function () {
 
         cell = ''
         for (j = 0; j < row.length; j++) {
-          cell += this.renderer.tablecell(
-            this.inline.output(row[j]), {
-              header: false,
-              align: this.token.align[j]
-            }
-          )
+          cell += this.renderer.tablecell(this.inline.output(row[j]), {
+            header: false,
+            align: this.token.align[j],
+          })
         }
 
         body += this.renderer.tablerow(cell)
@@ -220,7 +216,7 @@ Parser.prototype.tok = function () {
       return this.renderer.toc()
     }
     default: {
-      const errMsg = 'Token with "' + this.token.type + '" type was not found.'
+      const errMsg = `Token with "${this.token.type}" type was not found.`
       if (this.options.silent) {
         console.error(errMsg)
       } else {

@@ -3,46 +3,33 @@
  * returns only the textual part of the token
  */
 
-function TextRenderer () {}
+function TextRenderer() {}
 
 // no need for block level renderers
 
 TextRenderer.prototype.strong =
-TextRenderer.prototype.em =
-TextRenderer.prototype.codespan =
-TextRenderer.prototype.del =
-TextRenderer.prototype.text = function (text) {
-  return text
-}
+  TextRenderer.prototype.em =
+  TextRenderer.prototype.codespan =
+  TextRenderer.prototype.del =
+  TextRenderer.prototype.text =
+    (text) => text
 
-TextRenderer.prototype.html = function (html) {
-  return html
-}
+TextRenderer.prototype.html = (html) => html
 
-TextRenderer.prototype.inlineMath = function (math, displayMode) {
-  return math
-}
+TextRenderer.prototype.inlineMath = (math, _displayMode) => math
 
-TextRenderer.prototype.emoji = function (text, emoji) {
-  return emoji
-}
+TextRenderer.prototype.emoji = (_text, emoji) => emoji
 
-TextRenderer.prototype.script = function (content, marker) {
+TextRenderer.prototype.script = (content, marker) => {
   const tagName = marker === '^' ? 'sup' : 'sub'
   return `<${tagName}>${content}</${tagName}>`
 }
 
-TextRenderer.prototype.footnoteIdentifier = function (identifier, { footnoteId, footnoteIdentifierId, order }) {
-  return `<a href="#${footnoteId ? `fn${footnoteId}` : ''}" class="footnote-ref" id="fnref${footnoteIdentifierId}" role="doc-noteref"><sup>${order || identifier}</sup></a>`
-}
+TextRenderer.prototype.footnoteIdentifier = (identifier, { footnoteId, footnoteIdentifierId, order }) =>
+  `<a href="#${footnoteId ? `fn${footnoteId}` : ''}" class="footnote-ref" id="fnref${footnoteIdentifierId}" role="doc-noteref"><sup>${order || identifier}</sup></a>`
 
-TextRenderer.prototype.link =
-TextRenderer.prototype.image = function (href, title, text) {
-  return '' + text
-}
+TextRenderer.prototype.link = TextRenderer.prototype.image = (_href, _title, text) => `${text}`
 
-TextRenderer.prototype.br = function () {
-  return ''
-}
+TextRenderer.prototype.br = () => ''
 
 export default TextRenderer
