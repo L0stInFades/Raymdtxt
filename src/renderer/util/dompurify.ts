@@ -27,6 +27,6 @@ export const EXPORT_DOMPURIFY_CONFIG = Object.freeze({
   ALLOWED_URI_REGEXP: /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|cid|xmpp|file):|[^a-z]|[a-z+.-]+(?:[^a-z+.\-:]|$))/i, // eslint-disable-line no-useless-escape
 })
 
-export const sanitize = (html, purifyOptions) => {
+export const sanitize = (html: string, purifyOptions: Record<string, unknown>): string => {
   return runSanitize(html, purifyOptions)
 }

@@ -1,4 +1,5 @@
 import { createApp } from 'vue'
+import { createPinia } from 'pinia'
 import bootstrapRenderer from './bootstrap'
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
@@ -27,6 +28,7 @@ const router = routes(global.marktext.env.type)
 
 const app = createApp(RootApp)
 
+app.use(createPinia())
 app.use(store)
 app.use(router)
 app.use(ElementPlus)

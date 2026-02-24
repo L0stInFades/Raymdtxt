@@ -5,9 +5,6 @@ import project from './project'
 import editor from './editor'
 import layout from './layout'
 import preferences from './preferences'
-import autoUpdates from './autoUpdates'
-import notification from './notification'
-import tweet from './tweet'
 import commandCenter from './commandCenter'
 
 // global states
@@ -49,9 +46,6 @@ const store = createStore({
   modules: {
     // have no states
     listenForMain,
-    autoUpdates,
-    notification,
-    tweet,
     // have states
     project,
     preferences,

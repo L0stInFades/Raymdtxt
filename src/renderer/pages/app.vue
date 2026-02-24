@@ -52,6 +52,9 @@ import { loadingPageMixins } from '@/mixins'
 import { mapState } from 'vuex'
 import bus from '@/bus'
 import { DEFAULT_STYLE } from '@/config'
+import { useAutoUpdatesStore } from '@/store/pinia/autoUpdates'
+import { useNotificationStore } from '@/store/pinia/notification'
+import { useTweetStore } from '@/store/pinia/tweet'
 
 export default {
   name: 'marktext',
@@ -117,8 +120,8 @@ export default {
     dispatch('LINTEN_WIN_STATUS')
     // module: command center
     dispatch('LISTEN_COMMAND_CENTER_BUS')
-    // module: tweet
-    dispatch('LISTEN_FOR_TWEET')
+    // module: tweet (Pinia)
+    useTweetStore().listen()
     // module: layout
     dispatch('LISTEN_FOR_LAYOUT')
     // module: listenForMain
@@ -130,8 +133,8 @@ export default {
     dispatch('LISTEN_FOR_UPDATE_PROJECT')
     dispatch('LISTEN_FOR_LOAD_PROJECT')
     dispatch('LISTEN_FOR_SIDEBAR_CONTEXT_MENU')
-    // module: autoUpdates
-    dispatch('LISTEN_FOR_UPDATE')
+    // module: autoUpdates (Pinia)
+    useAutoUpdatesStore().listen()
     // module: editor
     dispatch('LISTEN_SCREEN_SHOT')
     dispatch('ASK_FOR_USER_PREFERENCE')
@@ -158,8 +161,8 @@ export default {
     dispatch('LISTEN_FOR_RELOAD_IMAGES')
     dispatch('LISTEN_FOR_CONTEXT_MENU')
 
-    // module: notification
-    dispatch('LISTEN_FOR_NOTIFICATION')
+    // module: notification (Pinia)
+    useNotificationStore().listen()
 
     // prevent Chromium's default behavior and try to open the first file
     window.addEventListener(

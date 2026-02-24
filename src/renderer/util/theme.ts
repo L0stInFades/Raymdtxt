@@ -4,36 +4,40 @@ import { isLinux } from './index'
 import elementStyle from 'element-plus/dist/index.css?inline'
 
 const ORIGINAL_THEME = '#409EFF'
-const patchTheme = (css) => {
+const patchTheme = (css: string): string => {
   return `@media not print {\n${css}\n}`
 }
 
-const getEmojiPickerPatch = () => {
+const getEmojiPickerPatch = (): string => {
   return isLinux
     ? '.ag-emoji-picker section .emoji-wrapper .item span { font-family: sans-serif, "Noto Color Emoji"; }'
     : ''
 }
 
-const getThemeCluster = (themeColor) => {
-  const tintColor = (color, tint) => {
+interface ThemeClusterEntry {
+  color: string
+  variable: string
+}
+
+const getThemeCluster = (themeColor: string): ThemeClusterEntry[] => {
+  const tintColor = (color: string, tint: number): string => {
     let red = parseInt(color.slice(1, 3), 16)
     let green = parseInt(color.slice(3, 5), 16)
     let blue = parseInt(color.slice(5, 7), 16)
     if (tint === 0) {
-      // when primary color is in its rgb space
       return [red, green, blue].join(',')
     } else {
       red += Math.round(tint * (255 - red))
       green += Math.round(tint * (255 - green))
       blue += Math.round(tint * (255 - blue))
-      red = red.toString(16)
-      green = green.toString(16)
-      blue = blue.toString(16)
-      return `#${red}${green}${blue}`
+      const redStr = red.toString(16)
+      const greenStr = green.toString(16)
+      const blueStr = blue.toString(16)
+      return `#${redStr}${greenStr}${blueStr}`
     }
   }
 
-  const clusters = [
+  const clusters: ThemeClusterEntry[] = [
     {
       color: themeColor,
       variable: 'var(--themeColor)',
@@ -49,11 +53,11 @@ const getThemeCluster = (themeColor) => {
   return clusters
 }
 
-export const addThemeStyle = (theme) => {
+export const addThemeStyle = (theme: string): void => {
   const isCmRailscasts = railscastsThemes.includes(theme)
   const isCmOneDark = oneDarkThemes.includes(theme)
   const isDarkTheme = isCmOneDark || isCmRailscasts
-  let themeStyleEle = document.querySelector(`#${THEME_STYLE_ID}`)
+  let themeStyleEle = document.querySelector(`#${THEME_STYLE_ID}`) as HTMLStyleElement | null
   if (!themeStyleEle) {
     themeStyleEle = document.createElement('style')
     themeStyleEle.id = THEME_STYLE_ID
@@ -106,14 +110,13 @@ export const addThemeStyle = (theme) => {
   }
 }
 
-export const setEditorWidth = (value) => {
+export const setEditorWidth = (value: string): void => {
   const EDITOR_WIDTH_STYLE_ID = 'editor-width'
   let result = ''
   if (value && /^[0-9]+(?:ch|px|%)$/.test(value)) {
-    // Overwrite the theme value and add 100px for padding.
     result = `:root { --editorAreaWidth: calc(100px + ${value}); }`
   }
-  let styleEle = document.querySelector(`#${EDITOR_WIDTH_STYLE_ID}`)
+  let styleEle = document.querySelector(`#${EDITOR_WIDTH_STYLE_ID}`) as HTMLStyleElement | null
   if (!styleEle) {
     styleEle = document.createElement('style')
     styleEle.setAttribute('id', EDITOR_WIDTH_STYLE_ID)
@@ -123,9 +126,15 @@ export const setEditorWidth = (value) => {
   styleEle.innerHTML = result
 }
 
-export const addCommonStyle = (options) => {
+interface CommonStyleOptions {
+  codeFontFamily: string
+  codeFontSize: number
+  hideScrollbar: boolean
+}
+
+export const addCommonStyle = (options: CommonStyleOptions): void => {
   const { codeFontFamily, codeFontSize, hideScrollbar } = options
-  let sheet = document.querySelector(`#${COMMON_STYLE_ID}`)
+  let sheet = document.querySelector(`#${COMMON_STYLE_ID}`) as HTMLStyleElement | null
   if (!sheet) {
     sheet = document.createElement('style')
     sheet.id = COMMON_STYLE_ID
@@ -153,9 +162,9 @@ ${getEmojiPickerPatch()}
 `
 }
 
-export const addElementStyle = () => {
+export const addElementStyle = (): void => {
   const ID = 'mt-el-style'
-  let sheet = document.querySelector(`#${ID}`)
+  let sheet = document.querySelector(`#${ID}`) as HTMLStyleElement | null
   if (sheet) {
     return
   }
@@ -171,8 +180,12 @@ export const addElementStyle = () => {
   sheet.innerHTML = newElementStyle
 }
 
+interface AddStylesOptions extends CommonStyleOptions {
+  theme: string
+}
+
 // Append common sheet and theme at the end of head - order is important.
-export const addStyles = (options) => {
+export const addStyles = (options: AddStylesOptions): void => {
   const { theme } = options
   addThemeStyle(theme)
   addCommonStyle(options)

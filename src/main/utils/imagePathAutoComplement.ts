@@ -6,13 +6,15 @@ import { isDirectory, isFile } from 'common/filesystem'
 import { IMAGE_EXTENSIONS } from 'common/filesystem/paths'
 import { BLACK_LIST } from '../config'
 
-// TODO(need::refactor): Refactor this file. Just return an array of directories and files without caching and watching?
+interface FileEntry {
+  file: string
+  type: string
+}
 
-// TODO: rebuild cache @jocs
-const IMAGE_PATH = new Map()
-export const watchers = new Map()
+const IMAGE_PATH = new Map<string, FileEntry[]>()
+export const watchers = new Map<string, fs.FSWatcher>()
 
-const filesHandler = (files, directory, key) => {
+const filesHandler = (files: string[], directory: string, key?: string): FileEntry[] | undefined => {
   const IMAGE_REG = new RegExp(`(${IMAGE_EXTENSIONS.join('|')})$`, 'i')
   const onlyDirAndImage = files
     .map((file) => {
@@ -41,7 +43,7 @@ const filesHandler = (files, directory, key) => {
   }
 }
 
-const rebuild = (directory) => {
+const rebuild = (directory: string): void => {
   fs.readdir(directory, (err, files) => {
     if (err) {
       log.error('imagePathAutoComplement::rebuild:', err)
@@ -51,8 +53,8 @@ const rebuild = (directory) => {
   })
 }
 
-const watchDirectory = (directory) => {
-  if (watchers.has(directory)) return // Do not duplicate watch the same directory
+const watchDirectory = (directory: string): void => {
+  if (watchers.has(directory)) return
   const watcher = fs.watch(directory, (eventType, _filename) => {
     if (eventType === 'rename') {
       rebuild(directory)
@@ -61,10 +63,10 @@ const watchDirectory = (directory) => {
   watchers.set(directory, watcher)
 }
 
-export const searchFilesAndDir = (directory, key) => {
-  let result = []
+export const searchFilesAndDir = (directory: string, key: string): Promise<FileEntry[] | undefined> => {
+  let result: FileEntry[] = []
   if (IMAGE_PATH.has(directory)) {
-    result = filter(IMAGE_PATH.get(directory), key, { key: 'file' })
+    result = filter(IMAGE_PATH.get(directory)!, key, { key: 'file' })
     return Promise.resolve(result)
   } else {
     return new Promise((resolve, reject) => {
@@ -72,7 +74,7 @@ export const searchFilesAndDir = (directory, key) => {
         if (err) {
           reject(err)
         } else {
-          result = filesHandler(files, directory, key)
+          result = filesHandler(files, directory, key) as FileEntry[]
           watchDirectory(directory)
           resolve(result)
         }

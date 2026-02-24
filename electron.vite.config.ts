@@ -2,12 +2,24 @@ import { createRequire } from 'module'
 import { defineConfig, externalizeDepsPlugin } from 'electron-vite'
 import { resolve, basename } from 'path'
 import { readFileSync, cpSync } from 'fs'
+import { execSync } from 'child_process'
 import vue from '@vitejs/plugin-vue'
 import { viteStaticCopy } from 'vite-plugin-static-copy'
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
 import type { Plugin } from 'vite'
 
 const _require = createRequire(import.meta.url)
+
+// Version information
+const { version } = JSON.parse(readFileSync(new URL('package.json', import.meta.url), 'utf-8'))
+let shortHash = 'N/A'
+let fullHash = 'N/A'
+try {
+  shortHash = execSync('git rev-parse --short HEAD', { cwd: new URL('.', import.meta.url).pathname }).toString().trim()
+  fullHash = execSync('git rev-parse HEAD', { cwd: new URL('.', import.meta.url).pathname }).toString().trim()
+} catch (_) {}
+const isStable = !!process.env.MARKTEXT_IS_STABLE
+const versionString = isStable ? `v${version}` : `v${version} (${shortHash})`
 
 // ---------------------------------------------------------------------------
 // Custom plugins
@@ -138,6 +150,11 @@ export default defineConfig(({ mode }) => {
         ...(isDev
           ? { __static: JSON.stringify(resolve('static')) }
           : {}),
+        'global.MARKTEXT_VERSION': JSON.stringify(version),
+        'global.MARKTEXT_VERSION_STRING': JSON.stringify(versionString),
+        'global.MARKTEXT_IS_STABLE': JSON.stringify(isStable),
+        'global.MARKTEXT_GIT_SHORT_HASH': JSON.stringify(shortHash),
+        'global.MARKTEXT_GIT_HASH': JSON.stringify(fullHash),
       },
       build: {
         outDir: 'dist/electron',
@@ -219,6 +236,8 @@ export default defineConfig(({ mode }) => {
         // Polyfill `global` → `window` so legacy code using `global.marktext.*`
         // continues to work in the browser context.
         global: 'window',
+        'process.versions.MARKTEXT_VERSION': JSON.stringify(version),
+        'process.versions.MARKTEXT_VERSION_STRING': JSON.stringify(versionString),
       },
       optimizeDeps: {
         // electron is not available in renderer; keep it external so Vite
