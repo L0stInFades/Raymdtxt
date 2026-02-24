@@ -1,7 +1,8 @@
 const isOsx = process.platform === 'darwin'
 
-const _normalizeAccelerator = accelerator => {
-  return accelerator.toLowerCase()
+const _normalizeAccelerator = (accelerator: string): string => {
+  return accelerator
+    .toLowerCase()
     .replace('commandorcontrol', isOsx ? 'cmd' : 'ctrl')
     .replace('cmdorctrl', isOsx ? 'cmd' : 'ctrl')
     .replace('control', 'ctrl')
@@ -10,19 +11,19 @@ const _normalizeAccelerator = accelerator => {
     .replace('option', 'alt')
 }
 
-export const isEqualAccelerator = (a, b) => {
-  a = _normalizeAccelerator(a)
-  b = _normalizeAccelerator(b)
-  const i1 = a.indexOf('+')
-  const i2 = b.indexOf('+')
+export const isEqualAccelerator = (a: string, b: string): boolean => {
+  const normalA = _normalizeAccelerator(a)
+  const normalB = _normalizeAccelerator(b)
+  const i1 = normalA.indexOf('+')
+  const i2 = normalB.indexOf('+')
   if (i1 === -1 && i2 === -1) {
-    return a === b
+    return normalA === normalB
   } else if (i1 === -1 || i2 === -1) {
     return false
   }
 
-  const partsA = a.split('+')
-  const partsB = b.split('+')
+  const partsA = normalA.split('+')
+  const partsB = normalB.split('+')
   if (partsA.length !== partsB.length) {
     return false
   }

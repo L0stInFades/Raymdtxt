@@ -1,14 +1,11 @@
 import fs from 'fs-extra'
-import fsPromises from 'fs/promises'
-import path from 'path'
+import fsPromises from 'node:fs/promises'
+import path from 'node:path'
 
 /**
  * Test whether or not the given path exists.
- *
- * @param {string} p The path to the file or directory.
- * @returns {boolean}
  */
-export const exists = async p => {
+export const exists = async (p: string): Promise<boolean> => {
   try {
     await fsPromises.access(p)
     return true
@@ -19,13 +16,11 @@ export const exists = async p => {
 
 /**
  * Ensure that a directory exist.
- *
- * @param {string} dirPath The directory path.
  */
-export const ensureDirSync = dirPath => {
+export const ensureDirSync = (dirPath: string): void => {
   try {
     fs.ensureDirSync(dirPath)
-  } catch (e) {
+  } catch (e: any) {
     if (e.code !== 'EEXIST') {
       throw e
     }
@@ -34,10 +29,8 @@ export const ensureDirSync = dirPath => {
 
 /**
  * Returns true if the path is a directory with read access.
- *
- * @param {string} dirPath The directory path.
  */
-export const isDirectory = dirPath => {
+export const isDirectory = (dirPath: string): boolean => {
   try {
     return fs.existsSync(dirPath) && fs.lstatSync(dirPath).isDirectory()
   } catch (_) {
@@ -47,10 +40,8 @@ export const isDirectory = dirPath => {
 
 /**
  * Returns true if the path is a directory or a symbolic link to a directory with read access.
- *
- * @param {string} dirPath The directory path.
  */
-export const isDirectory2 = dirPath => {
+export const isDirectory2 = (dirPath: string): boolean => {
   try {
     if (!fs.existsSync(dirPath)) {
       return false
@@ -71,10 +62,8 @@ export const isDirectory2 = dirPath => {
 
 /**
  * Returns true if the path is a file with read access.
- *
- * @param {string} filepath The file path.
  */
-export const isFile = filepath => {
+export const isFile = (filepath: string): boolean => {
   try {
     return fs.existsSync(filepath) && fs.lstatSync(filepath).isFile()
   } catch (_) {
@@ -84,10 +73,8 @@ export const isFile = filepath => {
 
 /**
  * Returns true if the path is a file or a symbolic link to a file with read access.
- *
- * @param {string} filepath The file path.
  */
-export const isFile2 = filepath => {
+export const isFile2 = (filepath: string): boolean => {
   try {
     if (!fs.existsSync(filepath)) {
       return false
@@ -108,10 +95,8 @@ export const isFile2 = filepath => {
 
 /**
  * Returns true if the path is a symbolic link with read access.
- *
- * @param {string} filepath The link path.
  */
-export const isSymbolicLink = filepath => {
+export const isSymbolicLink = (filepath: string): boolean => {
   try {
     return fs.existsSync(filepath) && fs.lstatSync(filepath).isSymbolicLink()
   } catch (_) {

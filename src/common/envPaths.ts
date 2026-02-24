@@ -1,11 +1,14 @@
-import path from 'path'
+import path from 'node:path'
 
 class EnvPaths {
-  /**
-   * @param {string} userDataPath The user data path.
-   * @returns
-   */
-  constructor (userDataPath) {
+  private readonly _electronUserDataPath: string
+  private readonly _userDataPath: string
+  private readonly _logPath: string
+  private readonly _preferencesPath: string
+  private readonly _dataCenterPath: string
+  private readonly _preferencesFilePath: string
+
+  constructor(userDataPath: string) {
     const currentDate = new Date()
     if (!userDataPath) {
       throw new Error('"userDataPath" is not set.')
@@ -26,28 +29,28 @@ class EnvPaths {
     // this._sessionsPath = path.join(this._userDataPath, 'sessions')
   }
 
-  get electronUserDataPath () {
+  get electronUserDataPath(): string {
     // This path is identical to app.getPath('userData') but userDataPath must not necessarily be the same path.
     return this._electronUserDataPath
   }
 
-  get userDataPath () {
+  get userDataPath(): string {
     return this._userDataPath
   }
 
-  get logPath () {
+  get logPath(): string {
     return this._logPath
   }
 
-  get preferencesPath () {
+  get preferencesPath(): string {
     return this._preferencesPath
   }
 
-  get dataCenterPath () {
+  get dataCenterPath(): string {
     return this._dataCenterPath
   }
 
-  get preferencesFilePath () {
+  get preferencesFilePath(): string {
     return this._preferencesFilePath
   }
 }
