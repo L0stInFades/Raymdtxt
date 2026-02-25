@@ -49,7 +49,7 @@ export default {
   created() {
     bus.on('aboutDialog', this.showDialog)
   },
-  beforeDestroy() {
+  beforeUnmount() {
     bus.off('aboutDialog', this.showDialog)
   },
   methods: {

@@ -1,6 +1,11 @@
 import { contextBridge, ipcRenderer, clipboard, shell, webFrame, nativeImage } from 'electron'
 import type { PreloadApi, SideBarContextMenuPayload, TabContextMenuPayload } from '../common/types/preload'
 
+/** Listener with an optional attached wrapped version (event-stripped) for ipcRenderer.on/off symmetry */
+type WrappedIpcListener = ((...args: unknown[]) => void) & {
+  __wrappedListener?: (event: Electron.IpcRendererEvent, ...args: unknown[]) => void
+}
+
 // Whitelist of allowed IPC channels (mt:: prefix convention)
 const ALLOWED_SEND_CHANNELS = [
   // File operations
@@ -246,7 +251,7 @@ const api: PreloadApi = {
         const wrappedListener = (_event: Electron.IpcRendererEvent, ...args: unknown[]) => listener(...args)
         ipcRenderer.on(channel, wrappedListener)
         // Store mapping for cleanup
-        ;(listener as any).__wrappedListener = wrappedListener
+        ;(listener as WrappedIpcListener).__wrappedListener = wrappedListener
       } else {
         console.warn(`[preload] Blocked listener on unauthorized channel: ${channel}`)
       }
@@ -259,10 +264,11 @@ const api: PreloadApi = {
       }
     },
     off: (channel: string, listener: (...args: unknown[]) => void) => {
-      const wrappedListener = (listener as any).__wrappedListener
+      const wrappedListener = (listener as WrappedIpcListener).__wrappedListener
       if (wrappedListener) {
         ipcRenderer.off(channel, wrappedListener)
       } else {
+        // biome-ignore lint/suspicious/noExplicitAny: listener type structurally differs from Electron's IpcRendererListener (event stripped); safe at runtime
         ipcRenderer.off(channel, listener as any)
       }
     },

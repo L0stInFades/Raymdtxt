@@ -48,7 +48,7 @@ export default {
   created() {
     bus.on('importDialog', this.showDialog)
   },
-  beforeDestroy() {
+  beforeUnmount() {
     bus.off('importDialog', this.showDialog)
   },
   methods: {

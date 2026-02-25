@@ -186,7 +186,7 @@ export default {
       this.drake.destroy()
     }
   },
-  beforeDestroy() {
+  beforeUnmount() {
     bus.off('TABS::close-this', this.closeTab)
     bus.off('TABS::close-others', this.closeOthers)
     bus.off('TABS::close-saved', this.closeSaved)

@@ -9,29 +9,31 @@
       custom-class="ag-dialog-table"
       width="350px"
     >
-      <div slot="title" class="key-input-wrapper">
-        <div class="input-wrapper">
-          <input
-            tabindex="0"
-            type="text"
-            ref="intputTextbox"
-            v-model="keybindingInputValue"
-            class="input-textbox"
-            @keydown="handleKeyDown"
-            @keyup="handleKeyUp"
-            :placeholder="placeholderText"
-          >
-        </div>
-        <div class="footer">
-          <div class="descriptions">Press Enter to continue or ESC to exit.</div>
-          <div
-            v-show="!isKeybindingValid"
-            class="invalid-keybinding"
-          >
-            Current key combination cannot be bound!
+      <template #title>
+        <div class="key-input-wrapper">
+          <div class="input-wrapper">
+            <input
+              tabindex="0"
+              type="text"
+              ref="intputTextbox"
+              v-model="keybindingInputValue"
+              class="input-textbox"
+              @keydown="handleKeyDown"
+              @keyup="handleKeyUp"
+              :placeholder="placeholderText"
+            >
+          </div>
+          <div class="footer">
+            <div class="descriptions">Press Enter to continue or ESC to exit.</div>
+            <div
+              v-show="!isKeybindingValid"
+              class="invalid-keybinding"
+            >
+              Current key combination cannot be bound!
+            </div>
           </div>
         </div>
-      </div>
+      </template>
     </el-dialog>
   </div>
 </template>
