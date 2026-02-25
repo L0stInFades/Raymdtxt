@@ -239,7 +239,7 @@ export default defineConfig(({ mode }) => {
       optimizeDeps: {
         // electron is not available in renderer; keep it external so Vite
         // doesn't try to bundle it.
-        exclude: ['electron', 'fontmanager-redux'],
+        exclude: ['electron', 'fontmanager-redux', 'eve'],
       },
       build: {
         outDir: 'dist/electron',
