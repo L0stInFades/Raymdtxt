@@ -194,7 +194,7 @@ export default defineConfig(({ mode }) => {
           include: ['path', 'os', 'buffer', 'events', 'util', 'stream', 'crypto'],
           // Electron's renderer sandbox already provides `process` natively (correct platform etc.)
           // Do NOT override it with a browser shim — that would break process.platform detection.
-          globals: { Buffer: true },
+          globals: { Buffer: true, process: true },
         }),
         // Copy CodeMirror mode files so dynamic require()/import() works.
         // Resolve the path at config-eval time (handles pnpm's virtual store).
