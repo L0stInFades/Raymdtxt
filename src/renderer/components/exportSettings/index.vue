@@ -406,7 +406,7 @@ export default {
       this[key] = value
     },
     loadThemesFromDisk() {
-      const { userDataPath } = global.marktext.paths
+      const { userDataPath } = window.marktext.paths
       const themeDir = path.join(userDataPath, 'themes/export')
 
       // Search for dictionaries on filesystem.

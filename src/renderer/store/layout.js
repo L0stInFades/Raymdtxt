@@ -16,7 +16,7 @@ const getters = {}
 const mutations = {
   SET_LAYOUT(state, layout) {
     if (layout.showSideBar !== undefined) {
-      const { windowId } = global.marktext.env
+      const { windowId } = window.marktext.env
       window.api.ipc.send('mt::update-sidebar-menu', windowId, !!layout.showSideBar)
     }
     Object.assign(state, layout)
@@ -53,13 +53,13 @@ const actions = {
 
     bus.on('view:toggle-layout-entry', (entryName) => {
       commit('TOGGLE_LAYOUT_ENTRY', entryName)
-      const { windowId } = global.marktext.env
+      const { windowId } = window.marktext.env
       window.api.ipc.send('mt::view-layout-changed', windowId, { [entryName]: state[entryName] })
     })
   },
 
   DISPATCH_LAYOUT_MENU_ITEMS({ state }) {
-    const { windowId } = global.marktext.env
+    const { windowId } = window.marktext.env
     const { showTabBar, showSideBar } = state
     window.api.ipc.send('mt::view-layout-changed', windowId, { showTabBar, showSideBar })
   },

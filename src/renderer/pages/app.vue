@@ -112,8 +112,8 @@ export default {
     const { commit, dispatch } = this.$store
 
     // Apply initial state (theme and titleBarStyle) and delay load other values.
-    if (global.marktext.initialState) {
-      commit('SET_USER_PREFERENCE', global.marktext.initialState)
+    if (window.marktext.initialState) {
+      commit('SET_USER_PREFERENCE', window.marktext.initialState)
     }
 
     // store/index.js
@@ -195,7 +195,7 @@ export default {
     )
 
     this.$nextTick(() => {
-      const style = global.marktext.initialState || DEFAULT_STYLE
+      const style = window.marktext.initialState || DEFAULT_STYLE
       addStyles(style)
       this.hideLoadingPage()
     })

@@ -24,7 +24,7 @@ addElementStyle()
 // -----------------------------------------------
 // Be careful when changing code before this line!
 
-const router = routes(global.marktext.env.type)
+const router = routes(window.marktext.env.type)
 
 const app = createApp(RootApp)
 

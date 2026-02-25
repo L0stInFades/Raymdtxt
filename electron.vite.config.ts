@@ -233,16 +233,13 @@ export default defineConfig(({ mode }) => {
         ],
       },
       define: {
-        // Polyfill `global` → `window` so legacy code using `global.marktext.*`
-        // continues to work in the browser context.
-        global: 'window',
         'process.versions.MARKTEXT_VERSION': JSON.stringify(version),
         'process.versions.MARKTEXT_VERSION_STRING': JSON.stringify(versionString),
       },
       optimizeDeps: {
         // electron is not available in renderer; keep it external so Vite
         // doesn't try to bundle it.
-        exclude: ['electron'],
+        exclude: ['electron', 'fontmanager-redux'],
       },
       build: {
         outDir: 'dist/electron',
