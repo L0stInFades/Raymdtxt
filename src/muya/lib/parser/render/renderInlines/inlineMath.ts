@@ -4,11 +4,11 @@ import 'katex/dist/contrib/mhchem.min.js'
 import { CLASS_OR_ID } from '../../../config'
 import { htmlToVNode } from '../snabbdom'
 import type { Block, Token } from '../../types'
+import type { Cursor, StateRenderContext } from '../renderContext'
 
 import 'katex/dist/katex.min.css'
 
-// biome-ignore lint/suspicious/noExplicitAny: mixin method — `this` is StateRender
-export default function displayMath(this: any, h: typeof import('snabbdom').h, cursor: unknown, block: Block, token: Token, outerClass: string) {
+export default function displayMath(this: StateRenderContext, h: typeof import('snabbdom').h, cursor: Cursor, block: Block, token: Token, outerClass: string) {
   const className = this.getClassName(outerClass, block, token, cursor)
   const mathSelector =
     className === CLASS_OR_ID.AG_HIDE ? `span.${className}.${CLASS_OR_ID.AG_MATH}` : `span.${CLASS_OR_ID.AG_MATH}`
@@ -26,10 +26,10 @@ export default function displayMath(this: any, h: typeof import('snabbdom').h, c
 
   const displayMode = false
   const key = `${math}_${type}`
-  let mathVnode = null
+  let mathVnode: import('snabbdom').VNodeChildren = null
   let previewSelector = `span.${CLASS_OR_ID.AG_MATH_RENDER}`
   if (loadMathMap.has(key)) {
-    mathVnode = loadMathMap.get(key)
+    mathVnode = loadMathMap.get(key) as import('snabbdom').VNodeChildren
   } else {
     try {
       const html = katex.renderToString(math, {

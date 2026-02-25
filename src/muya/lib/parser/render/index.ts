@@ -52,8 +52,7 @@ class StateRender {
   loadMathMap: Map<string, unknown>;
   mermaidCache: Map<string, { code: string; functionType: string }>;
   muya: MuyaInstance;
-  // biome-ignore lint/suspicious/noExplicitAny: mixin method injected at runtime
-  renderBlock: any;
+  renderBlock!: (parent: Block | null, block: Block, activeBlocks: Block[], matches: HighlightRange[], useCache?: boolean) => import('snabbdom').VNode;
   renderingRowContainer: Block | null;
   renderingTable: Block | null;
   tokenCache: Map<string, Record<string, unknown>[]>;

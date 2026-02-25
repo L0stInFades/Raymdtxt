@@ -1,3 +1,4 @@
+import type { StateRenderContext } from '../renderContext'
 import { CLASS_OR_ID } from '../../../config'
 import { getImageInfo } from '../../../utils'
 import type { Block, Token } from '../../types'
@@ -36,8 +37,7 @@ const renderIcon = (h: typeof import('snabbdom').h, className: string, icon: str
 }
 
 // I dont want operate dom directly, is there any better method? need help!
-// biome-ignore lint/suspicious/noExplicitAny: mixin method — `this` is StateRender
-export default function image(this: any, h: typeof import('snabbdom').h, _cursor: unknown, block: Block, token: Token, _outerClass: string) {
+export default function image(this: StateRenderContext, h: typeof import('snabbdom').h, _cursor: unknown, block: Block, token: Token, _outerClass: string) {
   const imageInfo = getImageInfo(token.attrs.src)
   const { selectedImage } = this.muya.contentState
   const data = {
@@ -87,9 +87,9 @@ export default function image(this: any, h: typeof import('snabbdom').h, _cursor
     // fix: it will generate a new id if the image is not loaded.
     const { selectedImage } = this.muya.contentState
     if (selectedImage && selectedImage.token.attrs.src === src && selectedImage.imageId !== id) {
-      selectedImage.imageId = id
+      selectedImage.imageId = id!
     }
-    src = this.urlMap.get(src)
+    src = this.urlMap.get(src) ?? ''
     isSuccess = true
   }
 
@@ -99,7 +99,7 @@ export default function image(this: any, h: typeof import('snabbdom').h, _cursor
       id: alt,
     })
     if (this.urlMap.has(alt)) {
-      src = this.urlMap.get(alt)
+      src = this.urlMap.get(alt)!
       isSuccess = true
     }
   }

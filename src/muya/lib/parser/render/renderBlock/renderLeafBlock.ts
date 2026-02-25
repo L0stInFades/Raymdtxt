@@ -7,6 +7,7 @@ import type { Block } from '../../types'
 import { tokenizer } from '../../'
 import { snakeToCamel, sanitize, escapeHTML, getLongUniqueId, getImageInfo } from '../../../utils'
 import { h, htmlToVNode } from '../snabbdom'
+import type { StateRenderContext, HighlightRange } from '../renderContext'
 
 // todo@jocs any better solutions?
 const MARKER_HASK = {
@@ -68,19 +69,18 @@ const hasReferenceToken = (tokens: Record<string, unknown>[]) => {
 }
 
 export default function renderLeafBlock(
-  // biome-ignore lint/suspicious/noExplicitAny: mixin method — `this` is StateRender with dynamic render methods
-  this: any,
+  this: StateRenderContext,
   _parent: Block | null,
   block: Block,
   activeBlocks: Block[],
-  matches: { key: string; start: number; end: number; active: boolean }[],
+  matches: HighlightRange[],
   useCache = false
 ) {
   const { loadMathMap } = this
   const { cursor } = this.muya.contentState
   let selector = this.getSelector(block, activeBlocks)
   // highlight search key in block
-  const highlights = matches.filter((m: { key: string }) => m.key === block.key)
+  const highlights = matches.filter((m) => m.key === block.key)
   const { text, type, checked, key, lang, functionType, editable } = block
 
   const data = {
@@ -90,12 +90,13 @@ export default function renderLeafBlock(
     style: {},
   }
 
-  let children = ''
+  // biome-ignore lint/suspicious/noExplicitAny: children is reassigned to arrays/strings/VNodes throughout
+  let children: any = ''
 
   if (text) {
-    let tokens = []
+    let tokens: Record<string, unknown>[] = []
     if (highlights.length === 0 && this.tokenCache.has(text)) {
-      tokens = this.tokenCache.get(text)
+      tokens = this.tokenCache.get(text) ?? []
     } else if (HAS_TEXT_BLOCK_REG.test(type) && functionType !== 'codeContent' && functionType !== 'languageInput') {
       const hasBeginRules = /paragraphContent|atxLine/.test(functionType as string)
 
@@ -110,7 +111,7 @@ export default function renderLeafBlock(
         this.tokenCache.set(text, tokens)
       }
     }
-    children = tokens.reduce((acc: unknown[], token: Record<string, unknown>) => [...acc, ...this[snakeToCamel(token.type as string)](h, cursor, block, token)], [])
+    children = tokens.reduce((acc: unknown[], token: Record<string, unknown>) => [...acc, ...(this[snakeToCamel(token.type as string)] as Function)(h, cursor, block, token)], [])
   }
 
   if (editable === false) {
@@ -121,18 +122,17 @@ export default function renderLeafBlock(
   }
 
   if (type === 'div') {
-    const code = this.codeCache.get(block.preSibling)
+    const code = this.codeCache.get(block.preSibling as string) ?? ''
     switch (functionType) {
       case 'html': {
         selector += `.${CLASS_OR_ID.AG_HTML_PREVIEW}`
         Object.assign(data.attrs, { spellcheck: 'false' })
 
-        const { disableHtml } = this.muya.options
+        const disableHtml = (this.muya.options.disableHtml ?? false) as boolean
         const htmlContent = sanitize(code, PREVIEW_DOMPURIFY_CONFIG, disableHtml)
 
         // handle empty html bock
         if (/^<([a-z][a-z\d]*)[^>]*?>(\s*)<\/\1>$/.test(htmlContent.trim())) {
-          // @ts-expect-error TS(2322): Type '(string | VNode)[] | undefined' is not assig... Remove this comment to see the full error message
           children = htmlToVNode('<div class="ag-empty">&lt;Empty HTML Block&gt;</div>')
         } else {
           const parser = new DOMParser()
@@ -144,8 +144,7 @@ export default function renderLeafBlock(
             img.setAttribute('src', imageInfo.src)
           }
 
-          // @ts-expect-error TS(2322): Type '(string | VNode)[] | undefined' is not assig... Remove this comment to see the full error message
-          children = htmlToVNode(doc.documentElement.querySelector('body').innerHTML)
+          children = htmlToVNode(doc.documentElement.querySelector('body')!.innerHTML)
         }
         break
       }
@@ -157,14 +156,13 @@ export default function renderLeafBlock(
           children = '< Empty Mathematical Formula >'
           selector += `.${CLASS_OR_ID.AG_EMPTY}`
         } else if (loadMathMap.has(key)) {
-          children = loadMathMap.get(key)
+          children = loadMathMap.get(key) as string
         } else {
           try {
             const html = katex.renderToString(code, {
               displayMode: true,
             })
 
-            // @ts-expect-error TS(2322): Type '(string | VNode)[] | undefined' is not assig... Remove this comment to see the full error message
             children = htmlToVNode(html)
             loadMathMap.set(key, children)
           } catch (_err) {
@@ -184,7 +182,7 @@ export default function renderLeafBlock(
           children = 'Loading...'
           this.mermaidCache.set(`#${block.key}`, {
             code,
-            functionType,
+            functionType: functionType as string,
           })
         }
         break
@@ -202,14 +200,15 @@ export default function renderLeafBlock(
           children = 'Loading...'
           this.diagramCache.set(`#${block.key}`, {
             code,
-            functionType,
+            functionType: functionType as string,
           })
         }
         break
       }
     }
   } else if (type === 'input') {
-    const { fontSize, lineHeight } = this.muya.options
+    const fontSize = this.muya.options.fontSize as number
+    const lineHeight = this.muya.options.lineHeight as number
 
     Object.assign(data.attrs, {
       type: 'checkbox',
@@ -240,17 +239,14 @@ export default function renderLeafBlock(
       prism.highlightElement(wrapper, false, function(this: HTMLElement) {
         const highlightedCode = this.innerHTML
         selector += `.language-${transformedLang}`
-        // @ts-expect-error TS(2322): Type '(string | VNode)[] | undefined' is not assig... Remove this comment to see the full error message
         children = htmlToVNode(highlightedCode)
       })
     } else {
-      // @ts-expect-error TS(2322): Type '(string | VNode)[] | undefined' is not assig... Remove this comment to see the full error message
       children = htmlToVNode(code)
     }
   } else if (type === 'span' && functionType === 'languageInput') {
     const escapedText = sanitize(text, PREVIEW_DOMPURIFY_CONFIG, true)
     const html = getHighlightHtml(escapedText, highlights, true)
-    // @ts-expect-error TS(2322): Type '(string | VNode)[] | undefined' is not assig... Remove this comment to see the full error message
     children = htmlToVNode(html)
   } else if (type === 'span' && functionType === 'footnoteInput') {
     Object.assign(data.attrs, { spellcheck: 'false' })

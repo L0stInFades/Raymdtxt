@@ -1,10 +1,10 @@
+import type { StateRenderContext, Cursor, InlineRenderMethod } from '../renderContext'
 import { CLASS_OR_ID } from '../../../config'
 import { snakeToCamel } from '../../../utils'
 import { sanitizeHyperlink } from '../../../utils/url'
 import type { Block, Token } from '../../types'
 
-// biome-ignore lint/suspicious/noExplicitAny: mixin method — `this` is StateRender
-export default function referenceLink(this: any, h: typeof import('snabbdom').h, cursor: unknown, block: Block, token: Token, outerClass: string) {
+export default function referenceLink(this: StateRenderContext, h: typeof import('snabbdom').h, cursor: Cursor, block: Block, token: Token, outerClass: string) {
   const className = this.getClassName(outerClass, block, token, cursor)
   const labelClass = className === CLASS_OR_ID.AG_GRAY ? CLASS_OR_ID.AG_REFERENCE_LABEL : className
 
@@ -15,13 +15,16 @@ export default function referenceLink(this: any, h: typeof import('snabbdom').h,
   const backlashStart = start + MARKER.length + anchor.length
   const content = [
     ...children.reduce((acc: unknown[], to: Record<string, unknown>) => {
-      const chunk = this[snakeToCamel(to.type as string)](h, cursor, block, to, className)
+      const method = this[snakeToCamel(to.type as string)] as InlineRenderMethod
+      const chunk = method.call(this, h, cursor, block, to as unknown as Token, className)
       return Array.isArray(chunk) ? [...acc, ...chunk] : [...acc, chunk]
     }, []),
     ...this.backlashInToken(h, backlash.first, className, backlashStart, token),
   ]
 
-  const { href, title } = this.labels.get(key)
+  const labelResult = this.labels.get(key)
+  const href = labelResult?.href ?? ''
+  const title = labelResult?.title ?? ''
   const startMarker = this.highlight(h, block, start, start + MARKER.length, token)
   const endMarker = this.highlight(h, block, start + MARKER.length + anchor.length + backlash.first.length, end, token)
   const anchorSelector = href

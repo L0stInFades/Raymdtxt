@@ -1,10 +1,10 @@
 import { CLASS_OR_ID } from '../../../config'
 import { validEmoji } from '../../../ui/emojis'
 import type { Block, Token } from '../../types'
+import type { Cursor, StateRenderContext } from '../renderContext'
 
 // render token of emoji to vdom
-// biome-ignore lint/suspicious/noExplicitAny: mixin method — `this` is StateRender
-export default function emoji(this: any, h: typeof import('snabbdom').h, cursor: unknown, block: Block, token: Token, outerClass: string) {
+export default function emoji(this: StateRenderContext, h: typeof import('snabbdom').h, cursor: Cursor, block: Block, token: Token, outerClass: string) {
   const { start: rStart, end: rEnd } = token.range
   const className = this.getClassName(outerClass, block, token, cursor)
   const validation = validEmoji(token.content)

@@ -1,10 +1,10 @@
+import type { StateRenderContext, Cursor } from '../renderContext'
 import { CLASS_OR_ID } from '../../../config'
 import { getImageInfo } from '../../../utils'
 import type { Block, Token } from '../../types'
 
 // reference_image
-// biome-ignore lint/suspicious/noExplicitAny: mixin method — `this` is StateRender
-export default function referenceImage(this: any, h: typeof import('snabbdom').h, cursor: unknown, block: Block, token: Token, outerClass: string) {
+export default function referenceImage(this: StateRenderContext, h: typeof import('snabbdom').h, cursor: Cursor, block: Block, token: Token, outerClass: string) {
   const className = this.getClassName(outerClass, block, token, cursor)
   const imageClass = CLASS_OR_ID.AG_IMAGE_MARKED_TEXT
   const { start, end } = token.range
@@ -13,8 +13,9 @@ export default function referenceImage(this: any, h: typeof import('snabbdom').h
   const rawSrc = label + backlash.second
   let href = ''
   let title = ''
-  if (this.labels.has(rawSrc.toLowerCase())) {
-    ;({ href, title } = this.labels.get(rawSrc.toLowerCase()))
+  const labelResult = this.labels.get(rawSrc.toLowerCase())
+  if (labelResult) {
+    ;({ href, title } = labelResult)
   }
   const imageInfo = getImageInfo(href)
   const { src } = imageInfo

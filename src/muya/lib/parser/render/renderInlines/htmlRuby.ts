@@ -1,9 +1,9 @@
 import { CLASS_OR_ID } from '../../../config'
 import { htmlToVNode } from '../snabbdom'
 import type { Block, Token } from '../../types'
+import type { Cursor, StateRenderContext } from '../renderContext'
 
-// biome-ignore lint/suspicious/noExplicitAny: mixin method — `this` is StateRender
-export default function htmlRuby(this: any, h: typeof import('snabbdom').h, cursor: unknown, block: Block, token: Token, outerClass: string) {
+export default function htmlRuby(this: StateRenderContext, h: typeof import('snabbdom').h, cursor: Cursor, block: Block, token: Token, outerClass: string) {
   const className = this.getClassName(outerClass, block, token, cursor)
   const { children } = token
   const { start, end } = token.range

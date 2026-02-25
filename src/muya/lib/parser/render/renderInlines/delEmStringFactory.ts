@@ -1,14 +1,14 @@
+import type { StateRenderContext, Cursor, InlineRenderMethod } from '../renderContext'
 import { CLASS_OR_ID } from '../../../config'
 import { snakeToCamel } from '../../../utils'
 import type { Block, Token } from '../../types'
 
 // render factory of `del`,`em`,`strong`
 export default function delEmStrongFac(
-  // biome-ignore lint/suspicious/noExplicitAny: mixin method — `this` is StateRender
-  this: any,
+  this: StateRenderContext,
   type: string,
   h: typeof import('snabbdom').h,
-  cursor: unknown,
+  cursor: Cursor,
   block: Block,
   token: Token,
   outerClass: string
@@ -20,8 +20,9 @@ export default function delEmStrongFac(
   const backlashStart = end - marker.length - token.backlash.length
   const content = [
     ...(token.children ?? []).reduce((acc: unknown[], to: Token) => {
-      const chunk = this[snakeToCamel(to.type)](h, cursor, block, to, className)
-      return Array.isArray(chunk) ? [...acc, ...chunk] : [...acc, chunk]
+      const chunk = this[snakeToCamel(to.type)] as InlineRenderMethod
+      const result = chunk.call(this, h, cursor, block, to, className)
+      return Array.isArray(result) ? [...acc, ...result] : [...acc, result]
     }, []),
     ...this.backlashInToken(h, token.backlash, className, backlashStart, token),
   ]

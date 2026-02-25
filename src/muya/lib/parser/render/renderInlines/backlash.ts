@@ -1,8 +1,8 @@
 import { CLASS_OR_ID } from '../../../config'
 import type { Block, Token } from '../../types'
+import type { Cursor, StateRenderContext } from '../renderContext'
 
-// biome-ignore lint/suspicious/noExplicitAny: mixin method — `this` is StateRender
-export default function backlash(this: any, h: typeof import('snabbdom').h, cursor: unknown, block: Block, token: Token, outerClass: string) {
+export default function backlash(this: StateRenderContext, h: typeof import('snabbdom').h, cursor: Cursor, block: Block, token: Token, outerClass: string) {
   const className = this.getClassName(outerClass, block, token, cursor)
   const { start, end } = token.range
   const content = this.highlight(h, block, start, end, token)

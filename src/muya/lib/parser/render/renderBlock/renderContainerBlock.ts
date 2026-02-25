@@ -1,3 +1,4 @@
+import type { StateRenderContext, HighlightRange } from '../renderContext'
 import { CLASS_OR_ID } from '../../../config'
 import type { Block } from '../../types'
 import { renderTableTools } from './renderToolBar'
@@ -22,12 +23,11 @@ const PRE_BLOCK_HASH: Record<string, string> = {
 }
 
 export default function renderContainerBlock(
-  // biome-ignore lint/suspicious/noExplicitAny: mixin method — `this` is StateRender with dynamic render methods
-  this: any,
+  this: StateRenderContext,
   parent: Block | null,
   block: Block,
   activeBlocks: Block[],
-  matches: { key: string; start: number; end: number; active: boolean }[],
+  matches: HighlightRange[],
   useCache = false
 ) {
   let selector = this.getSelector(block, activeBlocks)
@@ -52,7 +52,7 @@ export default function renderContainerBlock(
     this.renderingRowContainer = block
   }
 
-  const children = (block.children as Record<string, unknown>[]).map((child: Record<string, unknown>) => this.renderBlock(block, child, activeBlocks, matches, useCache))
+  const children = (block.children as Block[]).map((child: Block) => this.renderBlock(block, child, activeBlocks, matches, useCache))
   const data = {
     attrs: {},
     dataset: {},

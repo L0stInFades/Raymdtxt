@@ -1,10 +1,10 @@
 import { CLASS_OR_ID } from '../../../config'
 import { sanitizeHyperlink } from '../../../utils/url'
 import type { Block, Token } from '../../types'
+import type { Cursor, StateRenderContext } from '../renderContext'
 
 // render auto_link to vdom
-// biome-ignore lint/suspicious/noExplicitAny: mixin method — `this` is StateRender
-export default function autoLinkExtension(this: any, h: typeof import('snabbdom').h, _cursor: unknown, block: Block, token: Token, _outerClass: string) {
+export default function autoLinkExtension(this: StateRenderContext, h: typeof import('snabbdom').h, _cursor: Cursor, block: Block, token: Token, _outerClass: string) {
   const { linkType, www, url, email } = token
   const { start, end } = token.range
 

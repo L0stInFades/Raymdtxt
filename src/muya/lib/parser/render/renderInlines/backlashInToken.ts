@@ -1,10 +1,10 @@
+import type { StateRenderContext } from '../renderContext'
 import { union, isEven } from '../../../utils'
 import { CLASS_OR_ID } from '../../../config'
 import type { Token } from '../../types'
 // TODO HIGHLIGHT
 export default function backlashInToken(
-  // biome-ignore lint/suspicious/noExplicitAny: mixin method — `this` is StateRender
-  this: any,
+  this: StateRenderContext,
   h: typeof import('snabbdom').h,
   backlashes: string,
   outerClass: string,

@@ -1,9 +1,9 @@
+import type { StateRenderContext } from '../renderContext'
 import { getUniqueId, loadImage } from '../../../utils'
 import { insertAfter, operateClassName } from '../../../utils/domManipulate'
 import { CLASS_OR_ID } from '../../../config'
 
-// biome-ignore lint/suspicious/noExplicitAny: mixin method — `this` is StateRender
-export default function loadImageAsync(this: any, imageInfo: { src: string; isUnknownType?: boolean; [k: string]: unknown }, attrs: { alt?: string; title?: string; width?: number; height?: number; [k: string]: unknown }, className: string, imageClass: string) {
+export default function loadImageAsync(this: StateRenderContext, imageInfo: { src: string; isUnknownType?: boolean; [k: string]: unknown }, attrs: { alt?: string; title?: string; width?: number; height?: number; [k: string]: unknown }, className: string, imageClass: string) {
   const { src, isUnknownType } = imageInfo
   let id: string | undefined
   let isSuccess
@@ -13,7 +13,7 @@ export default function loadImageAsync(this: any, imageInfo: { src: string; isUn
 
   let reload = false
   if (this.loadImageMap.has(src)) {
-    const imageInfo = this.loadImageMap.get(src)
+    const imageInfo = this.loadImageMap.get(src)!
     if (imageInfo.dispMsec !== imageInfo.touchMsec) {
       // We have a cached image, but force it to load.
       reload = true
@@ -97,7 +97,7 @@ export default function loadImageAsync(this: any, imageInfo: { src: string; isUn
         })
       })
   } else {
-    const imageInfo = this.loadImageMap.get(src)
+    const imageInfo = this.loadImageMap.get(src)!
 
     id = imageInfo.id
     isSuccess = imageInfo.isSuccess
