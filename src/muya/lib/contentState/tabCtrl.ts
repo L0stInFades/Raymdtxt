@@ -18,8 +18,7 @@ const parseSelector = (str = '') => {
   for (const tagName of HTML_TAGS) {
     if (str.startsWith(tagName) && (!str[tagName.length] || /#|\./.test(str[tagName.length]))) {
       tag = tagName
-      // @ts-expect-error TS(2345): Argument of type 'htmlTags' is not assignable to p... Remove this comment to see the full error message
-      if (VOID_HTML_TAGS.indexOf(tagName) > -1) isVoid = true
+      if ((VOID_HTML_TAGS as readonly string[]).indexOf(tagName) > -1) isVoid = true
       str = str.substring(tagName.length)
     }
   }

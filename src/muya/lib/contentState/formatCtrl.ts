@@ -29,10 +29,8 @@ const getOffset = (offset: number, {
     }
     case 'html_tag': {
       // handle underline, sup, sub
-      // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
-      const OPEN_MARKER_LEN = FORMAT_MARKER_MAP[tag].open.length
-      // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
-      const CLOSE_MARKER_LEN = FORMAT_MARKER_MAP[tag].close.length
+      const OPEN_MARKER_LEN = (FORMAT_MARKER_MAP as unknown as Record<string, { open: string; close: string }>)[tag as string].open.length
+      const CLOSE_MARKER_LEN = (FORMAT_MARKER_MAP as unknown as Record<string, { open: string; close: string }>)[tag as string].close.length
       if (dis < 0) return 0
       if (dis >= 0 && dis < OPEN_MARKER_LEN) return -dis
       if (dis >= OPEN_MARKER_LEN && dis <= len - CLOSE_MARKER_LEN) return -OPEN_MARKER_LEN

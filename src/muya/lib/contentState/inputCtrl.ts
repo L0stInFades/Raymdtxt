@@ -64,27 +64,21 @@ const inputCtrl = (ContentState: { prototype: IContentState }) => {
       options: this.muya.options,
     })
 
-    const oldCache = {}
-    const cache = {}
+    const oldCache: Record<string, number> = {}
+    const cache: Record<string, number> = {}
 
-    for (const { type } of oldTokens) {
-      // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
+    for (const { type } of oldTokens as { type: string }[]) {
       if (oldCache[type]) {
-        // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
         oldCache[type]++
       } else {
-        // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
         oldCache[type] = 1
       }
     }
 
-    for (const { type } of tokens) {
-      // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
+    for (const { type } of tokens as { type: string }[]) {
       if (cache[type]) {
-        // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
         cache[type]++
       } else {
-        // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
         cache[type] = 1
       }
     }
@@ -94,7 +88,6 @@ const inputCtrl = (ContentState: { prototype: IContentState }) => {
     }
 
     for (const key of Object.keys(oldCache)) {
-      // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
       if (!cache[key] || oldCache[key] !== cache[key]) {
         return true
       }
@@ -200,13 +193,11 @@ const inputCtrl = (ContentState: { prototype: IContentState }) => {
         if (/^delete/.test(event.inputType)) {
           // handle `deleteContentBackward` or `deleteContentForward`
           const deletedChar = block.text[offset]
-          // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
-          if (event.inputType === 'deleteContentBackward' && postInputChar === BRACKET_HASH[deletedChar]) {
+          if (event.inputType === 'deleteContentBackward' && postInputChar === (BRACKET_HASH as Record<string, string>)[deletedChar]) {
             needRender = true
             text = text.substring(0, offset) + text.substring(offset + 1)
           }
-          // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
-          if (event.inputType === 'deleteContentForward' && inputChar === BACK_HASH[deletedChar]) {
+          if (event.inputType === 'deleteContentForward' && inputChar === (BACK_HASH as Record<string, string>)[deletedChar]) {
             needRender = true
             start.offset -= 1
             end.offset -= 1
@@ -247,10 +238,8 @@ const inputCtrl = (ContentState: { prototype: IContentState }) => {
                 /[*$`~_]{1}/.test(inputChar)))
           ) {
             needRender = true
-            // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
-            text = BRACKET_HASH[event.data]
-              // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
-              ? text.substring(0, offset) + BRACKET_HASH[inputChar] + text.substring(offset)
+            text = (BRACKET_HASH as Record<string, string>)[event.data!]
+              ? text.substring(0, offset) + (BRACKET_HASH as Record<string, string>)[inputChar] + text.substring(offset)
               : text
           }
           /* eslint-enable no-useless-escape */
@@ -299,8 +288,7 @@ const inputCtrl = (ContentState: { prototype: IContentState }) => {
     }
 
     // show quick insert
-    // @ts-expect-error TS(2531): Object is possibly 'null'.
-    const rect = paragraph.getBoundingClientRect()
+    const rect = paragraph!.getBoundingClientRect()
     const checkQuickInsert = this.checkQuickInsert(block!)
     const reference = this.getPositionReference()
     reference.getBoundingClientRect = () => {

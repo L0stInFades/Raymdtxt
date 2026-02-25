@@ -20,7 +20,6 @@ const loadRenderer = async (name: string) => {
         rendererCache.set(name, m.default)
         break
       case 'mermaid':
-        // @ts-expect-error TS(7016): Could not find a declaration file for module 'merm... Remove this comment to see the full error message
         m = await import('mermaid/dist/mermaid.core.mjs')
         rendererCache.set(name, m.default)
         break

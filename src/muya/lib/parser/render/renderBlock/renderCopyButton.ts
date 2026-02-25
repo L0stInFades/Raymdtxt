@@ -1,5 +1,4 @@
 import { h } from '../snabbdom'
-// @ts-expect-error TS(2307): Cannot find module '../../../assets/pngicon/copy/2... Remove this comment to see the full error message
 import copyIcon from '../../../assets/pngicon/copy/2.png'
 
 const renderCopyButton = () => {

@@ -150,7 +150,7 @@ export const loadImage = async (url: string, detectContentType = false) => {
     const isImage = await checkImageContentType(url)
     if (!isImage) throw new Error('not an image')
   }
-  return new Promise((resolve, reject) => {
+  return new Promise<{ url: string; width: number; height: number }>((resolve, reject) => {
     const image = new Image()
     image.onload = () => {
       resolve({
@@ -261,8 +261,7 @@ export const checkImageContentType = (url: string) => {
  * @param {string} src Image url
  * @param {string} baseUrl Base path; used on desktop to fix the relative image path.
  */
-// @ts-expect-error TS(2339): Property 'DIRNAME' does not exist on type 'Window ... Remove this comment to see the full error message
-export const getImageInfo = (src: string, baseUrl = window.DIRNAME) => {
+export const getImageInfo = (src: string, baseUrl = (window as unknown as Record<string, unknown>).DIRNAME as string | undefined) => {
   const imageExtension = IMAGE_EXT_REG.test(src)
   const isUrl = URL_REG.test(src) || (imageExtension && /^file:\/\/.+/.test(src))
 
@@ -366,7 +365,7 @@ export const mixins = (ctor: { prototype: Record<string, unknown> }, ...object: 
   return Object.assign(ctor.prototype, ...object)
 }
 
-export const sanitize = (html: string, purifyOptions: object, disableHtml: boolean) => {
+export const sanitize = (html: string, purifyOptions: Record<string, unknown>, disableHtml: boolean) => {
   if (disableHtml) {
     return runSanitize(escapeHtmlTags(html), purifyOptions)
   } else {

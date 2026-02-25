@@ -24,7 +24,6 @@ export default function loadImageAsync(this: StateRenderContext, imageInfo: { sr
   if (reload) {
     id = getUniqueId()
     loadImage(src, isUnknownType)
-      // @ts-expect-error TS(2345): Argument of type '({ url, width, height }: { url: ... Remove this comment to see the full error message
       .then(({ url, width, height }) => {
         const imageText = document.querySelector(`#${id}`)
         const img = document.createElement('img')
@@ -51,13 +50,11 @@ export default function loadImageAsync(this: StateRenderContext, imageInfo: { sr
         if (imageText) {
           if (imageText.classList.contains('ag-inline-image')) {
             const imageContainer = imageText.querySelector('.ag-image-container')
-            // @ts-expect-error TS(2531): Object is possibly 'null'.
-            const oldImage = imageContainer.querySelector('img')
+            const oldImage = imageContainer?.querySelector('img')
             if (oldImage) {
               oldImage.remove()
             }
-            // @ts-expect-error TS(2531): Object is possibly 'null'.
-            imageContainer.appendChild(img)
+            imageContainer?.appendChild(img)
             imageText.classList.remove('ag-image-loading')
             imageText.classList.add('ag-image-success')
           } else {

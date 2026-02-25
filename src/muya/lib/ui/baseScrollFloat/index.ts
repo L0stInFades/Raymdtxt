@@ -6,7 +6,6 @@ import type { FloatOptions } from '../baseFloat'
 class BaseScrollFloat extends BaseFloat {
   activeItem: unknown;
   reference: HTMLElement | { id: string; getBoundingClientRect(): DOMRect } | null;
-  declare render: () => void;
   renderArray: unknown[] = [];
   scrollElement: HTMLDivElement;
   constructor(muya: IMuya, name: string, options: FloatOptions = {}) {
@@ -63,8 +62,10 @@ class BaseScrollFloat extends BaseFloat {
     this.reference = null
   }
 
-  show(reference: HTMLElement | { id: string; getBoundingClientRect(): DOMRect }, cb: (...args: unknown[]) => void) {
-    this.cb = cb
+  show(reference: HTMLElement | { id: string; getBoundingClientRect(): DOMRect }, cb?: (...args: unknown[]) => void) {
+    if (cb) {
+      this.cb = cb
+    }
     if (reference instanceof HTMLElement) {
       if (this.reference && this.reference === reference && this.status) return
     } else {
@@ -83,7 +84,6 @@ class BaseScrollFloat extends BaseFloat {
     }
     this.activeItem = this.renderArray[index]
     this.render()
-    // @ts-expect-error TS(2554): Expected 0 arguments, but got 1.
     const activeEle = this.getItemElement(this.activeItem)
     this.activeEleScrollIntoView(activeEle)
   }
@@ -95,7 +95,9 @@ class BaseScrollFloat extends BaseFloat {
     setTimeout(this.hide.bind(this))
   }
 
-  getItemElement(): HTMLElement | null { return null }
+  render() {}
+
+  getItemElement(_item?: unknown): HTMLElement | null { return null }
 }
 
 export default BaseScrollFloat

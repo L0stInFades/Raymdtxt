@@ -6,14 +6,10 @@ import { getAttributes, parseSrcAndTitle, validateEmphasize, lowerPriority } fro
 // const CAN_NEST_RULES = ['strong', 'em', 'link', 'del', 'a_link', 'reference_link', 'html_tag']
 // disallowed html tags in https://github.github.com/gfm/#raw-html
 const disallowedHtmlTag = /(?:title|textarea|style|xmp|iframe|noembed|noframes|script|plaintext)/i
-const validateRules = Object.assign({}, inlineRules)
-// @ts-expect-error TS(2790): The operand of a 'delete' operator must be optiona... Remove this comment to see the full error message
+const validateRules: Record<string, RegExp> = Object.assign({}, inlineRules)
 delete validateRules.em
-// @ts-expect-error TS(2790): The operand of a 'delete' operator must be optiona... Remove this comment to see the full error message
 delete validateRules.strong
-// @ts-expect-error TS(2790): The operand of a 'delete' operator must be optiona... Remove this comment to see the full error message
 delete validateRules.tail_header
-// @ts-expect-error TS(2790): The operand of a 'delete' operator must be optiona... Remove this comment to see the full error message
 delete validateRules.backlash
 
 const correctUrl = (token: RegExpExecArray | null) => {

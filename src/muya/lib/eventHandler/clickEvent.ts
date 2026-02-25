@@ -16,8 +16,7 @@ class ClickEvent {
     const { container, eventCenter, contentState } = this.muya
     const handler = (event: MouseEvent) => {
       // Allow native context menu in MarkText.
-      // @ts-expect-error TS(2304): Cannot find name 'global'.
-      if (!global || !global.marktext) {
+      if (!(globalThis as Record<string, unknown>).marktext) {
         // __MARKTEXT_PATCH__
         event.preventDefault()
         event.stopPropagation()

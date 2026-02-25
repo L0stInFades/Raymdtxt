@@ -98,13 +98,15 @@ const importRegister = (ContentState: any) => {
     const { footnote, isGitlabCompatibilityEnabled, superSubScript, trimUnnecessaryCodeBlockEmptyLines } =
       this.muya.options
 
-    // @ts-expect-error TS(7009): 'new' expression, whose target lacks a construct s... Remove this comment to see the full error message
-    const tokens = new Lexer({
-      disableInline: true,
-      footnote,
-      isGitlabCompatibilityEnabled,
-      superSubScript,
-    }).lex(markdown)
+    // biome-ignore lint/suspicious/noExplicitAny: Lexer tokens are dynamically shaped with .type, .text, etc.
+    const tokens: any[] = (new (Lexer as unknown as new (opts: Record<string, unknown>) => { lex(src: string): unknown[] })(
+      {
+        disableInline: true,
+        footnote,
+        isGitlabCompatibilityEnabled,
+        superSubScript,
+      }
+    )).lex(markdown)
 
     // biome-ignore lint/suspicious/noExplicitAny: lexer tokens are dynamically typed
     let token: any
@@ -439,7 +441,7 @@ const importRegister = (ContentState: any) => {
   ContentState.prototype.htmlToMarkdown = function (this: ContentStateInstance, html: string, keeps: string[] = []) {
     // turn html to markdown
     const { turndownConfig } = this
-    const turndownService = new TurndownService(turndownConfig)
+    const turndownService = new TurndownService(turndownConfig as Record<string, unknown>)
     usePluginAddRules(turndownService, keeps)
 
     // fix #752, but I don't know why the &nbsp; vanlished.
@@ -659,8 +661,7 @@ const importRegister = (ContentState: any) => {
           travel(b)
         }
       } else if (text && type === 'span' && /paragraphContent|atxLine|cellContent/.test(functionType as string)) {
-        // @ts-expect-error TS(2554): Expected 1-2 arguments, but got 4.
-        const tokens = tokenizer(text, [], false, render.labels) as InlineToken[]
+        const tokens = tokenizer(text, { highlights: [], hasBeginRules: false, labels: render.labels }) as unknown as InlineToken[]
         for (const token of tokens) {
           travelToken(token)
         }

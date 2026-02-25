@@ -1,5 +1,5 @@
 import { isLengthEven, getParagraphReference } from '../utils'
-import type { IContentState, Block, CursorPosition } from '../types'
+import type { IContentState, Block, BlockAlign, CursorPosition } from '../types'
 
 const TABLE_BLOCK_REG = /^\|.*?(\\*)\|.*?(\\*)\|/
 
@@ -23,8 +23,7 @@ const tableBlockCtrl = (ContentState: { prototype: IContentState }) => {
       const rowContents = tableContents[i]
       for (j = 0; j < columns; j++) {
         const cell = this.createBlock(i === 0 ? 'th' : 'td', {
-          // @ts-expect-error TS(2339): Property 'align' does not exist on type 'never'.
-          align: rowContents ? rowContents[j].align : '',
+          align: rowContents ? rowContents[j].align as BlockAlign : '',
           column: j,
         })
         const cellContent = this.createBlock('span', {
@@ -239,8 +238,7 @@ const tableBlockCtrl = (ContentState: { prototype: IContentState }) => {
           this.partialRender()
         }
 
-        // @ts-expect-error TS(2531): Object is possibly 'null'.
-        const reference = getParagraphReference(tableEle, tableEle.id)
+        const reference = getParagraphReference(tableEle as HTMLElement, (tableEle as HTMLElement).id)
         eventCenter.dispatch('muya-table-picker', { row, column }, reference, handler.bind(this))
       }
     }

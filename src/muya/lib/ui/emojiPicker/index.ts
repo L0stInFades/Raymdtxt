@@ -66,7 +66,6 @@ class EmojiPicker extends BaseScrollFloat {
     }) as (...args: unknown[]) => void)
   }
 
-  // @ts-expect-error TS(2425): Class 'BaseScrollFloat' defines instance member pr... Remove this comment to see the full error message
   render() {
     const { scrollElement, _renderObj, activeItem, oldVnode } = this
     if (!_renderObj) return
@@ -102,10 +101,9 @@ class EmojiPicker extends BaseScrollFloat {
     this.oldVnode = vnode
   }
 
-  // @ts-expect-error TS(2416): Property 'getItemElement' in type 'EmojiPicker' is... Remove this comment to see the full error message
-  getItemElement(item: EmojiItem) {
-    const label = item.aliases[0]
-    return this.floatBox.querySelector(`[data-label="${label}"]`)
+  override getItemElement(item?: unknown) {
+    const label = (item as EmojiItem).aliases[0]
+    return this.floatBox.querySelector(`[data-label="${label}"]`) as HTMLElement | null
   }
 
   destroy() {

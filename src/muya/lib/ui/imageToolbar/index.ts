@@ -75,10 +75,9 @@ class ImageToolbar extends BaseFloat {
     const dataAlign = attrs['data-align']
     const children = icons.map((i: ToolbarIcon) => {
       let icon
-      let iconWrapperSelector
+      let iconWrapperSelector = 'div.icon-wrapper'
       if (i.icon) {
         // SVG icon Asset
-        iconWrapperSelector = 'div.icon-wrapper'
         icon = h(
           'i.icon',
           h(
@@ -93,7 +92,6 @@ class ImageToolbar extends BaseFloat {
           ),
         )
       }
-      // @ts-expect-error TS(2769): No overload matches this call.
       const iconWrapper = h(iconWrapperSelector, icon)
       let itemSelector = `li.item.${i.type}`
 

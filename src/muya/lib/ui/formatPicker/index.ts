@@ -71,10 +71,9 @@ class FormatPicker extends BaseFloat {
     if (!formats) return
     const children = icons.map((i: FormatIcon) => {
       let icon
-      let iconWrapperSelector
+      let iconWrapperSelector = 'div.icon-wrapper'
       if (i.icon) {
         // SVG icon Asset
-        iconWrapperSelector = 'div.icon-wrapper'
         icon = h(
           'i.icon',
           h(
@@ -89,7 +88,6 @@ class FormatPicker extends BaseFloat {
           ),
         )
       }
-      // @ts-expect-error TS(2769): No overload matches this call.
       const iconWrapper = h(iconWrapperSelector, icon)
 
       let itemSelector = `li.item.${i.type}`

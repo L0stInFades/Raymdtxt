@@ -2,6 +2,7 @@ import Renderer from './renderer'
 import Lexer from './lexer'
 import Parser from './parser'
 import options from './options'
+import { escape } from './utils'
 
 /**
  * Marked
@@ -18,14 +19,11 @@ function marked(src: string, opt: Record<string, unknown> = {}) {
 
   try {
     opt = Object.assign({}, options, opt)
-    // @ts-expect-error TS(7009): 'new' expression, whose target lacks a construct s... Remove this comment to see the full error message
-    return new Parser(opt).parse(new Lexer(opt).lex(src))
+    return (new (Parser as unknown as new (opt: Record<string, unknown>) => { parse(src: unknown): string })(opt)).parse((new (Lexer as unknown as new (opt: Record<string, unknown>) => { lex(src: string): unknown })(opt)).lex(src))
   } catch (e) {
-    // @ts-expect-error TS(2571): Object is of type 'unknown'.
-    e.message += '\nPlease report this to https://github.com/marktext/marktext/issues.'
+    (e as Error).message += '\nPlease report this to https://github.com/marktext/marktext/issues.'
     if (opt.silent) {
-      // @ts-expect-error TS(2571): Object is of type 'unknown'.
-      return `<p>An error occurred:</p><pre>${escape(`${e.message}`, true)}</pre>`
+      return `<p>An error occurred:</p><pre>${escape(`${(e as Error).message}`, true)}</pre>`
     }
     throw e
   }

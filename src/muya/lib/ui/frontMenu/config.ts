@@ -1,10 +1,6 @@
-// @ts-expect-error TS(2307): Cannot find module '../../assets/pngicon/copy/2.pn... Remove this comment to see the full error message
 import copyIcon from '../../assets/pngicon/copy/2.png'
-// @ts-expect-error TS(2307): Cannot find module '../../assets/pngicon/paragraph... Remove this comment to see the full error message
 import newIcon from '../../assets/pngicon/paragraph/2.png'
-// @ts-expect-error TS(2307): Cannot find module '../../assets/pngicon/delete/2.... Remove this comment to see the full error message
 import deleteIcon from '../../assets/pngicon/delete/2.png'
-// @ts-expect-error TS(2307): Cannot find module '../../assets/pngicon/turninto/... Remove this comment to see the full error message
 import turnIcon from '../../assets/pngicon/turninto/2.png'
 import { isOsx } from '../../config'
 import { quickInsertObj } from '../quickInsert/config'

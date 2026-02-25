@@ -1,15 +1,10 @@
-// @ts-expect-error TS(7016): Could not find a declaration file for module 'pris... Remove this comment to see the full error message
 import components from 'prismjs/components.js'
-// @ts-expect-error TS(7016): Could not find a declaration file for module 'pris... Remove this comment to see the full error message
 import getLoader from 'prismjs/dependencies'
 import { getDefer } from '../utils'
 
 // Pre-bundle all prismjs language components so Vite can resolve them.
-// @ts-expect-error TS(1343): The 'import.meta' meta-property is only allowed wh... Remove this comment to see the full error message
-const prismLangModules = import.meta.glob(
-  '../../../../node_modules/prismjs/components/prism-*.js',
-  { eager: false }
-)
+// import.meta.glob is Vite-specific; kept in a .js file to avoid tsc TS1343 under CommonJS module mode.
+import { prismLangModules } from './prismLangModules'
 /**
  * The set of all languages which have been loaded using the below function.
  *

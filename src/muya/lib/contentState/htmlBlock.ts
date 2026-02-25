@@ -23,8 +23,7 @@ const htmlBlock = (ContentState: { prototype: IContentState }) => {
       const content = matches[4] || ''
       const openTag = matches[2]
       const closeTag = matches[5]
-      // @ts-expect-error TS(2345): Argument of type 'string' is not assignable to par... Remove this comment to see the full error message
-      const isVoidTag = VOID_HTML_TAGS.indexOf(tag) > -1
+      const isVoidTag = (VOID_HTML_TAGS as readonly string[]).indexOf(tag) > -1
       if (closeTag) {
         htmlContent = text
       } else if (isVoidTag) {
@@ -57,8 +56,7 @@ const htmlBlock = (ContentState: { prototype: IContentState }) => {
     const { text } = block.children[0]
     const match = HTML_BLOCK_REG.exec(text)
     const tagName = match?.[1] && HTML_TAGS.find((t) => t === match[1])
-    // @ts-expect-error TS(2345): Argument of type '"" | htmlTags | undefined' is no... Remove this comment to see the full error message
-    return VOID_HTML_TAGS.indexOf(tagName) === -1 && tagName ? this.initHtmlBlock(block) : false
+    return (VOID_HTML_TAGS as readonly string[]).indexOf(tagName as string) === -1 && tagName ? this.initHtmlBlock(block) : false
   }
 }
 

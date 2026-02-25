@@ -112,8 +112,7 @@ const arrowCtrl = (ContentState: { prototype: IContentState }) => {
       const { right } = selection.getCaretOffsets(node)
       if (right === 0 && start.key === end.key && start.offset === end.offset) {
         // It's not recommended to use such lower API, but it's work well.
-        // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
-        return selection.select(node.parentNode.nextElementSibling, 0)
+        return selection.select((node!.parentNode as Element).nextElementSibling as Node, 0)
       }
     }
 

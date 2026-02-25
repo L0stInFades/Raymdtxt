@@ -1,6 +1,5 @@
 import BaseFloat from '../baseFloat'
 import { patch, h } from '../../parser/render/snabbdom'
-// @ts-expect-error TS(2307): Cannot find module '../../assets/pngicon/warning/2... Remove this comment to see the full error message
 import WarningIcon from '../../assets/pngicon/warning/2.png'
 import type { IMuya, Block } from '../../types'
 import type { VNode } from 'snabbdom'

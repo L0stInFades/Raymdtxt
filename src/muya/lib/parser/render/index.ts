@@ -312,7 +312,6 @@ class StateRender {
   }
 }
 
-// @ts-expect-error TS(2345): StateRender prototype is stricter than Record<string, unknown> but mixins only copies properties
-mixins(StateRender, renderInlines, renderBlock)
+mixins(StateRender as unknown as { prototype: Record<string, unknown> }, renderInlines, renderBlock)
 
 export default StateRender

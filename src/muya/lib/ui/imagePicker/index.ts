@@ -1,10 +1,7 @@
 import BaseScrollFloat from '../baseScrollFloat'
 import { patch, h } from '../../parser/render/snabbdom'
-// @ts-expect-error TS(2307): Cannot find module '../../assets/icons/folder.svg'... Remove this comment to see the full error message
 import FolderIcon from '../../assets/icons/folder.svg'
-// @ts-expect-error TS(2307): Cannot find module '../../assets/icons/image.svg' ... Remove this comment to see the full error message
 import ImageIcon from '../../assets/icons/image.svg'
-// @ts-expect-error TS(2307): Cannot find module '../../assets/icons/upload.svg'... Remove this comment to see the full error message
 import UploadIcon from '../../assets/icons/upload.svg'
 import type { IMuya } from '../../types'
 import type { VNode } from 'snabbdom'
@@ -58,7 +55,6 @@ class ImagePathPicker extends BaseScrollFloat {
     }) as (...args: unknown[]) => void)
   }
 
-  // @ts-expect-error TS(2425): Class 'BaseScrollFloat' defines instance member pr... Remove this comment to see the full error message
   render() {
     const { renderArray, oldVnode, scrollElement, activeItem } = this
     const children = renderArray.map((item: unknown) => {
@@ -119,10 +115,9 @@ class ImagePathPicker extends BaseScrollFloat {
     this.oldVnode = vnode
   }
 
-  // @ts-expect-error TS(2416): Property 'getItemElement' in type 'ImagePathPicker... Remove this comment to see the full error message
-  getItemElement(item: ImagePickerItem) {
-    const { text } = item
-    return this.floatBox.querySelector(`[data-label="${text}"]`)
+  override getItemElement(item?: unknown) {
+    const { text } = item as ImagePickerItem
+    return this.floatBox.querySelector(`[data-label="${text}"]`) as HTMLElement | null
   }
 }
 

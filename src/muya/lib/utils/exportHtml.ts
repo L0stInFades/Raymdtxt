@@ -1,7 +1,5 @@
 import marked from '../parser/marked'
-// @ts-expect-error TS(7016): Could not find a declaration file for module 'pris... Remove this comment to see the full error message
 import Prism from 'prismjs'
-// @ts-expect-error TS(7016): Could not find a declaration file for module 'kate... Remove this comment to see the full error message
 import katex from 'katex'
 import 'katex/dist/contrib/mhchem.min.js'
 import loadRenderer from '../renderers'

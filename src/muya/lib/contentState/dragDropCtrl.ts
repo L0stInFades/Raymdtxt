@@ -50,8 +50,7 @@ const dragDropCtrl = (ContentState: { prototype: IContentState }) => {
         document.body.appendChild(ghost)
       }
 
-      // @ts-expect-error TS(2339): Property 'style' does not exist on type 'Element'.
-      Object.assign(ghost.style, {
+      Object.assign((ghost as HTMLElement).style, {
         width: `${rect.width}px`,
         left: `${rect.left}px`,
         top: position === 'up' ? `${rect.top - GHOST_HEIGHT}px` : `${rect.top + rect.height}px`,

@@ -6,7 +6,39 @@ import { edit, noop } from './utils'
  * Block-Level Rules
  */
 
-export const block = {
+type Noop = typeof noop
+
+interface BlockRules {
+  newline: RegExp
+  code: RegExp
+  fences: RegExp | Noop
+  hr: RegExp
+  heading: RegExp
+  blockquote: RegExp
+  list: RegExp
+  html: RegExp | string
+  def: RegExp
+  nptable: RegExp | string | Noop
+  table: RegExp | string | Noop
+  lheading: RegExp
+  _paragraph: RegExp
+  text: RegExp
+  frontmatter: RegExp
+  multiplemath: RegExp
+  multiplemathGitlab: RegExp
+  footnote: RegExp
+  // Dynamically added properties
+  _label: RegExp
+  _title: RegExp
+  checkbox: RegExp
+  bullet: RegExp
+  item: RegExp
+  _tag: string
+  _comment: RegExp
+  paragraph: RegExp
+}
+
+export const block: BlockRules = {
   newline: /^\n+/,
   code: /^( {4}[^\n]+\n*)+/,
   fences: /^ {0,3}(`{3,}(?=[^`\n]*\n)|~{3,})([^\n]*)\n(?:|([\s\S]*?)\n)(?: {0,3}\1[~`]* *(?:\n+|$)|$)/,
@@ -40,34 +72,35 @@ export const block = {
   multiplemath: /^\$\$\n([\s\S]+?)\n\$\$(?:\n+|$)/,
   multiplemathGitlab: /^ {0,3}(`{3,})math\n(?:(|[\s\S]*?)\n)(?: {0,3}\1`* *(?:\n+|$)|$)/, // Math inside a code block (GitLab display math)
   footnote: /^\[\^([^^[\]\s]+?)(?<!\\)\]:[\s\S]+?(?=\n *\n {0,3}[^ ]+|$)/,
+
+  // Dynamically computed below — initialized with placeholder values
+  _label: /(?!)/, // replaced below
+  _title: /(?!)/, // replaced below
+  checkbox: /(?!)/, // replaced below
+  bullet: /(?!)/, // replaced below
+  item: /(?!)/, // replaced below
+  _tag: '', // replaced below
+  _comment: /(?!)/, // replaced below
+  paragraph: /(?!)/, // replaced below
 }
 
-// @ts-expect-error TS(2339): Property '_label' does not exist on type '{ newlin... Remove this comment to see the full error message
 block._label = /(?!\s*\])(?:\\[[\]]|[^[\]])+/
-// @ts-expect-error TS(2339): Property '_title' does not exist on type '{ newlin... Remove this comment to see the full error message
 block._title = /(?:"(?:\\"?|[^"\\])*"|'[^'\n]*(?:\n[^'\n]+)*\n?'|\([^()]*\))/
-// @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
 block.def = edit(block.def).replace('label', block._label).replace('title', block._title).getRegex()
 
-// @ts-expect-error TS(2339): Property 'checkbox' does not exist on type '{ newl... Remove this comment to see the full error message
 block.checkbox = /^\[([ xX])\] +/
-// @ts-expect-error TS(2339): Property 'bullet' does not exist on type '{ newlin... Remove this comment to see the full error message
 block.bullet = /(?:[*+-]|\d{1,9}(?:\.|\)))/ // patched: support "(" as ordered list delimiter too
 // patched: fix https://github.com/marktext/marktext/issues/831#issuecomment-477719256
 // block.item = /^( *)(bull) ?[^\n]*(?:\n(?!\1bull ?)[^\n]*)*/
-// @ts-expect-error TS(2339): Property 'item' does not exist on type '{ newline:... Remove this comment to see the full error message
 block.item = /^(( {0,3})(bull) [^\n]*(?:\n(?!(\2bull |\2bull\n))[^\n]*)*|( {0,3})(bull)(?:\n(?!(\2bull |\2bull\n)))*)/ // eslint-disable-line no-useless-backreference
-// @ts-expect-error TS(2339): Property 'item' does not exist on type '{ newline:... Remove this comment to see the full error message
 block.item = edit(block.item, 'gm').replace(/bull/g, block.bullet).getRegex()
 
 block.list = edit(block.list)
-  // @ts-expect-error TS(2339): Property 'bullet' does not exist on type '{ newlin... Remove this comment to see the full error message
   .replace(/bull/g, block.bullet)
   .replace('hr', '\\n+(?=\\1?(?:(?:- *){3,}|(?:_ *){3,}|(?:\\* *){3,})(?:\\n+|$))')
   .replace('def', `\\n+(?=${block.def.source})`)
   .getRegex()
 
-// @ts-expect-error TS(2339): Property '_tag' does not exist on type '{ newline:... Remove this comment to see the full error message
 block._tag =
   'address|article|aside|base|basefont|blockquote|body|caption' +
   '|center|col|colgroup|dd|details|dialog|dir|div|dl|dt|fieldset|figcaption' +
@@ -75,18 +108,13 @@ block._tag =
   '|legend|li|link|main|menu|menuitem|meta|nav|noframes|ol|optgroup|option' +
   '|p|param|section|source|summary|table|tbody|td|tfoot|th|thead|title|tr' +
   '|track|ul'
-// @ts-expect-error TS(2339): Property '_comment' does not exist on type '{ newl... Remove this comment to see the full error message
 block._comment = /<!--(?!-?>)[\s\S]*?(?:-->|$)/
-// @ts-expect-error TS(2322): Type 'RegExp' is not assignable to type 'string'.
 block.html = edit(block.html, 'i')
-  // @ts-expect-error TS(2339): Property '_comment' does not exist on type '{ newl... Remove this comment to see the full error message
   .replace('comment', block._comment)
-  // @ts-expect-error TS(2339): Property '_tag' does not exist on type '{ newline:... Remove this comment to see the full error message
   .replace('tag', block._tag)
   .replace('attribute', / +[a-zA-Z:_][\w.:-]*(?: *= *"[^"\n]*"| *= *'[^'\n]*'| *= *[^\s"'=<>`]+)?/)
   .getRegex()
 
-// @ts-expect-error TS(2551): Property 'paragraph' does not exist on type '{ new... Remove this comment to see the full error message
 block.paragraph = edit(block._paragraph)
   .replace('hr', block.hr)
   .replace('heading', ' {0,3}#{1,6} ')
@@ -95,11 +123,9 @@ block.paragraph = edit(block._paragraph)
   .replace('fences', ' {0,3}(?:`{3,}(?=[^`\\n]*\\n)|~{3,})[^\\n]*\\n')
   .replace('list', ' {0,3}(?:[*+-]|1[.)]) ') // only lists starting from 1 can interrupt
   .replace('html', '</?(?:tag)(?: +|\\n|/?>)|<(?:script|pre|style|!--)')
-  // @ts-expect-error TS(2339): Property '_tag' does not exist on type '{ newline:... Remove this comment to see the full error message
   .replace('tag', block._tag) // pars can be interrupted by type (6) html blocks
   .getRegex()
 
-// @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
 block.blockquote = edit(block.blockquote).replace('paragraph', block.paragraph).getRegex()
 
 /**
@@ -112,7 +138,7 @@ export const normal = Object.assign({}, block)
  * GFM Block Grammar
  */
 
-export const gfm = Object.assign({}, normal, {
+export const gfm: BlockRules = Object.assign({}, normal, {
   nptable:
     '^ *([^|\\n ].*\\|.*)\\n' + // Header
     ' {0,3}([-:]+ *\\|[-| :]*)' + // Align
@@ -123,8 +149,7 @@ export const gfm = Object.assign({}, normal, {
     '(?:\\n *((?:(?!\\n|hr|heading|blockquote|code|fences|list|html).*(?:\\n|$))*)\\n*|$)', // Cells
 })
 
-// @ts-expect-error TS(2322): Type 'RegExp' is not assignable to type '{ (): voi... Remove this comment to see the full error message
-gfm.nptable = edit(gfm.nptable)
+gfm.nptable = edit(gfm.nptable as string)
   .replace('hr', block.hr)
   .replace('heading', ' {0,3}#{1,6} ')
   .replace('blockquote', ' {0,3}>')
@@ -132,12 +157,10 @@ gfm.nptable = edit(gfm.nptable)
   .replace('fences', ' {0,3}(?:`{3,}(?=[^`\\n]*\\n)|~{3,})[^\\n]*\\n')
   .replace('list', ' {0,3}(?:[*+-]|1[.)]) ') // only lists starting from 1 can interrupt
   .replace('html', '</?(?:tag)(?: +|\\n|/?>)|<(?:script|pre|style|!--)')
-  // @ts-expect-error TS(2339): Property '_tag' does not exist on type '{ newline:... Remove this comment to see the full error message
   .replace('tag', block._tag) // tables can be interrupted by type (6) html blocks
   .getRegex()
 
-// @ts-expect-error TS(2322): Type 'RegExp' is not assignable to type '{ (): voi... Remove this comment to see the full error message
-gfm.table = edit(gfm.table)
+gfm.table = edit(gfm.table as string)
   .replace('hr', block.hr)
   .replace('heading', ' {0,3}#{1,6} ')
   .replace('blockquote', ' {0,3}>')
@@ -145,7 +168,6 @@ gfm.table = edit(gfm.table)
   .replace('fences', ' {0,3}(?:`{3,}(?=[^`\\n]*\\n)|~{3,})[^\\n]*\\n')
   .replace('list', ' {0,3}(?:[*+-]|1[.)]) ') // only lists starting from 1 can interrupt
   .replace('html', '</?(?:tag)(?: +|\\n|/?>)|<(?:script|pre|style|!--)')
-  // @ts-expect-error TS(2339): Property '_tag' does not exist on type '{ newline:... Remove this comment to see the full error message
   .replace('tag', block._tag) // tables can be interrupted by type (6) html blocks
   .getRegex()
 
@@ -153,13 +175,12 @@ gfm.table = edit(gfm.table)
  * Pedantic grammar (original John Gruber's loose markdown specification)
  */
 
-export const pedantic = Object.assign({}, normal, {
+export const pedantic: BlockRules = Object.assign({}, normal, {
   html: edit(
     '^ *(?:comment *(?:\\n|\\s*$)' +
       '|<(tag)[\\s\\S]+?</\\1> *(?:\\n{2,}|\\s*$)' + // closed tag
       '|<tag(?:"[^"]*"|\'[^\']*\'|\\s[^\'"/>\\s]*)*?/?> *(?:\\n{2,}|\\s*$))',
   )
-    // @ts-expect-error TS(2339): Property '_comment' does not exist on type '{ newl... Remove this comment to see the full error message
     .replace('comment', block._comment)
     .replace(
       /tag/g,

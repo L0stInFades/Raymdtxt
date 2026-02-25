@@ -3,20 +3,16 @@ import type { IContentState, Block } from '../types'
 const calculateAspects = (tableId: string, barType: string) => {
   const table = document.querySelector(`#${tableId}`)
   if (barType === 'bottom') {
-    // @ts-expect-error TS(2531): Object is possibly 'null'.
-    const firstRow = table.querySelector('tr')
-    // @ts-expect-error TS(2531): Object is possibly 'null'.
-    return Array.from(firstRow.children).map((cell) => cell.clientWidth)
+    const firstRow = table?.querySelector('tr')
+    return Array.from(firstRow!.children).map((cell) => (cell as HTMLElement).clientWidth)
   } else {
-    // @ts-expect-error TS(2531): Object is possibly 'null'.
-    return Array.from(table.querySelectorAll('tr')).map((row) => row.clientHeight)
+    return Array.from(table!.querySelectorAll('tr')).map((row) => (row as HTMLElement).clientHeight)
   }
 }
 
 export const getAllTableCells = (tableId: string) => {
   const table = document.querySelector(`#${tableId}`)
-  // @ts-expect-error TS(2531): Object is possibly 'null'.
-  const rows = table.querySelectorAll('tr')
+  const rows = table!.querySelectorAll('tr')
   const cells = []
   for (const row of Array.from(rows)) {
     cells.push(Array.from(row.children))
@@ -47,16 +43,13 @@ const getDragCells = (tableId: string, barType: string, index: number) => {
   const dragCells = []
   if (barType === 'left') {
     if (index === 0) {
-      // @ts-expect-error TS(2531): Object is possibly 'null'.
-      dragCells.push(...table.querySelectorAll('th'))
+      dragCells.push(...table!.querySelectorAll('th'))
     } else {
-      // @ts-expect-error TS(2531): Object is possibly 'null'.
-      const row = table.querySelector('tbody').children[index - 1]
+      const row = table!.querySelector('tbody')!.children[index - 1]
       dragCells.push(...row.children)
     }
   } else {
-    // @ts-expect-error TS(2531): Object is possibly 'null'.
-    const rows = Array.from(table.querySelectorAll('tr'))
+    const rows = Array.from(table!.querySelectorAll('tr'))
     const len = rows.length
     let i
     for (i = 0; i < len; i++) {
@@ -140,9 +133,8 @@ const tableDragBarCtrl = (ContentState: { prototype: IContentState }) => {
   ContentState.prototype.hideUnnecessaryBar = function () {
     const { barType } = this.dragInfo!
     const hideClassName = barType === 'bottom' ? 'left' : 'bottom'
-    const needHideBar = document.querySelector(`.ag-drag-handler.${hideClassName}`)
+    const needHideBar = document.querySelector(`.ag-drag-handler.${hideClassName}`) as HTMLElement | null
     if (needHideBar) {
-      // @ts-expect-error TS(2339): Property 'style' does not exist on type 'Element'.
       needHideBar.style.display = 'none'
     }
   }

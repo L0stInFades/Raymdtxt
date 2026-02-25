@@ -2,11 +2,8 @@ import type { StateRenderContext } from '../renderContext'
 import { CLASS_OR_ID } from '../../../config'
 import { getImageInfo } from '../../../utils'
 import type { Block, Token } from '../../types'
-// @ts-expect-error TS(2307): Cannot find module '../../../assets/pngicon/image/... Remove this comment to see the full error message
 import ImageIcon from '../../../assets/pngicon/image/2.png'
-// @ts-expect-error TS(2307): Cannot find module '../../../assets/pngicon/image_... Remove this comment to see the full error message
 import ImageFailIcon from '../../../assets/pngicon/image_fail/2.png'
-// @ts-expect-error TS(2307): Cannot find module '../../../assets/pngicon/delete... Remove this comment to see the full error message
 import DeleteIcon from '../../../assets/pngicon/delete/2.png'
 
 const renderIcon = (h: typeof import('snabbdom').h, className: string, icon: string) => {

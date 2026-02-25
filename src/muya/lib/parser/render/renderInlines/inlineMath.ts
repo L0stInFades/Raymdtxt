@@ -1,4 +1,3 @@
-// @ts-expect-error TS(7016): Could not find a declaration file for module 'kate... Remove this comment to see the full error message
 import katex from 'katex'
 import 'katex/dist/contrib/mhchem.min.js'
 import { CLASS_OR_ID } from '../../../config'

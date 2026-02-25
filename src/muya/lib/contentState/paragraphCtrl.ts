@@ -8,8 +8,7 @@ import type { IContentState, Block, SelectionCursorPos, ListType, ListItemType }
 //      h2 => 2
 const getCurrentLevel = (type: string) => {
   if (/\d/.test(type)) {
-    // @ts-expect-error TS(2531): Object is possibly 'null'.
-    return Number(/\d/.exec(type)[0]);
+    return Number(/\d/.exec(type)![0]);
   } else {
     return 0
   }
@@ -538,8 +537,7 @@ const paragraphCtrl = (ContentState: { prototype: IContentState }) => {
         const headingStyle = DEFAULT_TURNDOWN_CONFIG.headingStyle
         const parent = this.getParent(block)!
         // \u00A0 is &nbsp;
-        // @ts-expect-error TS(2488): Type 'RegExpExecArray | null' must have a '[Symbol... Remove this comment to see the full error message
-        const [, hash, partText] = /(^ {0,3}#*[ \u00A0]*)([\s\S]*)/.exec(text)
+        const [, hash, partText] = /(^ {0,3}#*[ \u00A0]*)([\s\S]*)/.exec(text)!
         let newLevel = 0 // 1, 2, 3, 4, 5, 6
         let newType = 'p'
         let key

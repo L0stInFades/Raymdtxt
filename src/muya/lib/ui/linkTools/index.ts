@@ -86,10 +86,9 @@ class LinkTools extends BaseFloat {
     const { icons, oldVnode, linkContainer } = this
     const children = icons.map((i: LinkIcon) => {
       let icon
-      let iconWrapperSelector
+      let iconWrapperSelector = 'div.icon-wrapper'
       if (i.icon) {
         // SVG icon Asset
-        iconWrapperSelector = 'div.icon-wrapper'
         icon = h(
           'i.icon',
           h(
@@ -104,7 +103,6 @@ class LinkTools extends BaseFloat {
           ),
         )
       }
-      // @ts-expect-error TS(2769): No overload matches this call.
       const iconWrapper = h(iconWrapperSelector, icon)
       let itemSelector = `li.item.${i.type}`
 

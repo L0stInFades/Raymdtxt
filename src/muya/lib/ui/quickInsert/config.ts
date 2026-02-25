@@ -1,46 +1,24 @@
-// @ts-expect-error TS(2307): Cannot find module '../../assets/pngicon/paragraph... Remove this comment to see the full error message
 import paragraphIcon from '../../assets/pngicon/paragraph/2.png'
-// @ts-expect-error TS(2307): Cannot find module '../../assets/pngicon/html/2.pn... Remove this comment to see the full error message
 import htmlIcon from '../../assets/pngicon/html/2.png'
-// @ts-expect-error TS(2307): Cannot find module '../../assets/pngicon/horizonta... Remove this comment to see the full error message
 import hrIcon from '../../assets/pngicon/horizontal_line/2.png'
-// @ts-expect-error TS(2307): Cannot find module '../../assets/pngicon/front_mat... Remove this comment to see the full error message
 import frontMatterIcon from '../../assets/pngicon/front_matter/2.png'
-// @ts-expect-error TS(2307): Cannot find module '../../assets/pngicon/heading_1... Remove this comment to see the full error message
 import header1Icon from '../../assets/pngicon/heading_1/2.png'
-// @ts-expect-error TS(2307): Cannot find module '../../assets/pngicon/heading_2... Remove this comment to see the full error message
 import header2Icon from '../../assets/pngicon/heading_2/2.png'
-// @ts-expect-error TS(2307): Cannot find module '../../assets/pngicon/heading_3... Remove this comment to see the full error message
 import header3Icon from '../../assets/pngicon/heading_3/2.png'
-// @ts-expect-error TS(2307): Cannot find module '../../assets/pngicon/heading_4... Remove this comment to see the full error message
 import header4Icon from '../../assets/pngicon/heading_4/2.png'
-// @ts-expect-error TS(2307): Cannot find module '../../assets/pngicon/heading_5... Remove this comment to see the full error message
 import header5Icon from '../../assets/pngicon/heading_5/2.png'
-// @ts-expect-error TS(2307): Cannot find module '../../assets/pngicon/heading_6... Remove this comment to see the full error message
 import header6Icon from '../../assets/pngicon/heading_6/2.png'
-// @ts-expect-error TS(2307): Cannot find module '../../assets/pngicon/new_table... Remove this comment to see the full error message
 import newTableIcon from '../../assets/pngicon/new_table/2.png'
-// @ts-expect-error TS(2307): Cannot find module '../../assets/pngicon/bullet_li... Remove this comment to see the full error message
 import bulletListIcon from '../../assets/pngicon/bullet_list/2.png'
-// @ts-expect-error TS(2307): Cannot find module '../../assets/pngicon/code/2.pn... Remove this comment to see the full error message
 import codeIcon from '../../assets/pngicon/code/2.png'
-// @ts-expect-error TS(2307): Cannot find module '../../assets/pngicon/quote_blo... Remove this comment to see the full error message
 import quoteIcon from '../../assets/pngicon/quote_block/2.png'
-// @ts-expect-error TS(2307): Cannot find module '../../assets/pngicon/todolist/... Remove this comment to see the full error message
 import todoListIcon from '../../assets/pngicon/todolist/2.png'
-// @ts-expect-error TS(2307): Cannot find module '../../assets/pngicon/math/2.pn... Remove this comment to see the full error message
 import mathblockIcon from '../../assets/pngicon/math/2.png'
-// @ts-expect-error TS(2307): Cannot find module '../../assets/pngicon/order_lis... Remove this comment to see the full error message
 import orderListIcon from '../../assets/pngicon/order_list/2.png'
-// @ts-expect-error TS(2307): Cannot find module '../../assets/pngicon/flowchart... Remove this comment to see the full error message
 import flowchartIcon from '../../assets/pngicon/flowchart/2.png'
-// @ts-expect-error TS(2307): Cannot find module '../../assets/pngicon/sequence/... Remove this comment to see the full error message
 import sequenceIcon from '../../assets/pngicon/sequence/2.png'
-// @ts-expect-error TS(2307): Cannot find module '../../assets/pngicon/plantuml/... Remove this comment to see the full error message
 import plantumlIcon from '../../assets/pngicon/plantuml/2.png'
-// @ts-expect-error TS(2307): Cannot find module '../../assets/pngicon/mermaid/2... Remove this comment to see the full error message
 import mermaidIcon from '../../assets/pngicon/mermaid/2.png'
-// @ts-expect-error TS(2307): Cannot find module '../../assets/pngicon/chart/2.p... Remove this comment to see the full error message
 import vegaIcon from '../../assets/pngicon/chart/2.png'
 import { isOsx } from '../../config'
 

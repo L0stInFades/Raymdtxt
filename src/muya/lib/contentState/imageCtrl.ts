@@ -127,8 +127,7 @@ const imageCtrl = (ContentState: { prototype: IContentState }) => {
     this.singleRender(block, false)
     const image = document.querySelector(`#${imageId} img`)
     if (image) {
-      // @ts-expect-error TS(2339): Property 'click' does not exist on type 'Element'.
-      image.click()
+      ;(image as HTMLElement).click()
       return this.muya.dispatchChange()
     }
   }

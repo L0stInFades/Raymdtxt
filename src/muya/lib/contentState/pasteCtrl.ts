@@ -82,10 +82,8 @@ const pasteCtrl = (ContentState: { prototype: IContentState }) => {
     const tables = Array.from(tempWrapper.querySelectorAll('table'))
     for (const table of tables) {
       const row = table.querySelector('tr')
-      // @ts-expect-error TS(2531): Object is possibly 'null'.
-      if (row.firstElementChild.tagName !== 'TH') {
-        // @ts-expect-error TS(2531): Object is possibly 'null'.
-        ;[...row.children].forEach((cell) => {
+      if (row!.firstElementChild!.tagName !== 'TH') {
+        ;[...row!.children].forEach((cell) => {
           const th = document.createElement('th')
           th.innerHTML = cell.innerHTML
           cell.replaceWith(th)
@@ -112,8 +110,7 @@ const pasteCtrl = (ContentState: { prototype: IContentState }) => {
     for (const link of links) {
       const href = link.getAttribute('href')
       const text = link.textContent
-      // @ts-expect-error TS(2345): Argument of type 'string | null' is not assignable... Remove this comment to see the full error message
-      if (URL_REG.test(href) && href === text) {
+      if (href && URL_REG.test(href) && href === text) {
         const title = await getPageTitle(href)
         if (title) {
           link.innerHTML = sanitize(title, PREVIEW_DOMPURIFY_CONFIG, true)
@@ -197,8 +194,7 @@ const pasteCtrl = (ContentState: { prototype: IContentState }) => {
 
       const reader = new FileReader()
       reader.onload = (event) => {
-        // @ts-expect-error TS(2531): Object is possibly 'null'.
-        const base64 = event.target.result
+        const base64 = event.target!.result as string
         const imageWrapper = this.muya.container.querySelector(`span[data-id=${id}]`)
         const imageContainer = this.muya.container.querySelector(`span[data-id=${id}] .ag-image-container`)
         this.stateRender.urlMap.set(id, base64)
@@ -206,7 +202,6 @@ const pasteCtrl = (ContentState: { prototype: IContentState }) => {
           imageWrapper!.classList.remove('ag-empty-image')
           imageWrapper!.classList.add('ag-image-success')
           const image = document.createElement('img')
-          // @ts-expect-error TS(2322): Type 'string | ArrayBuffer | null' is not assignab... Remove this comment to see the full error message
           image.src = base64
           imageContainer.appendChild(image)
         }

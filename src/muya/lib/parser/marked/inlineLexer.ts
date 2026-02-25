@@ -14,8 +14,7 @@ function InlineLexer(this: any, links: Record<string, { href: string; title: str
   this.links = links
   this.footnotes = footnotes
   this.rules = normal
-  // @ts-expect-error TS(7009): 'new' expression, whose target lacks a construct s... Remove this comment to see the full error message
-  this.renderer = this.options.renderer || new Renderer()
+  this.renderer = this.options.renderer || new (Renderer as unknown as new () => Record<string, unknown>)()
   this.renderer.options = this.options
 
   if (!this.links) {

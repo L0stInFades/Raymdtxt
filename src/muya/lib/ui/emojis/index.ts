@@ -1,6 +1,5 @@
 import { filter } from 'fuzzaldrin'
-// @ts-expect-error TS(2307): Cannot find module './emojisJson' or its correspon... Remove this comment to see the full error message
-import emojis from './emojisJson'
+import emojis from './emojisJson.json'
 import { CLASS_OR_ID } from '../../config'
 
 export interface EmojiItem {

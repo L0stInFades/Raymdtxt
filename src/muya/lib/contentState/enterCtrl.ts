@@ -161,8 +161,7 @@ const enterCtrl = (ContentState: { prototype: IContentState }) => {
       event.stopPropagation()
       const { imageId, ...imageInfo } = selectedImage as Record<string, unknown>
       const imageWrapper = document.querySelector(`#${imageId}`)
-      // @ts-expect-error TS(2531): Object is possibly 'null'.
-      const rect = imageWrapper.getBoundingClientRect()
+      const rect = imageWrapper!.getBoundingClientRect()
       const reference = {
         getBoundingClientRect() {
           rect.height = 0 // Put image selector below the top border of image.
@@ -379,12 +378,10 @@ const enterCtrl = (ContentState: { prototype: IContentState }) => {
     switch (true) {
       case left !== 0 && right !== 0: {
         // cursor in the middle
-        // @ts-expect-error TS(2339): Property 'pre' does not exist on type '{ pre: any;... Remove this comment to see the full error message
-        let { pre, post } = selection.chopHtmlByCursor(paragraph)
+        let { pre, post } = selection.chopHtmlByCursor(paragraph as HTMLElement)!
         if (/^h\d$/.test(block.type)) {
           if (block.headingStyle === 'atx') {
-            // @ts-expect-error TS(2531): Object is possibly 'null'.
-            const PREFIX = /^#+/.exec(pre)[0]
+            const PREFIX = /^#+/.exec(pre)![0]
             post = `${PREFIX} ${post}`
           }
           block.children[0].text = pre

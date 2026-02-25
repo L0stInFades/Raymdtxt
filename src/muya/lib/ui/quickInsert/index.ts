@@ -60,7 +60,6 @@ class QuickInsert extends BaseScrollFloat {
     }
   }
 
-  // @ts-expect-error TS(2425): Class 'BaseScrollFloat' defines instance member pr... Remove this comment to see the full error message
   render() {
     const { scrollElement, activeItem, _renderObj } = this
     if (!_renderObj) return
@@ -114,8 +113,7 @@ class QuickInsert extends BaseScrollFloat {
       })
 
     if (children.length === 0) {
-      // @ts-expect-error TS(2740): Type 'VNode' is missing the following properties f... Remove this comment to see the full error message
-      children = h('div.no-result', 'No result')
+      children = [h('div.no-result', 'No result')]
     }
     const vnode = h('div', children)
 
@@ -133,7 +131,6 @@ class QuickInsert extends BaseScrollFloat {
     eventCenter.subscribe('muya-quick-insert', ((reference: HTMLElement, block: Block, status: boolean) => {
       if (status) {
         this.block = block
-        // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
         this.show(reference)
         this.search(block.text.substring(1)) // remove `@` char
       } else {
@@ -183,10 +180,9 @@ class QuickInsert extends BaseScrollFloat {
     setTimeout(this.hide.bind(this))
   }
 
-  // @ts-expect-error TS(2416): Property 'getItemElement' in type 'QuickInsert' is... Remove this comment to see the full error message
-  getItemElement(item: QuickInsertItem) {
-    const { label } = item
-    return this.scrollElement.querySelector(`[data-label="${label}"]`)
+  override getItemElement(item?: unknown) {
+    const { label } = item as QuickInsertItem
+    return this.scrollElement.querySelector(`[data-label="${label}"]`) as HTMLElement | null
   }
 }
 

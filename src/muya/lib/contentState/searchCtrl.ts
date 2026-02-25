@@ -59,10 +59,8 @@ const searchCtrl = (ContentState: { prototype: IContentState }) => {
     block.text = text.substring(0, start) + value + text.substring(end)
   }
 
-  ContentState.prototype.replace = function (replaceValue: string, opt = { isSingle: true }) {
-    // @ts-expect-error TS(2339): Property 'isRegexp' does not exist on type '{ isSi... Remove this comment to see the full error message
+  ContentState.prototype.replace = function (replaceValue: string, opt: { isSingle?: boolean; isRegexp?: boolean } = { isSingle: true }) {
     const { isSingle, isRegexp } = opt
-    // @ts-expect-error TS(2790): The operand of a 'delete' operator must be optiona... Remove this comment to see the full error message
     delete opt.isSingle
     const searchOptions = Object.assign({}, defaultSearchOption, opt)
     const { matches, value, index } = this.searchMatches

@@ -15,12 +15,10 @@ function Parser(this: any, options: Record<string, unknown>) {
   this.footnotes = null
   this.footnoteIdentifier = ''
   this.options = options || defaultOptions
-  // @ts-expect-error TS(7009): 'new' expression, whose target lacks a construct s... Remove this comment to see the full error message
-  this.options.renderer = this.options.renderer || new Renderer()
+  this.options.renderer = this.options.renderer || new (Renderer as unknown as new () => Record<string, unknown>)()
   this.renderer = this.options.renderer
   this.renderer.options = this.options
-  // @ts-expect-error TS(7009): 'new' expression, whose target lacks a construct s... Remove this comment to see the full error message
-  this.slugger = new Slugger()
+  this.slugger = new (Slugger as unknown as new () => Record<string, unknown>)()
 }
 
 /**
@@ -28,15 +26,12 @@ function Parser(this: any, options: Record<string, unknown>) {
  */
 
 Parser.prototype.parse = function (src: Record<string, unknown>[] & { links: Record<string, { href: string; title: string }>; footnotes: Record<string, { order: number; identifier: string; footnoteId: number; footnoteIdentifierId?: number }> }) {
-  // @ts-expect-error TS(7009): 'new' expression, whose target lacks a construct s... Remove this comment to see the full error message
-  this.inline = new InlineLexer(src.links, src.footnotes, this.options)
+  this.inline = new (InlineLexer as unknown as new (...args: unknown[]) => Record<string, unknown>)(src.links, src.footnotes, this.options)
   // use an InlineLexer with a TextRenderer to extract pure text
-  // @ts-expect-error TS(7009): 'new' expression, whose target lacks a construct s... Remove this comment to see the full error message
-  this.inlineText = new InlineLexer(
+  this.inlineText = new (InlineLexer as unknown as new (...args: unknown[]) => Record<string, unknown>)(
     src.links,
     src.footnotes,
-    // @ts-expect-error TS(7009): 'new' expression, whose target lacks a construct s... Remove this comment to see the full error message
-    Object.assign({}, this.options, { renderer: new TextRenderer() }),
+    Object.assign({}, this.options, { renderer: new (TextRenderer as unknown as new () => Record<string, unknown>)() }),
   )
   this.tokens = src.reverse()
   this.footnotes = src.footnotes

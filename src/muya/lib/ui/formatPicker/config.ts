@@ -1,23 +1,13 @@
 import { isOsx } from '../../config'
-// @ts-expect-error TS(2307): Cannot find module '../../assets/pngicon/format_st... Remove this comment to see the full error message
 import strongIcon from '../../assets/pngicon/format_strong/2.png'
-// @ts-expect-error TS(2307): Cannot find module '../../assets/pngicon/format_em... Remove this comment to see the full error message
 import emphasisIcon from '../../assets/pngicon/format_emphasis/2.png'
-// @ts-expect-error TS(2307): Cannot find module '../../assets/pngicon/format_un... Remove this comment to see the full error message
 import underlineIcon from '../../assets/pngicon/format_underline/2.png'
-// @ts-expect-error TS(2307): Cannot find module '../../assets/pngicon/code/2.pn... Remove this comment to see the full error message
 import codeIcon from '../../assets/pngicon/code/2.png'
-// @ts-expect-error TS(2307): Cannot find module '../../assets/pngicon/format_im... Remove this comment to see the full error message
 import imageIcon from '../../assets/pngicon/format_image/2.png'
-// @ts-expect-error TS(2307): Cannot find module '../../assets/pngicon/format_li... Remove this comment to see the full error message
 import linkIcon from '../../assets/pngicon/format_link/2.png'
-// @ts-expect-error TS(2307): Cannot find module '../../assets/pngicon/format_st... Remove this comment to see the full error message
 import strikeIcon from '../../assets/pngicon/format_strike/2.png'
-// @ts-expect-error TS(2307): Cannot find module '../../assets/pngicon/format_ma... Remove this comment to see the full error message
 import mathIcon from '../../assets/pngicon/format_math/2.png'
-// @ts-expect-error TS(2307): Cannot find module '../../assets/pngicon/highlight... Remove this comment to see the full error message
 import highlightIcon from '../../assets/pngicon/highlight/2.png'
-// @ts-expect-error TS(2307): Cannot find module '../../assets/pngicon/format_cl... Remove this comment to see the full error message
 import clearIcon from '../../assets/pngicon/format_clear/2.png'
 
 const COMMAND_KEY = isOsx ? '⌘' : 'Ctrl'

@@ -39,7 +39,7 @@ class TablePicker extends BaseFloat {
     super.listen()
     eventCenter.subscribe('muya-table-picker', ((data: TableSize, reference: HTMLElement, cb: (...args: unknown[]) => void) => {
       if (!this.status) {
-        this.show(data, reference, cb)
+        this.showTable(data, reference, cb)
         this.render()
       } else {
         this.hide()
@@ -159,8 +159,7 @@ class TablePicker extends BaseFloat {
     }
   }
 
-  // @ts-expect-error TS(2416): Property 'show' in type 'TablePicker' is not assig... Remove this comment to see the full error message
-  show(current: TableSize, reference: HTMLElement, cb: (...args: unknown[]) => void) {
+  showTable(current: TableSize, reference: HTMLElement, cb: (...args: unknown[]) => void) {
     // current { row, column } zero base
     this.current = this.select = current
     super.show(reference, cb)

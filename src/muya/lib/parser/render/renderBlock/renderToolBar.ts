@@ -1,15 +1,10 @@
 // used for render table tookbar or others.
 import { h } from '../snabbdom'
 import { CLASS_OR_ID } from '../../../config'
-// @ts-expect-error TS(2307): Cannot find module '../../../assets/pngicon/table/... Remove this comment to see the full error message
 import TableIcon from '../../../assets/pngicon/table/table@2x.png'
-// @ts-expect-error TS(2307): Cannot find module '../../../assets/pngicon/algin_... Remove this comment to see the full error message
 import AlignLeftIcon from '../../../assets/pngicon/algin_left/2.png'
-// @ts-expect-error TS(2307): Cannot find module '../../../assets/pngicon/algin_... Remove this comment to see the full error message
 import AlignRightIcon from '../../../assets/pngicon/algin_right/2.png'
-// @ts-expect-error TS(2307): Cannot find module '../../../assets/pngicon/algin_... Remove this comment to see the full error message
 import AlignCenterIcon from '../../../assets/pngicon/algin_center/2.png'
-// @ts-expect-error TS(2307): Cannot find module '../../../assets/pngicon/table_... Remove this comment to see the full error message
 import DeleteIcon from '../../../assets/pngicon/table_delete/2.png'
 
 export const TABLE_TOOLS = Object.freeze([

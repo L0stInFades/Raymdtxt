@@ -8,8 +8,7 @@ const footnoteCtrl = (ContentState: { prototype: IContentState }) => {
     const { start, end } = this.cursor
     const { text } = line
     const match = FOOTNOTE_REG.exec(text)
-    // @ts-expect-error TS(2531): Object is possibly 'null'.
-    const footnoteIdentifer = match[1]
+    const footnoteIdentifer = match![1]
     const sectionWrapper = this.createBlock('figure', {
       functionType: 'footnote',
     })
@@ -17,8 +16,7 @@ const footnoteCtrl = (ContentState: { prototype: IContentState }) => {
       text: footnoteIdentifer,
       functionType: 'footnoteInput',
     })
-    // @ts-expect-error TS(2531): Object is possibly 'null'.
-    const pBlock = this.createBlockP(text.substring(match[0].length))
+    const pBlock = this.createBlockP(text.substring(match![0].length))
     this.appendChild(sectionWrapper, footnoteInput)
     this.appendChild(sectionWrapper, pBlock)
     this.insertBefore(sectionWrapper, block)

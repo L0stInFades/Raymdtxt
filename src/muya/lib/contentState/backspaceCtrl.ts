@@ -20,10 +20,8 @@ const backspaceCtrl = (ContentState: { prototype: IContentState }) => {
     const outBlock = this.findOutMostBlock(block!)
     const parent = this.getParent(block!)
 
-    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
-    const { left: outLeft } = selection.getCaretOffsets(outMostParagraph)
-    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
-    const { left: inLeft } = selection.getCaretOffsets(paragraph)
+    const { left: outLeft } = selection.getCaretOffsets(outMostParagraph!)
+    const { left: inLeft } = selection.getCaretOffsets(paragraph!)
 
     if (
       (parent && parent.type === 'li' && inLeft === 0 && this.isFirstChild(block!)) ||
@@ -291,20 +289,17 @@ const backspaceCtrl = (ContentState: { prototype: IContentState }) => {
     let block = this.getBlock(id)
     let parent = this.getBlock(block!.parent)
     const preBlock = this.findPreBlockInLocation(block!)
-    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
-    const { left, right } = selection.getCaretOffsets(paragraph)
+    const { left, right } = selection.getCaretOffsets(paragraph!)
     const inlineDegrade = this.checkBackspaceCase() as { type: string; info?: string } | false | undefined
     // Handle backspace when the previous is an inline image.
     if (parentNode?.classList.contains('ag-inline-image')) {
-      // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
-      if (selection.getCaretOffsets(node).left === 0) {
+      if (selection.getCaretOffsets(node!).left === 0) {
         event.preventDefault()
         event.stopPropagation()
         const imageInfo = getImageInfo(parentNode as HTMLElement)
         return this.deleteImage(imageInfo)
       }
-      // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
-      if (selection.getCaretOffsets(node).left === 1 && right === 0) {
+      if (selection.getCaretOffsets(node!).left === 1 && right === 0) {
         event.stopPropagation()
         event.preventDefault()
         const key = startBlock!.key

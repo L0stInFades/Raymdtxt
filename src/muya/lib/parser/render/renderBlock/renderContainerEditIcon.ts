@@ -1,6 +1,5 @@
 import { h } from '../snabbdom'
 import { CLASS_OR_ID } from '../../../config'
-// @ts-expect-error TS(2307): Cannot find module '../../../assets/pngicon/html/2... Remove this comment to see the full error message
 import htmlIcon from '../../../assets/pngicon/html/2.png'
 
 export const renderEditIcon = () => {

@@ -1,4 +1,3 @@
-// @ts-expect-error TS(7016): Could not find a declaration file for module 'kate... Remove this comment to see the full error message
 import katex from 'katex'
 import prism, { loadedLanguages, transformAliasToOrigin } from '../../../prism/'
 import 'katex/dist/contrib/mhchem.min.js'
@@ -236,7 +235,7 @@ export default function renderLeafBlock(
       const wrapper = document.createElement('div')
       wrapper.classList.add(`language-${transformedLang}`)
       wrapper.innerHTML = code
-      prism.highlightElement(wrapper, false, function(this: HTMLElement) {
+      prism.highlightElement(wrapper, false, function(this: Element) {
         const highlightedCode = this.innerHTML
         selector += `.language-${transformedLang}`
         children = htmlToVNode(highlightedCode)

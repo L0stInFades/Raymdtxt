@@ -1,8 +1,6 @@
-// @ts-expect-error TS(7016): Could not find a declaration file for module 'turn... Remove this comment to see the full error message
 import TurndownService from 'turndown'
 import { identity } from './index'
 
-// @ts-expect-error TS(7016): Could not find a declaration file for module 'jopl... Remove this comment to see the full error message
 import * as turndownPluginGfm from 'joplin-turndown-plugin-gfm'
 
 // biome-ignore lint/suspicious/noExplicitAny: TurndownService lacks type declarations

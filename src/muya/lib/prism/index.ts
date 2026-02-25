@@ -1,8 +1,6 @@
-// @ts-expect-error TS(7016): Could not find a declaration file for module 'pris... Remove this comment to see the full error message
 import Prism from 'prismjs'
 import { filter } from 'fuzzaldrin'
 import initLoadLanguage, { loadedLanguages, transformAliasToOrigin } from './loadLanguage'
-// @ts-expect-error TS(7016): Could not find a declaration file for module 'pris... Remove this comment to see the full error message
 import { languages } from 'prismjs/components.js'
 
 interface LangEntry {
@@ -13,10 +11,8 @@ interface LangEntry {
 }
 
 const prism = Prism
-// @ts-expect-error TS(2339): Property 'Prism' does not exist on type 'Window & ... Remove this comment to see the full error message
-window.Prism = Prism
+;(window as unknown as Record<string, unknown>).Prism = Prism
 /* eslint-disable */
-// @ts-expect-error TS(7016): Could not find a declaration file for module 'pris... Remove this comment to see the full error message
 import('prismjs/plugins/keep-markup/prism-keep-markup')
 /* eslint-enable */
 const langs: LangEntry[] = []

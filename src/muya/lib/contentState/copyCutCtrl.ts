@@ -91,15 +91,13 @@ const copyCutCtrl = (ContentState: { prototype: IContentState }) => {
         const originItem = document.querySelector(`#${item.id}`)
         let checked = false
         if (originItem?.firstElementChild && originItem.firstElementChild.nodeName === 'INPUT') {
-          // @ts-expect-error TS(2339): Property 'checked' does not exist on type 'Element... Remove this comment to see the full error message
-          checked = originItem.firstElementChild.checked
+          checked = (originItem.firstElementChild as HTMLInputElement).checked
         }
 
         const input = document.createElement('input')
         input.setAttribute('type', 'checkbox')
         if (checked) {
-          // @ts-expect-error TS(2345): Argument of type 'boolean' is not assignable to pa... Remove this comment to see the full error message
-          input.setAttribute('checked', true)
+          input.setAttribute('checked', 'true')
         }
 
         item.insertBefore(input, firstChild)
@@ -163,18 +161,16 @@ const copyCutCtrl = (ContentState: { prototype: IContentState }) => {
       const block = this.getBlock(id)!
       const language = block.lang || ''
       const codeContent = cf.querySelector('.ag-code-content')
-      // @ts-expect-error TS(2531): Object is possibly 'null'.
-      const value = escapeHTML(codeContent.textContent)
+      const value = escapeHTML(codeContent!.textContent)
       cf.innerHTML = `<code class="language-${language}">${value}</code>`
     }
 
     const tightListItem = wrapper.querySelectorAll('.ag-tight-list-item')
     for (const li of tightListItem) {
       for (const item of li.childNodes) {
-        // @ts-expect-error TS(2339): Property 'tagName' does not exist on type 'ChildNo... Remove this comment to see the full error message
-        if (item.tagName === 'P' && item.childElementCount === 1 && item.classList.contains('ag-paragraph')) {
-          // @ts-expect-error TS(2339): Property 'firstElementChild' does not exist on typ... Remove this comment to see the full error message
-          li.replaceChild(item.firstElementChild, item)
+        const el = item as HTMLElement
+        if (el.tagName === 'P' && el.childElementCount === 1 && el.classList.contains('ag-paragraph')) {
+          li.replaceChild(el.firstElementChild!, item)
         }
       }
     }
@@ -183,8 +179,7 @@ const copyCutCtrl = (ContentState: { prototype: IContentState }) => {
     for (const hb of htmlBlock) {
       const codeContent = hb.querySelector('.ag-code-content')
       const pre = document.createElement('pre')
-      // @ts-expect-error TS(2531): Object is possibly 'null'.
-      pre.textContent = codeContent.textContent
+      pre.textContent = codeContent!.textContent
       hb.replaceWith(pre)
     }
 
@@ -197,11 +192,9 @@ const copyCutCtrl = (ContentState: { prototype: IContentState }) => {
     const mathBlock = wrapper.querySelectorAll('figure.ag-container-block')
     for (const mb of mathBlock) {
       const preElement = mb.querySelector('pre[data-role]')
-      // @ts-expect-error TS(2531): Object is possibly 'null'.
-      const functionType = preElement.getAttribute('data-role')
+      const functionType = preElement!.getAttribute('data-role')
       const codeContent = mb.querySelector('.ag-code-content')
-      // @ts-expect-error TS(2531): Object is possibly 'null'.
-      const value = codeContent.textContent
+      const value = codeContent!.textContent
       let pre
       switch (functionType) {
         case 'multiplemath':

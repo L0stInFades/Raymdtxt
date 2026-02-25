@@ -52,10 +52,8 @@ Lexer.prototype.lex = function (src: string) {
     }
   }
 
-  const result = [...hasNoFootnoteTokens, ...footnoteTokens]
-  // @ts-expect-error TS(2339): Property 'links' does not exist on type 'any[]'.
+  const result = [...hasNoFootnoteTokens, ...footnoteTokens] as unknown[] & { links: unknown; footnotes: unknown }
   result.links = tokens.links
-  // @ts-expect-error TS(2339): Property 'footnotes' does not exist on type 'any[]... Remove this comment to see the full error message
   result.footnotes = tokens.footnotes
   return result
 }

@@ -53,7 +53,6 @@ class CodePicker extends BaseScrollFloat {
     }) as (...args: unknown[]) => void)
   }
 
-  // @ts-expect-error TS(2425): Class 'BaseScrollFloat' defines instance member pr... Remove this comment to see the full error message
   render() {
     const { renderArray, oldVnode, scrollElement, activeItem } = this
     let children = renderArray.map((item: unknown) => {
@@ -67,7 +66,7 @@ class CodePicker extends BaseScrollFloat {
       // Because `markdown mode in Codemirror` don't have extensions.
       // if still can not get the className, add a common className 'atom-icon light-cyan'
       if (!iconClassNames) {
-        iconClassNames = mode.name === 'markdown' ? fileIcons.getClassByName('fackname.md') : 'atom-icon light-cyan'
+        iconClassNames = (mode.name === 'markdown' ? fileIcons.getClassByName('fackname.md') : null) ?? 'atom-icon light-cyan'
       }
       const iconSelector =
         'span' +
@@ -107,10 +106,9 @@ class CodePicker extends BaseScrollFloat {
     this.oldVnode = vnode
   }
 
-  // @ts-expect-error TS(2416): Property 'getItemElement' in type 'CodePicker' is ... Remove this comment to see the full error message
-  getItemElement(item: CodeMode) {
-    const { name } = item
-    return this.floatBox.querySelector(`[data-label="${name}"]`)
+  override getItemElement(item?: unknown) {
+    const { name } = item as CodeMode
+    return this.floatBox.querySelector(`[data-label="${name}"]`) as HTMLElement | null
   }
 }
 

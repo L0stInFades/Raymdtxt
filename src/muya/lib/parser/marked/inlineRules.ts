@@ -7,7 +7,43 @@ import { edit, noop } from './utils'
  * Inline-Level Grammar
  */
 
-const inline = {
+type Noop = typeof noop
+
+interface InlineRules {
+  escape: RegExp
+  autolink: RegExp
+  url: RegExp | Noop
+  tag: RegExp | string
+  link: RegExp
+  reflink: RegExp
+  nolink: RegExp
+  strong: RegExp
+  em: RegExp
+  code: RegExp
+  br: RegExp
+  del: RegExp | Noop
+  text: RegExp
+  emoji: RegExp | Noop
+  math: RegExp
+  superscript: RegExp
+  subscript: RegExp
+  footnoteIdentifier: RegExp
+  // Dynamically added properties
+  _punctuation: string
+  _comment: RegExp
+  _escapes: RegExp
+  _scheme: RegExp
+  _email: RegExp
+  _attribute: RegExp
+  _label: RegExp
+  _href: RegExp
+  _title: RegExp
+  // GFM-specific properties
+  _extended_email: RegExp
+  _backpedal: RegExp
+}
+
+const inline: InlineRules = {
   escape: /^\\([!"#$%&'()*+,\-./:;<=>?@[\]\\^_`{|}~])/,
   autolink: /^<(scheme:[^\s\x00-\x1f<>]*|email)>/, // eslint-disable-line no-control-regex
   url: noop,
@@ -45,77 +81,72 @@ const inline = {
   superscript: /^(\^)((?:[^^\s]|(?<=\\)\1|(?<=\\) )+?)(?<!\\)\1(?!\1)/,
   subscript: /^(~)((?:[^~\s]|(?<=\\)\1|(?<=\\) )+?)(?<!\\)\1(?!\1)/,
   footnoteIdentifier: /^\[\^([^^[\]\s]+?)(?<!\\)\]/,
+
+  // Dynamically computed below — initialized with placeholder values
+  _punctuation: '', // replaced below
+  _comment: /(?!)/, // replaced below
+  _escapes: /(?!)/, // replaced below
+  _scheme: /(?!)/, // replaced below
+  _email: /(?!)/, // replaced below
+  _attribute: /(?!)/, // replaced below
+  _label: /(?!)/, // replaced below
+  _href: /(?!)/, // replaced below
+  _title: /(?!)/, // replaced below
+  _extended_email: /(?!)/, // replaced below
+  _backpedal: /(?!)/, // replaced below
 }
 
 // list of punctuation marks from common mark spec
 // without ` and ] to workaround Rule 17 (inline code blocks/links)
 // without , to work around example 393
-// @ts-expect-error TS(2339): Property '_punctuation' does not exist on type '{ ... Remove this comment to see the full error message
 inline._punctuation = '!"#$%&\'()+\\-.,/:;<=>?@\\[\\]`^{|}~'
 
-// @ts-expect-error TS(2339): Property '_comment' does not exist on type '{ esca... Remove this comment to see the full error message
 inline._comment = edit(block._comment).replace('(?:-->|$)', '-->').getRegex()
 
 inline.em = edit(inline.em)
-  // @ts-expect-error TS(2339): Property '_punctuation' does not exist on type '{ ... Remove this comment to see the full error message
   .replace(/punctuation/g, inline._punctuation)
   .getRegex()
 
-// @ts-expect-error TS(2551): Property '_escapes' does not exist on type '{ esca... Remove this comment to see the full error message
 inline._escapes = /\\([!"#$%&'()*+,\-./:;<=>?@[\]\\^_`{|}~])/g
 
-// @ts-expect-error TS(2339): Property '_scheme' does not exist on type '{ escap... Remove this comment to see the full error message
 inline._scheme = /[a-zA-Z][a-zA-Z0-9+.-]{1,31}/
-// @ts-expect-error TS(2339): Property '_email' does not exist on type '{ escape... Remove this comment to see the full error message
 inline._email =
   /[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+(@)[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+(?![-_])/
-// @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
 inline.autolink = edit(inline.autolink).replace('scheme', inline._scheme).replace('email', inline._email).getRegex()
 
-// @ts-expect-error TS(2339): Property '_attribute' does not exist on type '{ es... Remove this comment to see the full error message
 inline._attribute = /\s+[a-zA-Z:_][\w.:-]*(?:\s*=\s*"[^"]*"|\s*=\s*'[^']*'|\s*=\s*[^\s"'=<>`]+)?/
 
-// @ts-expect-error TS(2322): Type 'RegExp' is not assignable to type 'string'.
 inline.tag = edit(inline.tag).replace('comment', inline._comment).replace('attribute', inline._attribute).getRegex()
 
-// @ts-expect-error TS(2339): Property '_label' does not exist on type '{ escape... Remove this comment to see the full error message
 inline._label = /(?:\[(?:\\.|[^[\]\\])*\]|\\.|`[^`]*`|[^[\]\\`])*?/
-// @ts-expect-error TS(2339): Property '_href' does not exist on type '{ escape:... Remove this comment to see the full error message
 inline._href = /<(?:\\.|[^\n<>\\])+>|[^\s\x00-\x1f]*/ // eslint-disable-line no-control-regex
-// @ts-expect-error TS(2339): Property '_title' does not exist on type '{ escape... Remove this comment to see the full error message
 inline._title = /"(?:\\"?|[^"\\])*"|'(?:\\'?|[^'\\])*'|\((?:\\\)?|[^)\\])*\)/
 
 inline.link = edit(inline.link)
-  // @ts-expect-error TS(2339): Property '_label' does not exist on type '{ escape... Remove this comment to see the full error message
   .replace('label', inline._label)
-  // @ts-expect-error TS(2339): Property '_href' does not exist on type '{ escape:... Remove this comment to see the full error message
   .replace('href', inline._href)
-  // @ts-expect-error TS(2339): Property '_title' does not exist on type '{ escape... Remove this comment to see the full error message
   .replace('title', inline._title)
   .getRegex()
 
-// @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
 inline.reflink = edit(inline.reflink).replace('label', inline._label).getRegex()
 
 /**
  * Normal Inline Grammar
  */
 
-export const normal = Object.assign({}, inline)
+export const normal: InlineRules = Object.assign({}, inline)
 
 /**
  * Pedantic Inline Grammar
  */
 
-export const pedantic = Object.assign({}, normal, {
+export const pedantic: InlineRules = Object.assign({}, normal, {
   strong: /^__(?=\S)([\s\S]*?\S)__(?!_)|^\*\*(?=\S)([\s\S]*?\S)\*\*(?!\*)/,
   em: /^_(?=\S)([\s\S]*?\S)_(?!_)|^\*(?=\S)([\s\S]*?\S)\*(?!\*)/,
   link: edit(/^!?\[(label)\]\((.*?)\)/)
-    // @ts-expect-error TS(2339): Property '_label' does not exist on type '{ escape... Remove this comment to see the full error message
     .replace('label', inline._label)
     .getRegex(),
   reflink: edit(/^!?\[(label)\]\s*\[([^\]]*)\]/)
-    // @ts-expect-error TS(2339): Property '_label' does not exist on type '{ escape... Remove this comment to see the full error message
     .replace('label', inline._label)
     .getRegex(),
 })
@@ -124,7 +155,7 @@ export const pedantic = Object.assign({}, normal, {
  * GFM Inline Grammar
  */
 
-export const gfm = Object.assign({}, normal, {
+export const gfm: InlineRules = Object.assign({}, normal, {
   escape: edit(inline.escape).replace('])', '~|])').getRegex(),
   _extended_email: /[A-Za-z0-9._+-]+(@)[a-zA-Z0-9-_]+(?:\.[a-zA-Z0-9-_]*[a-zA-Z0-9])+(?![-_])/,
   url: /^((?:ftp|https?):\/\/|www\.)(?:[a-zA-Z0-9-]+\.?)+[^\s<]*|^email/,
@@ -143,14 +174,13 @@ export const gfm = Object.assign({}, normal, {
   emoji: /^(:)([a-z_\d+-]+?)\1/, // not real GFM but put it in here
 })
 
-// @ts-expect-error TS(2322): Type 'RegExp' is not assignable to type '{ (): voi... Remove this comment to see the full error message
-gfm.url = edit(gfm.url, 'i').replace('email', gfm._extended_email).getRegex()
+gfm.url = edit(gfm.url as RegExp, 'i').replace('email', gfm._extended_email).getRegex()
 
 /**
  * GFM + Line Breaks Inline Grammar
  */
 
-export const breaks = Object.assign({}, gfm, {
+export const breaks: InlineRules = Object.assign({}, gfm, {
   br: edit(inline.br).replace('{2,}', '*').getRegex(),
   text: edit(gfm.text)
     .replace('\\b_', '\\b_| {2,}\\n')
