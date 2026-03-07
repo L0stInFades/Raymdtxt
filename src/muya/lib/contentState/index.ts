@@ -45,6 +45,20 @@ import importMarkdown from '../utils/importMarkdown'
 import Cursor from '../selection/cursor'
 import escapeCharactersMap, { escapeCharacters } from '../parser/escapeCharacter'
 
+const syncEditingContainerKey = (contentState: ContentState) => {
+  if (!contentState.editingContainerKey) {
+    return
+  }
+
+  const editingFigure = contentState.getBlock(contentState.editingContainerKey)
+  const startBlock = contentState.getBlock(contentState.cursor.start.key)
+  const outMostBlock = startBlock ? contentState.findOutMostBlock(startBlock) : null
+
+  if (!editingFigure || editingFigure.functionType !== 'mermaid' || outMostBlock?.key !== editingFigure.key) {
+    contentState.editingContainerKey = null
+  }
+}
+
 class StateRenderStub implements IStateRender {
   tokenCache = new Map<string, unknown>()
   urlMap = new Map<string, unknown>()
@@ -100,6 +114,7 @@ const prototypes = [
   importMarkdown,
 ]
 
+// biome-ignore lint/suspicious/noUnsafeDeclarationMerging: ContentState methods are composed via runtime mixins below.
 class ContentState {
   _selectedImage: unknown
   _selectedTableCells: {
@@ -116,6 +131,7 @@ class ContentState {
   dragEventIds: string[]
   dragInfo: IDragInfo | null
   dropAnchor: { position: string; anchor: Block } | null
+  editingContainerKey: string | null
   exemption: Set<string>
   history: History
   historyTimer: ReturnType<typeof setTimeout> | null
@@ -140,6 +156,7 @@ class ContentState {
     this.stateRender = new StateRenderStub()
     this.renderRange = [null, null]
     this.currentCursor = null
+    this.editingContainerKey = null
     // you'll select the outmost block of current cursor when you click the front icon.
     this.selectedBlock = null
     this._selectedImage = null
@@ -293,6 +310,7 @@ class ContentState {
       blocks,
       searchMatches: { matches, index },
     } = this
+    syncEditingContainerKey(this)
     const activeBlocks = this.getActiveBlocks()
     if (clearCache) {
       this.stateRender.tokenCache.clear()
@@ -316,6 +334,7 @@ class ContentState {
       blocks,
       searchMatches: { matches, index },
     } = this
+    syncEditingContainerKey(this)
     const activeBlocks = this.getActiveBlocks()
     const [startKey, endKey] = this.renderRange
     matches.forEach((m: { active: boolean }, i: number) => {
@@ -354,6 +373,7 @@ class ContentState {
       blocks,
       searchMatches: { matches, index },
     } = this
+    syncEditingContainerKey(this)
     const activeBlocks = this.getActiveBlocks()
     matches.forEach((m: { active: boolean }, i: number) => {
       m.active = i === index

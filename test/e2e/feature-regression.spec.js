@@ -20,6 +20,7 @@ test.describe('Feature regressions', () => {
     try {
       await expect(page.locator('.editor-tabs li.active')).toContainText('Untitled-1')
       await expect(page.locator('#ag-editor-id')).toBeVisible()
+      await expect(page.locator('.new-file')).toHaveCount(0)
 
       await app.evaluate(({ BrowserWindow }) => {
         BrowserWindow.getAllWindows()[0].setSize(1240, 860)
@@ -44,6 +45,11 @@ test.describe('Feature regressions', () => {
       expect(metrics.scrollWidth).toBeLessThanOrEqual(metrics.clientWidth + 1)
       expect(metrics.editorWithinViewport).toBe(true)
       expect(metrics.editorHasHeight).toBe(true)
+
+      await page.locator('#ag-editor-id').click()
+      await page.keyboard.type('A page begins here.')
+      await expect(page.locator('.new-file')).toHaveCount(1)
+
       await expect
         .poll(async () => {
           return app.evaluate(({ app: electronApp }) => electronApp.getName())
@@ -163,7 +169,7 @@ test.describe('Feature regressions', () => {
     }
   })
 
-  test('markdown drop-open and styled HTML export complete end to end', async () => {
+  test('markdown open and styled HTML export complete end to end', async () => {
     const userDataDir = createTempDir()
     const workspaceDir = createTempDir()
     const importFile = path.join(workspaceDir, 'drop-import.md')
@@ -175,7 +181,7 @@ test.describe('Feature regressions', () => {
 
     try {
       await page.evaluate((pathname) => {
-        window.api.ipc.send('mt::window::drop', [pathname])
+        window.api.ipc.send('mt::open-file-or-folder', pathname)
       }, importFile)
 
       await expect(page.locator('.editor-tabs li.active')).toContainText('drop-import.md')

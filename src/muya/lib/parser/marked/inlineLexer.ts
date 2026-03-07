@@ -3,17 +3,35 @@ import { normal, breaks, gfm, pedantic } from './inlineRules'
 import defaultOptions from './options'
 // biome-ignore lint/suspicious/noShadowRestrictedNames: intentional import naming
 import { escape, findClosingBracket, getUniqueId, rtrim } from './utils'
-import { validateEmphasize, lowerPriority } from '../utils'
+import { validateEmphasize, validateInlineMath, lowerPriority } from '../utils'
 
 /**
  * Inline Lexer & Compiler
  */
 
-// biome-ignore lint/suspicious/noExplicitAny: legacy constructor-function pattern with dynamic rule maps
+interface FootnoteInfo {
+  order: number
+  identifier: string
+  footnoteId: number
+  footnoteIdentifierId?: number
+}
+
+interface InlineLexerContext {
+  options: Record<string, unknown>
+  links: Record<string, { href: string; title: string }>
+  footnotes: Record<string, FootnoteInfo>
+  rules: Record<string, RegExp>
+  renderer: Record<string, unknown> & { options?: Record<string, unknown> }
+  highPriorityEmpRules: Record<string, RegExp>
+  highPriorityLinkRules: Record<string, RegExp>
+  inLink?: boolean
+  inRawBlock?: boolean
+}
+
 function InlineLexer(
-  this: any,
+  this: InlineLexerContext,
   links: Record<string, { href: string; title: string }>,
-  footnotes: Record<string, { order: number; identifier: string; footnoteId: number; footnoteIdentifierId?: number }>,
+  footnotes: Record<string, FootnoteInfo>,
   options: Record<string, unknown>,
 ) {
   this.options = options || defaultOptions
@@ -206,7 +224,7 @@ InlineLexer.prototype.output = function (src: string) {
     // math
     if (math) {
       cap = this.rules.math.exec(src)
-      if (cap) {
+      if (cap && validateInlineMath(cap[1])) {
         src = src.substring(cap[0].length)
         lastChar = cap[0].charAt(cap[0].length - 1)
         text = cap[1]

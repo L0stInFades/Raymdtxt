@@ -10,7 +10,7 @@ Its tone comes from Ludwig Wandinger's [*Is Peace Wild?*](https://ludwigwandinge
 
 ## Screenshots
 
-![Vien welcome screen](docs/screenshots/welcome.png)
+![Vien writing surface](docs/screenshots/blank-surface.png)
 ![Vien about dialog](docs/screenshots/about.png)
 
 ## A Name From The Record
@@ -38,6 +38,8 @@ What Vien offers, without raising its voice:
 Vien is being shaped for people who like calm writing software but still want a real desktop app: local files, native behavior, keyboard depth, and an interface that does not keep asking to be looked at.
 
 It is especially focused on macOS polish, but it keeps the open-source, file-first spirit of the editor lineage it came from.
+
+When Vien opens, it goes straight to the page. No dashboard, no drop target, no staging area. Open a file through `File > Open…`, `Open Recent`, quick open, or a CLI path and keep moving.
 
 ## Start Quietly
 

@@ -222,7 +222,10 @@ class ClickEvent {
         if (targetEl.closest('div.ag-container-preview')) {
           event.preventDefault()
           const figureEle = targetEl.closest('figure')
-          contentState.handleContainerBlockClick(figureEle)
+          const role = figureEle?.getAttribute('data-role')
+          if (role !== 'MERMAID') {
+            contentState.handleContainerBlockClick(figureEle)
+          }
         }
         return
       }

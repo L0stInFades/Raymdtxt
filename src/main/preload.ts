@@ -20,7 +20,6 @@ const ALLOWED_SEND_CHANNELS = [
   'mt::response-file-move-to',
   'mt::response-export',
   'mt::response-print',
-  'mt::window::drop',
   'mt::ask-for-image-auto-path',
   'mt::format-link-click',
   // Editor actions

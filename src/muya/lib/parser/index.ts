@@ -1,7 +1,7 @@
 import { beginRules, inlineRules, inlineExtensionRules } from './rules'
 import { isLengthEven, union } from '../utils'
 import { findClosingBracket } from './marked/utils'
-import { getAttributes, parseSrcAndTitle, validateEmphasize, lowerPriority } from './utils'
+import { getAttributes, parseSrcAndTitle, validateEmphasize, validateInlineMath, lowerPriority } from './utils'
 
 // const CAN_NEST_RULES = ['strong', 'em', 'link', 'del', 'a_link', 'reference_link', 'html_tag']
 // disallowed html tags in https://github.github.com/gfm/#raw-html
@@ -189,6 +189,9 @@ const tokenizerFac = (
     for (const rule of chunks) {
       const to = inlineRules[rule].exec(src)
       if (to && isLengthEven(to[3])) {
+        if (rule === 'inline_math' && !validateInlineMath(to[2])) {
+          continue
+        }
         if (rule === 'emoji' && !lowerPriority(src, to[0].length, validateRules)) break
         inChunk = true
         pushPending()

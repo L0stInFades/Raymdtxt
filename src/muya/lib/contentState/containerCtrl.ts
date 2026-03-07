@@ -90,6 +90,7 @@ const containerCtrl = (ContentState: { prototype: IContentState }) => {
     const { id } = figureEle
     const mathBlock = this.getBlock(id)
     if (!mathBlock || !mathBlock.children.length) return
+    this.editingContainerKey = mathBlock.functionType === 'mermaid' ? mathBlock.key : null
     const preBlock = mathBlock.children[0]
     if (!preBlock.children.length || !preBlock.children[0] || !preBlock.children[0].children.length) return
     const firstLine = preBlock.children[0].children[0]

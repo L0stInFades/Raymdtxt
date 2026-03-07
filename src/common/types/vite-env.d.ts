@@ -209,7 +209,11 @@ declare module 'mermaid/dist/mermaid.core.mjs' {
     initialize(config: Record<string, unknown>): void
     init(config: unknown, nodes: NodeListOf<Element> | Element | string): void
     parse(text: string): boolean
-    render(id: string, text: string, callback?: (svgCode: string) => void): string
+    render(
+      id: string,
+      text: string,
+      container?: Element,
+    ): Promise<{ svg: string; bindFunctions?: (element: Element) => void }>
     [key: string]: unknown
   }
   export default mermaid

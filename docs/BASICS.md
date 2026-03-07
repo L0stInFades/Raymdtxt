@@ -2,7 +2,7 @@
 
 ## Getting started
 
-Vien is a realtime preview editor for markdown with various markdown extensions. You can simply write and edit text and Vien hides all unnecessary syntax elements. When you first start Vien an empty editor window is shown. You can see [key bindings](KEYBINDINGS.md) or command palette (<kbd>CmdOrCtrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>) for all available commands or just type `@` to get an overlay with available text elements. Vien provides a minimal and simple interface and in the next sections you can learn more about the interface and features.
+Vien is a realtime preview editor for markdown with various markdown extensions. You can simply write and edit text and Vien hides all unnecessary syntax elements. When you first start Vien an empty editor window is shown immediately. There is no dashboard and no drag-to-open layer. You can see [key bindings](KEYBINDINGS.md) or command palette (<kbd>CmdOrCtrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>) for all available commands or just type `@` to get an overlay with available text elements. Vien provides a minimal and simple interface and in the next sections you can learn more about the interface and features.
 
 ![](assets/vien-default.png)
 
@@ -38,7 +38,7 @@ Use <kbd>CmdOrCtrl</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd> to enter distraction free
 
 ### Open your first file
 
-You can use the menu `File -> Open File` or press <kbd>CmdOrCtrl</kbd>+<kbd>O</kbd> to open a file dialog to choose a markdown file. Another way to is to launch Vien with directories or files via command line.
+You can use the menu `File -> Open File`, `File -> Open Recent`, or press <kbd>CmdOrCtrl</kbd>+<kbd>O</kbd> to open a file dialog and choose a markdown file. Another way is to launch Vien with directories or files via command line. Vien intentionally does not use window-level drag and drop to open files.
 
 ### Save your edited file
 

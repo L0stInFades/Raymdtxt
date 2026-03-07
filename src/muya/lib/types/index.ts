@@ -264,6 +264,7 @@ export interface IContentState {
   blocks: Block[]
   currentCursor: Cursor | null
   prevCursor: Cursor | null
+  editingContainerKey: string | null
   selectedBlock: Block | null
   history: IHistory
   stateRender: IStateRender

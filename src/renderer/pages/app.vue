@@ -28,14 +28,12 @@
       <export-setting-dialog></export-setting-dialog>
       <rename></rename>
       <tweet></tweet>
-      <import-modal></import-modal>
     </div>
   </div>
 </template>
 
 <script>
 import { addStyles, addThemeStyle } from '@/util/theme'
-import { getDroppedPaths, shouldUseWindowFileDropOverlay } from '@/util/windowDragDrop'
 import EditorWithTabs from '@/components/editorWithTabs'
 import TitleBar from '@/components/titleBar'
 import SideBar from '@/components/sideBar'
@@ -44,10 +42,8 @@ import CommandPalette from '@/components/commandPalette'
 import ExportSettingDialog from '@/components/exportSettings'
 import Rename from '@/components/rename'
 import Tweet from '@/components/tweet'
-import ImportModal from '@/components/import'
 import { loadingPageMixins } from '@/mixins'
 import { mapState } from 'vuex'
-import bus from '@/bus'
 import { DEFAULT_STYLE } from '@/config'
 import { useAutoUpdatesStore } from '@/store/pinia/autoUpdates'
 import { useNotificationStore } from '@/store/pinia/notification'
@@ -63,16 +59,9 @@ export default {
     ExportSettingDialog,
     Rename,
     Tweet,
-    ImportModal,
     CommandPalette,
   },
   mixins: [loadingPageMixins],
-  data() {
-    return {
-      dragDepth: 0,
-      windowDragListeners: null,
-    }
-  },
   computed: {
     ...mapState({
       showTabBar: (state) => state.layout.showTabBar,
@@ -163,89 +152,11 @@ export default {
     // module: notification (Pinia)
     useNotificationStore().listen()
 
-    this.windowDragListeners = {
-      dragenter: (event) => this.handleWindowDragEnter(event),
-      dragover: (event) => this.handleWindowDragOver(event),
-      dragleave: (event) => this.handleWindowDragLeave(event),
-      drop: (event) => this.handleWindowDrop(event),
-    }
-
-    for (const [eventName, listener] of Object.entries(this.windowDragListeners)) {
-      window.addEventListener(eventName, listener, false)
-    }
-
     this.$nextTick(() => {
       const style = window.marktext.initialState || DEFAULT_STYLE
       addStyles(style)
       this.hideLoadingPage()
     })
-  },
-  beforeUnmount() {
-    if (this.windowDragListeners) {
-      for (const [eventName, listener] of Object.entries(this.windowDragListeners)) {
-        window.removeEventListener(eventName, listener, false)
-      }
-    }
-    this.resetWindowDragState()
-  },
-  methods: {
-    showImportOverlay(active = false) {
-      bus.emit('importDialog', { visible: true, active })
-    },
-    resetWindowDragState() {
-      this.dragDepth = 0
-      bus.emit('importDialog', { visible: false })
-    },
-    isLeavingWindow(event) {
-      return (
-        event.clientX <= 0 ||
-        event.clientY <= 0 ||
-        event.clientX >= window.innerWidth ||
-        event.clientY >= window.innerHeight
-      )
-    },
-    handleWindowDragEnter(event) {
-      if (!shouldUseWindowFileDropOverlay(event.dataTransfer)) {
-        return
-      }
-
-      event.preventDefault()
-      this.dragDepth += 1
-      event.dataTransfer.dropEffect = 'copy'
-      this.showImportOverlay()
-    },
-    handleWindowDragOver(event) {
-      if (!shouldUseWindowFileDropOverlay(event.dataTransfer)) {
-        return
-      }
-
-      event.preventDefault()
-      event.dataTransfer.dropEffect = 'copy'
-      this.showImportOverlay(true)
-    },
-    handleWindowDragLeave(event) {
-      if (!shouldUseWindowFileDropOverlay(event.dataTransfer)) {
-        return
-      }
-
-      this.dragDepth = Math.max(0, this.dragDepth - 1)
-      if (this.dragDepth === 0 || this.isLeavingWindow(event)) {
-        this.resetWindowDragState()
-      }
-    },
-    handleWindowDrop(event) {
-      if (!shouldUseWindowFileDropOverlay(event.dataTransfer)) {
-        return
-      }
-
-      event.preventDefault()
-      const fileList = getDroppedPaths(event.dataTransfer)
-      this.resetWindowDragState()
-
-      if (fileList.length > 0) {
-        window.api.ipc.send('mt::window::drop', fileList)
-      }
-    },
   },
 }
 </script>

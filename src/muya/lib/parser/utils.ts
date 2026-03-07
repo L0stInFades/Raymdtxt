@@ -62,6 +62,14 @@ export const WHITELIST_ATTRIBUTES = Object.freeze([
 // ])
 
 const UNICODE_WHITESPACE_REG = /^\s/
+const INLINE_MATH_CJK_REG = /[\u3040-\u30ff\u3400-\u9fff\uf900-\ufaff\uac00-\ud7af]/u
+const INLINE_MATH_GREEK_OR_SYMBOL_REG = /[\u0370-\u03FF\u2200-\u22FF]/u
+const INLINE_MATH_PLAIN_WORD_REG = /^[A-Za-z]{2,}$/
+const INLINE_MATH_SINGLE_VAR_REG = /^[A-Za-z]$/
+const INLINE_MATH_NUMBER_REG = /^\d+(?:[.,]\d+)*$/
+const INLINE_MATH_ALPHA_NUMERIC_REG = /^(?:[A-Za-z]+\d+|\d+[A-Za-z]+)$/
+const INLINE_MATH_CALL_REG = /^[A-Za-z]+\([^)]*\)$/
+const INLINE_MATH_MATHY_MARKER_REG = /\\|[=+\-*/^_<>|]|[()[\]{}]/
 
 const validWidthAndHeight = (value: string | null) => {
   if (!value || !/^\d{1,}$/.test(value)) return ''
@@ -89,6 +97,27 @@ export const lowerPriority = (src: string, offset: number, rules: Record<string,
     }
   }
   return true
+}
+
+export const validateInlineMath = (content: string) => {
+  if (!content || content.trim() !== content) {
+    return false
+  }
+
+  if (INLINE_MATH_CJK_REG.test(content) || INLINE_MATH_PLAIN_WORD_REG.test(content)) {
+    return false
+  }
+
+  if (
+    INLINE_MATH_SINGLE_VAR_REG.test(content) ||
+    INLINE_MATH_NUMBER_REG.test(content) ||
+    INLINE_MATH_ALPHA_NUMERIC_REG.test(content) ||
+    INLINE_MATH_CALL_REG.test(content)
+  ) {
+    return true
+  }
+
+  return INLINE_MATH_GREEK_OR_SYMBOL_REG.test(content) || INLINE_MATH_MATHY_MARKER_REG.test(content)
 }
 
 export const getAttributes = (html: string) => {

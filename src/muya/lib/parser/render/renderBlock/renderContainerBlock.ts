@@ -157,6 +157,9 @@ export default function renderContainerBlock(
   } else if (type === 'figure') {
     if (functionType) {
       Object.assign(data.dataset, { role: functionType.toUpperCase() })
+      if (functionType === 'mermaid' && this.muya.contentState.editingContainerKey === block.key) {
+        selector += '.ag-editing'
+      }
       if (functionType === 'table' && activeBlocks[0] && activeBlocks[0].functionType === 'cellContent') {
         children.unshift(renderTableTools(activeBlocks))
       } else if (functionType !== 'footnote') {

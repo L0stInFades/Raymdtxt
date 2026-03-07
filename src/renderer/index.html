@@ -16,10 +16,8 @@
     <title>Vien</title>
     <style>
       :root {
-        --loading-accent: rgba(33, 181, 111, 1);
-        --loading-accent-soft: rgba(33, 181, 111, 0.18);
-        --loading-text: rgba(22, 28, 45, 0.88);
-        --loading-muted: rgba(22, 28, 45, 0.58);
+        --loading-bg: rgb(248, 244, 238);
+        --loading-mark: rgba(56, 48, 39, 0.62);
       }
 
       html, body {
@@ -36,117 +34,41 @@
       #loading-page {
         position: absolute;
         inset: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: radial-gradient(circle at top, rgba(255, 255, 255, 0.96), rgba(245, 248, 252, 0.95) 42%, rgba(232, 237, 244, 0.92));
+        display: grid;
+        place-items: center;
+        background: var(--loading-bg);
         -webkit-app-region: drag;
+        opacity: 1;
+        transition: opacity 90ms ease-out;
       }
 
-      .loading-shell {
-        position: relative;
-        width: min(360px, calc(100vw - 48px));
-        padding: 34px 28px 26px;
-        border-radius: 30px;
-        background: rgba(255, 255, 255, 0.68);
-        border: 1px solid rgba(255, 255, 255, 0.8);
-        box-shadow: 0 30px 80px rgba(15, 23, 42, 0.12);
-        backdrop-filter: blur(20px);
-        text-align: center;
-        overflow: hidden;
+      #loading-page.is-leaving {
+        opacity: 0;
       }
 
-      .loading-shell::before {
-        content: '';
-        position: absolute;
-        inset: 1px;
-        border-radius: 29px;
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.54), rgba(255, 255, 255, 0.12));
-        pointer-events: none;
-      }
-
-      .loading-halo {
-        position: absolute;
-        width: 180px;
-        height: 180px;
-        left: 50%;
-        top: -66px;
-        transform: translateX(-50%);
-        border-radius: 50%;
-        background: radial-gradient(circle, var(--loading-accent-soft) 0%, rgba(255, 255, 255, 0) 72%);
-        filter: blur(2px);
-      }
-
-      .loading-logo,
-      .loading-brand,
-      .loading-copy,
-      .loading-progress {
-        position: relative;
-        z-index: 1;
+      .loading-stage {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        letter-spacing: 0.08em;
       }
 
       .loading-logo {
-        width: 96px;
-        height: 96px;
-        border-radius: 28px;
-        box-shadow: 0 18px 44px rgba(63, 87, 173, 0.22);
+        width: 24px;
+        height: 24px;
+        border-radius: 8px;
       }
 
-      .loading-brand {
-        margin-top: 18px;
-        font-size: 28px;
-        font-weight: 600;
-        letter-spacing: 0.12em;
-        color: var(--loading-text);
+      .loading-wordmark {
+        font-size: 12px;
+        font-weight: 500;
+        text-transform: uppercase;
+        color: var(--loading-mark);
       }
 
-      .loading-copy {
-        margin: 10px auto 0;
-        max-width: 240px;
-        font-size: 13px;
-        line-height: 1.6;
-        color: var(--loading-muted);
-      }
-
-      .loading-progress {
-        margin: 22px auto 0;
-        width: 160px;
-        height: 4px;
-        border-radius: 999px;
-        background: rgba(15, 23, 42, 0.08);
-        overflow: hidden;
-      }
-
-      .loading-progress::after {
-        content: '';
-        display: block;
-        width: 55%;
-        height: 100%;
-        border-radius: inherit;
-        background: linear-gradient(90deg, var(--loading-accent), rgba(73, 118, 206, 0.95));
-        animation: loading-slide 1.8s ease-in-out infinite;
-      }
-
-      @keyframes loading-slide {
-        0% {
-          transform: translateX(-110%);
-        }
-        50% {
-          transform: translateX(120%);
-        }
-        100% {
-          transform: translateX(220%);
-        }
-      }
-
-      @media (max-width: 420px) {
-        .loading-shell {
-          padding: 28px 22px 22px;
-          border-radius: 24px;
-        }
-
-        .loading-brand {
-          font-size: 24px;
+      @media (prefers-reduced-motion: reduce) {
+        #loading-page {
+          transition: none;
         }
       }
     </style>
@@ -157,52 +79,34 @@
 
     <!-- Loading page on application startup -->
     <div id="loading-page">
-      <div class="loading-shell">
-        <div class="loading-halo"></div>
+      <div class="loading-stage">
         <img class="loading-logo" src="./assets/images/logo.png" alt="Vien logo">
-        <div class="loading-brand">Vien</div>
-        <div class="loading-copy">A quiet page is opening.</div>
-        <div class="loading-progress"></div>
+        <div class="loading-wordmark">Vien</div>
       </div>
     </div>
 
     <script>
       const params = new URLSearchParams(window.location.search)
-      const THEMES_COLOR = {
-        'one-dark': 'rgba(77, 120, 204, 1)',
-        'dark': '#409eff',
-        'graphite': 'rgb(104, 134, 170)',
-        'material-dark': '#f48237',
-        'light': 'rgba(33, 181, 111, 1)',
-        'ulysses': 'rgb(12, 139, 186)'
+      const THEME_SURFACES = {
+        'one-dark': 'rgb(27, 29, 33)',
+        'dark': 'rgb(24, 25, 29)',
+        'graphite': 'rgb(34, 38, 42)',
+        'material-dark': 'rgb(32, 29, 27)',
+        'light': 'rgb(248, 244, 238)',
+        'ulysses': 'rgb(244, 241, 235)'
+      }
+      const THEME_MARKS = {
+        'one-dark': 'rgba(240, 234, 224, 0.72)',
+        'dark': 'rgba(240, 234, 224, 0.72)',
+        'graphite': 'rgba(240, 234, 224, 0.68)',
+        'material-dark': 'rgba(244, 236, 225, 0.72)',
+        'light': 'rgba(56, 48, 39, 0.62)',
+        'ulysses': 'rgba(64, 54, 41, 0.62)'
       }
 
-      const hexToRgba = (hex, alpha) => {
-        const normalized = hex.replace('#', '')
-        if (normalized.length !== 6) return hex
-
-        const r = Number.parseInt(normalized.slice(0, 2), 16)
-        const g = Number.parseInt(normalized.slice(2, 4), 16)
-        const b = Number.parseInt(normalized.slice(4, 6), 16)
-        return `rgba(${r}, ${g}, ${b}, ${alpha})`
-      }
-
-      const toSoftColor = (value) => {
-        if (value.startsWith('rgba(')) {
-          return value.replace(/rgba\((.+),\s*[^,]+\)$/, 'rgba($1, 0.18)')
-        }
-        if (value.startsWith('rgb(')) {
-          return value.replace(/rgb\((.+)\)$/, 'rgba($1, 0.18)')
-        }
-        if (value.startsWith('#')) {
-          return hexToRgba(value, 0.18)
-        }
-        return value
-      }
-
-      const accent = THEMES_COLOR[params.get('theme')] || 'rgba(33, 181, 111, 1)'
-      document.documentElement.style.setProperty('--loading-accent', accent)
-      document.documentElement.style.setProperty('--loading-accent-soft', toSoftColor(accent))
+      const theme = params.get('theme')
+      document.documentElement.style.setProperty('--loading-bg', THEME_SURFACES[theme] || 'rgb(248, 244, 238)')
+      document.documentElement.style.setProperty('--loading-mark', THEME_MARKS[theme] || 'rgba(56, 48, 39, 0.62)')
     </script>
 
     <!-- Renderer entry point — Vite injects the bundled script here -->

@@ -29,6 +29,7 @@
       </ul>
     </div>
     <div
+      v-if="showNewFileButton"
       class="new-file"
     >
       <svg class="icon" aria-hidden="true"
@@ -58,8 +59,15 @@ export default {
   computed: {
     ...mapState({
       currentFile: (state) => state.editor.currentFile,
+      currentMarkdown: (state) => state.editor.currentFile.markdown,
       tabs: (state) => state.editor.tabs,
     }),
+    showNewFileButton() {
+      const isSingleUntitledTab = this.tabs.length === 1 && !this.currentFile.pathname
+      const isBlank = typeof this.currentMarkdown === 'string' ? this.currentMarkdown.trim().length === 0 : true
+
+      return !isSingleUntitledTab || !isBlank
+    },
   },
   methods: {
     newFile() {
@@ -137,7 +145,7 @@ export default {
       tabs.addEventListener('wheel', this.handleTabScroll)
 
       // Allow tab drag and drop to reorder tabs.
-      const drake = (this.drake = dragula([this.$refs.tabDropContainer], {
+      const drake = dragula([this.$refs.tabDropContainer], {
         direction: 'horizontal',
         revertOnSpill: true,
         mirrorContainer: this.$refs.tabDropContainer,
@@ -157,7 +165,8 @@ export default {
           fromId: droppedId,
           toId: isLastTab ? null : nextTabId,
         })
-      }))
+      })
+      this.drake = drake
 
       // TODO(perf): Create a copy of dom-autoscroller and just hook tabs-container to
       //   improve performance. Currently autoScroll is triggered when the mouse is moved
@@ -176,7 +185,9 @@ export default {
   },
   beforeUnmount() {
     const tabs = this.$refs.tabContainer
-    tabs.removeEventListener('wheel', this.handleTabScroll)
+    if (tabs) {
+      tabs.removeEventListener('wheel', this.handleTabScroll)
+    }
 
     if (this.autoScroller) {
       // Force destroy
@@ -185,8 +196,6 @@ export default {
     if (this.drake) {
       this.drake.destroy()
     }
-  },
-  beforeUnmount() {
     bus.off('TABS::close-this', this.closeTab)
     bus.off('TABS::close-others', this.closeOthers)
     bus.off('TABS::close-saved', this.closeSaved)

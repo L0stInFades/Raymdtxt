@@ -1,6 +1,6 @@
 import loadRenderer from '../../renderers'
-import { CLASS_OR_ID, PREVIEW_DOMPURIFY_CONFIG } from '../../config'
-import { conflict, mixins, camelToSnake, sanitize } from '../../utils'
+import { CLASS_OR_ID } from '../../config'
+import { conflict, mixins, camelToSnake } from '../../utils'
 import { patch, toVNode, toHTML, h } from './snabbdom'
 import { beginRules } from '../rules'
 import renderInlines from './renderInlines'
@@ -38,6 +38,11 @@ interface MuyaInstance {
   }
   options: Record<string, unknown>
   [k: string]: unknown
+}
+
+interface MermaidRenderResult {
+  svg: string
+  bindFunctions?: (element: Element) => void
 }
 
 class StateRender {
@@ -155,14 +160,128 @@ class StateRender {
     return selector
   }
 
+  getMermaidOffscreenCanvas() {
+    let canvas = document.querySelector('#ag-mermaid-canvas') as HTMLDivElement | null
+    if (!canvas) {
+      canvas = document.createElement('div')
+      canvas.id = 'ag-mermaid-canvas'
+      Object.assign(canvas.style, {
+        position: 'absolute',
+        left: '-99999px',
+        top: '0',
+        opacity: '0',
+        pointerEvents: 'none',
+        overflow: 'hidden',
+        zIndex: '-1',
+      })
+      document.body.appendChild(canvas)
+    }
+
+    canvas.innerHTML = ''
+    return canvas
+  }
+
+  tightenMermaidSvg(svg: SVGSVGElement) {
+    const styleText = svg.getAttribute('style') ?? ''
+    const maxWidthMatch = /max-width:\s*([\d.]+)px/.exec(styleText)
+    const widthAttr = Number.parseFloat(svg.getAttribute('width') ?? '')
+    const heightAttr = Number.parseFloat(svg.getAttribute('height') ?? '')
+    const viewBoxValues = (svg.getAttribute('viewBox') ?? '')
+      .trim()
+      .split(/\s+/)
+      .map((value) => Number.parseFloat(value))
+    const viewBoxWidth = Number.isFinite(viewBoxValues[2]) ? viewBoxValues[2] : 0
+    const viewBoxHeight = Number.isFinite(viewBoxValues[3]) ? viewBoxValues[3] : 0
+
+    let intrinsicWidth = maxWidthMatch ? Math.ceil(Number.parseFloat(maxWidthMatch[1])) : 0
+    if (!intrinsicWidth && Number.isFinite(widthAttr) && widthAttr > 0) {
+      intrinsicWidth = Math.ceil(widthAttr)
+    }
+    if (!intrinsicWidth && viewBoxWidth > 0) {
+      intrinsicWidth = Math.ceil(viewBoxWidth)
+    }
+
+    let intrinsicHeight = Number.isFinite(heightAttr) && heightAttr > 0 ? Math.ceil(heightAttr) : 0
+    if (!intrinsicHeight && intrinsicWidth > 0 && viewBoxWidth > 0 && viewBoxHeight > 0) {
+      intrinsicHeight = Math.ceil((intrinsicWidth / viewBoxWidth) * viewBoxHeight)
+    }
+
+    if ((!intrinsicWidth || !intrinsicHeight) && svg.getBBox) {
+      const { x, y, width, height } = svg.getBBox()
+      const padding = 24
+      intrinsicWidth = Math.ceil(width + padding * 2)
+      intrinsicHeight = Math.ceil(height + padding * 2)
+      svg.setAttribute('viewBox', `${x - padding} ${y - padding} ${intrinsicWidth} ${intrinsicHeight}`)
+    }
+
+    if (!intrinsicWidth || !intrinsicHeight) {
+      return null
+    }
+
+    svg.setAttribute('width', `${intrinsicWidth}`)
+    svg.setAttribute('height', `${intrinsicHeight}`)
+    svg.setAttribute('preserveAspectRatio', 'xMinYMin meet')
+    svg.style.width = `${intrinsicWidth}px`
+    svg.style.maxWidth = 'none'
+    svg.style.height = `${intrinsicHeight}px`
+
+    return {
+      intrinsicWidth,
+      intrinsicHeight,
+    }
+  }
+
+  async renderMermaidToStaticSvg(
+    mermaid: {
+      render: (id: string, text: string, container?: Element) => MermaidRenderResult | Promise<MermaidRenderResult>
+    },
+    code: string,
+    renderId: string,
+  ) {
+    const offscreenCanvas = this.getMermaidOffscreenCanvas()
+    const tempContainer = document.createElement('div')
+    tempContainer.id = renderId
+    offscreenCanvas.appendChild(tempContainer)
+
+    const renderResult = await Promise.resolve(mermaid.render(renderId, code))
+    const svgMarkup = typeof renderResult === 'string' ? renderResult : renderResult.svg
+    tempContainer.innerHTML = svgMarkup
+
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() => {
+        resolve()
+      })
+    })
+
+    const svg = tempContainer.querySelector('svg')
+    if (!(svg instanceof SVGSVGElement)) {
+      offscreenCanvas.innerHTML = ''
+      return null
+    }
+
+    const dimensions = this.tightenMermaidSvg(svg)
+    const markup = svg.outerHTML
+    offscreenCanvas.innerHTML = ''
+
+    if (!dimensions) {
+      return null
+    }
+
+    return {
+      markup,
+      ...dimensions,
+    }
+  }
+
   async renderMermaid() {
     if (this.mermaidCache.size) {
       const mermaid = (await loadRenderer('mermaid')) as {
         initialize: (opts: Record<string, unknown>) => void
         parse: (code: string) => void
-        init: (opts: unknown, target: Element) => void
+        render: (id: string, text: string, container?: Element) => MermaidRenderResult | Promise<MermaidRenderResult>
       }
       mermaid.initialize({
+        startOnLoad: false,
         securityLevel: 'strict',
         theme: this.muya.options.mermaidTheme,
       })
@@ -174,8 +293,15 @@ class StateRender {
         }
         try {
           mermaid.parse(code)
-          target.innerHTML = sanitize(code, PREVIEW_DOMPURIFY_CONFIG, true)
-          mermaid.init(undefined, target)
+          const renderId = `${key.replace(/^#/, 'ag-mermaid-static-')}-${Date.now().toString(36)}`
+          const renderedSvg = await this.renderMermaidToStaticSvg(mermaid, code, renderId)
+          if (!renderedSvg) {
+            throw new Error('Unable to render Mermaid SVG.')
+          }
+
+          target.innerHTML = renderedSvg.markup
+          target.style.setProperty('--ag-mermaid-preview-width', `${renderedSvg.intrinsicWidth}px`)
+          target.style.setProperty('--ag-mermaid-preview-height', `${renderedSvg.intrinsicHeight}px`)
         } catch (_err) {
           target.innerHTML = '< Invalid Mermaid Codes >'
           target.classList.add(CLASS_OR_ID.AG_MATH_ERROR)

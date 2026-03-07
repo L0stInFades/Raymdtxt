@@ -6,7 +6,6 @@ import { isDirectory, isFile, exists } from 'common/filesystem'
 import { MARKDOWN_EXTENSIONS, isMarkdownFile } from 'common/filesystem/paths'
 import { checkUpdates, userSetting } from './marktext'
 import { showTabBar } from './view'
-import { classifyDroppedPaths } from './drop'
 import { COMMANDS } from '../../commands'
 import { EXTENSION_HASN, PANDOC_EXTENSIONS, URL_REG } from '../../config'
 import { normalizeAndResolvePath, writeFile } from '../../filesystem'
@@ -199,15 +198,6 @@ const noticePandocNotFound = (win) => {
   })
 }
 
-const noticeDropNotSupported = (win) => {
-  return win.webContents.send('mt::show-notification', {
-    title: "Can't open this item",
-    type: 'warning',
-    message: 'Drop a Markdown file, a folder, or a document Vien can import.',
-    time: 6000,
-  })
-}
-
 const openPandocFile = async (windowId, pathname) => {
   try {
     const converter = pandoc(pathname, 'markdown')
@@ -336,30 +326,6 @@ ipcMain.on('mt::response-file-save', handleResponseForSave)
 ipcMain.on('mt::response-export', handleResponseForExport)
 
 ipcMain.on('mt::response-print', handleResponseForPrint)
-
-ipcMain.on('mt::window::drop', async (e, fileList) => {
-  const win = BrowserWindow.fromWebContents(e.sender)
-  const { openPaths, importPaths, unsupportedPaths } = classifyDroppedPaths(fileList)
-
-  for (const pathname of openPaths) {
-    openFileOrFolder(win, pathname)
-  }
-
-  if (importPaths.length > 0) {
-    const existsPandoc = pandoc.exists()
-    if (!existsPandoc) {
-      noticePandocNotFound(win)
-    } else {
-      for (const pathname of importPaths) {
-        await openPandocFile(win.id, pathname)
-      }
-    }
-  }
-
-  if (openPaths.length === 0 && importPaths.length === 0 && unsupportedPaths.length > 0) {
-    noticeDropNotSupported(win)
-  }
-})
 
 ipcMain.on('mt::rename', async (e, { id, pathname, newPathname }) => {
   if (pathname === newPathname) return

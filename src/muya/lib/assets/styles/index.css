@@ -182,6 +182,30 @@ figure.ag-active.ag-container-block pre {
   box-sizing: border-box;
 }
 
+figure[data-role="MERMAID"].ag-container-block:not(.ag-editing) > pre {
+  width: 0;
+  height: 0;
+  opacity: 0;
+  z-index: -1;
+  position: absolute;
+  margin-top: 0;
+  margin-bottom: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+figure[data-role="MERMAID"].ag-container-block.ag-editing > pre {
+  position: static;
+  width: 100%;
+  height: auto;
+  opacity: 1;
+  z-index: 1;
+  display: block;
+  box-sizing: border-box;
+  overflow: visible;
+  pointer-events: auto;
+}
+
 figure[data-role="HTML"] .ag-html-preview {
   display: block;
 }
@@ -502,6 +526,26 @@ table {
   margin-top: 0;
 }
 
+figure[data-role="TABLE"] {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 0;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  overscroll-behavior-x: contain;
+}
+
+figure[data-role="TABLE"] > table {
+  width: max-content;
+  max-width: none;
+}
+
+figure[data-role="TABLE"]::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
 li.ag-task-list-item {
   list-style-type: none;
   position: relative;
@@ -750,11 +794,37 @@ pre.ag-active.ag-fence-code::after {
 
 figure.ag-container-block div.ag-container-preview {
   width: 100%;
-  text-align: center;
+  overflow-x: auto;
+  overflow-y: hidden;
+  text-align: left;
+  padding-bottom: 6px;
 }
 
 figure.ag-container-block div.ag-container-preview > svg {
-  width: 100%;
+  display: block;
+  width: auto;
+  max-width: none;
+  margin: 0 auto;
+}
+
+figure[data-role="MERMAID"].ag-container-block > div.ag-container-preview {
+  width: min(100%, var(--ag-mermaid-preview-width, 100%));
+  max-width: 100%;
+  margin: 6px auto 14px;
+  padding: 8px 0 6px;
+  box-sizing: border-box;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+figure[data-role="MERMAID"].ag-container-block > div.ag-container-preview > svg {
+  margin: 0 auto;
+}
+
+figure[data-role="MERMAID"].ag-active.ag-container-block:not(.ag-editing) {
+  padding-bottom: 14px;
 }
 
 figure.ag-active.ag-container-block > div.ag-container-preview {
@@ -770,6 +840,120 @@ figure.ag-active.ag-container-block > div.ag-container-preview {
   border: 1px solid var(--floatBorderColor);
   border-radius: 4px;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}
+
+figure[data-role="MERMAID"].ag-active.ag-container-block:not(.ag-editing) > div.ag-container-preview {
+  position: static;
+  top: auto;
+  left: auto;
+  z-index: 1;
+  transform: none;
+  width: min(calc(100% - 16px), var(--ag-mermaid-preview-width, calc(100% - 16px)));
+  max-width: calc(100% - 16px);
+  margin: 6px auto 0;
+  padding: 8px 0 6px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+figure[data-role="MERMAID"].ag-container-block.ag-editing > div.ag-container-preview {
+  position: static;
+  top: auto;
+  left: auto;
+  z-index: 1;
+  transform: none;
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-height: 0;
+  margin: 0;
+  padding: 50px 20px 20px;
+  border: 0;
+  border-top: 1px solid rgba(126, 102, 76, 0.12);
+  border-radius: 0 0 18px 18px;
+  background: linear-gradient(180deg, rgba(253, 251, 247, 0.98), rgba(250, 247, 242, 0.88));
+  box-shadow: none;
+  position: relative;
+  text-align: center;
+}
+
+figure[data-role="MERMAID"].ag-container-block.ag-editing {
+  width: min(100%, max(420px, calc(var(--ag-mermaid-preview-width, 0px) + 120px)));
+  margin: 1.25rem 0;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0;
+  border: 1px solid rgba(126, 102, 76, 0.14);
+  border-radius: 18px;
+  background: rgba(255, 251, 245, 0.92);
+  box-shadow: 0 12px 30px rgba(118, 94, 68, 0.06);
+  overflow: hidden;
+}
+
+figure[data-role="MERMAID"].ag-container-block.ag-editing > .ag-front-icon,
+figure[data-role="MERMAID"].ag-container-block.ag-editing > .ag-container-icon,
+figure[data-role="MERMAID"].ag-container-block.ag-editing > pre .ag-code-copy {
+  display: none;
+}
+
+figure[data-role="MERMAID"].ag-container-block.ag-editing > pre {
+  position: static;
+  width: 100%;
+  height: auto;
+  opacity: 1;
+  z-index: 1;
+  display: block;
+  box-sizing: border-box;
+  overflow: visible;
+  pointer-events: auto;
+  margin: 0;
+  padding: 16px 20px 14px;
+  border: 0;
+  border-radius: 18px 18px 0 0;
+  background: linear-gradient(180deg, rgba(246, 244, 240, 0.98), rgba(255, 255, 255, 0.78));
+  box-shadow: none;
+}
+
+figure[data-role="MERMAID"].ag-container-block.ag-editing > pre.ag-active[data-role="mermaid"]::before,
+figure[data-role="MERMAID"].ag-container-block.ag-editing > pre.ag-active[data-role="mermaid"]::after {
+  content: none;
+  display: none;
+}
+
+figure[data-role="MERMAID"].ag-container-block.ag-editing > pre > code {
+  display: block;
+  min-height: 120px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+
+figure[data-role="MERMAID"].ag-container-block.ag-editing > pre > code::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+figure[data-role="MERMAID"].ag-container-block.ag-editing > div.ag-container-preview::before {
+  content: "mermaid";
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  padding: 5px 14px;
+  border: 1px solid rgba(126, 102, 76, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.74);
+  color: var(--editorColor80);
+  font-family: "DejaVu Sans Mono", "Source Code Pro", "Droid Sans Mono", Consolas, monospace;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: lowercase;
+}
+
+figure[data-role="MERMAID"].ag-container-block.ag-editing > div.ag-container-preview > svg {
+  margin: 0 auto;
 }
 
 div.ag-html-preview {
@@ -1181,6 +1365,10 @@ span.ag-reference-link {
 
 .ag-paragraph.ag-active .ag-front-icon {
   display: block;
+}
+
+figure[data-role="MERMAID"].ag-paragraph.ag-active:not(.ag-editing) > .ag-front-icon {
+  display: none;
 }
 
 .ag-meta-or-ctrl img,

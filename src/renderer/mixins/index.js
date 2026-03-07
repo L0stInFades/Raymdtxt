@@ -24,7 +24,10 @@ export const loadingPageMixins = {
     hideLoadingPage() {
       const loadingPage = document.querySelector('#loading-page')
       if (loadingPage) {
-        loadingPage.remove()
+        loadingPage.classList.add('is-leaving')
+        window.setTimeout(() => {
+          loadingPage.remove()
+        }, 90)
       }
     },
   },
