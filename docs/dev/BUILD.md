@@ -3,14 +3,15 @@
 Clone the repository:
 
 ```
-git clone https://github.com/marktext/marktext.git
+git clone https://github.com/L0stInFades/vien.git
 ```
 
 ### Prerequisites
 
-Before you can get started developing, you need set up your build environment:
+Before you start developing, set up the following:
 
-- Node.js `>=v16` but `<v17` and yarn
+- Current Node.js LTS
+- `pnpm`
 - Python `>=v3.6` for node-gyp
 - C++ compiler and development tools
 - Build is supported on Linux, macOS and Windows
@@ -31,27 +32,43 @@ On Red Hat-based Linux: `sudo dnf install libX11-devel libxkbfile-devel libsecre
 - Windows 10 SDK (only needed before Windows 10)
 - Visual Studio 2019 (preferred)
 
-### Let's build
+### Install and build
 
-1. Go to `marktext` folder
-2. Install dependencies: `yarn install` or `yarn install --frozen-lockfile`
-3. Build MarkText binaries and packages: `yarn run build`
-4. MarkText binary is located under `build` folder
+1. Install dependencies: `pnpm install`
+2. Start development mode: `pnpm run dev`
+3. Build renderer and main bundles only: `pnpm run electron:build`
+4. Build packaged binaries for your current OS: `pnpm run build`
 
-Copy the build app to applications folder, or if on Windows run the executable installer.
+Packaged artifacts are written to `build/`.
+
+### macOS release build
+
+Vien currently ships macOS release artifacts through the main release flow.
+
+```sh
+pnpm run release:mac
+```
+
+The resulting `.dmg` and `.zip` files are written to `build/`.
 
 ### Important scripts
 
-```
-$ yarn run <script> # or npm run <script>
+```sh
+pnpm run <script>
 ```
 
-| Script          | Description                                      |
-| --------------- | ------------------------------------------------ |
-| `build`         | Build MarkText binaries and packages for your OS |
-| `build:bin`     | Build MarkText binary for your OS                |
-| `dev`           | Build and run MarkText in developer mode         |
-| `lint`          | Lint code style                                  |
-| `test` / `unit` | Run unit tests                                   |
+| Script              | Description                                 |
+| ------------------- | ------------------------------------------- |
+| `dev`               | Start Vien in development mode              |
+| `electron:build`    | Build the Electron app without packaging    |
+| `build`             | Build and package for the current platform  |
+| `release:mac`       | Build macOS release artifacts only          |
+| `release:linux`     | Build Linux release artifacts               |
+| `release:win`       | Build Windows release artifacts             |
+| `unit`              | Run unit tests                              |
+| `test:specs`        | Run CommonMark and GFM specification checks |
+| `e2e`               | Run Playwright Electron end-to-end tests    |
+| `lint`              | Run Biome against `src/`                    |
+| `validate-licenses` | Validate third-party license metadata       |
 
 For more scripts please see `package.json`.

@@ -18,7 +18,8 @@ class DataCenter extends EventEmitter {
     const { dataCenterPath, userDataPath } = paths
     this.dataCenterPath = dataCenterPath
     this.userDataPath = userDataPath
-    this.serviceName = 'marktext'
+    this.serviceName = 'vien'
+    this.legacyServiceNames = ['marktext']
     this.encryptKeys = ['githubToken']
     this.hasDataCenterFile = fs.existsSync(path.join(this.dataCenterPath, `./${DATA_CENTER_NAME}.json`))
     this.store = new Store({
@@ -53,20 +54,15 @@ class DataCenter extends EventEmitter {
   }
 
   async getAll() {
-    const { serviceName, encryptKeys } = this
+    const { encryptKeys } = this
     const data = this.store.store
     try {
       const encryptData = await Promise.all(
         encryptKeys.map((key) => {
-          return keytar.getPassword(serviceName, key)
+          return this._getSecureValue(key)
         }),
       )
-      const encryptObj = encryptKeys.reduce((acc, k, i) => {
-        return {
-          ...acc,
-          [k]: encryptData[i],
-        }
-      }, {})
+      const encryptObj = Object.fromEntries(encryptKeys.map((key, index) => [key, encryptData[index]]))
 
       return Object.assign(data, encryptObj)
     } catch (err) {
@@ -110,9 +106,9 @@ class DataCenter extends EventEmitter {
    * return a promise
    */
   getItem(key) {
-    const { encryptKeys, serviceName } = this
+    const { encryptKeys } = this
     if (encryptKeys.includes(key)) {
-      return keytar.getPassword(serviceName, key)
+      return this._getSecureValue(key)
     } else {
       const value = this.store.get(key)
       return Promise.resolve(value)
@@ -134,6 +130,28 @@ class DataCenter extends EventEmitter {
     } else {
       return this.store.set(key, value)
     }
+  }
+
+  async _getSecureValue(key) {
+    const { serviceName, legacyServiceNames } = this
+    const currentValue = await keytar.getPassword(serviceName, key)
+    if (currentValue) {
+      return currentValue
+    }
+
+    for (const legacyServiceName of legacyServiceNames) {
+      const legacyValue = await keytar.getPassword(legacyServiceName, key)
+      if (legacyValue) {
+        try {
+          await keytar.setPassword(serviceName, key, legacyValue)
+        } catch (err) {
+          log.error(`Failed to migrate secure key "${key}" from ${legacyServiceName} to ${serviceName}:`, err)
+        }
+        return legacyValue
+      }
+    }
+
+    return null
   }
 
   /**

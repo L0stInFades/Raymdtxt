@@ -24,7 +24,7 @@ const initializeLogger = (appEnvironment) => {
 // NOTE: We only support Linux, macOS and Windows but not BSD nor SunOS.
 if (!/^(darwin|win32|linux)$/i.test(process.platform)) {
   process.stdout.write(
-    `Operating system "${process.platform}" is not supported! Please open an issue at "https://github.com/marktext/marktext".\n`,
+    `Operating system "${process.platform}" is not supported. Please open an issue at "https://github.com/L0stInFades/vien/issues".\n`,
   )
   process.exit(1)
 }
@@ -39,16 +39,16 @@ if (args['--disable-gpu']) {
   app.disableHardwareAcceleration()
 }
 
-// Make MarkText a single instance application.
+// Keep Vien as a single-instance application.
 if (!process.mas && process.env.NODE_ENV !== 'development') {
   const gotSingleInstanceLock = app.requestSingleInstanceLock()
   if (!gotSingleInstanceLock) {
-    process.stdout.write('Other MarkText instance detected: exiting...\n')
+    process.stdout.write('Another Vien instance was detected: exiting...\n')
     app.exit()
   }
 }
 
-// MarkText environment is configured successfully. You can now access paths, use the logger etc.
+// The application environment is configured successfully. You can now access paths, use the logger etc.
 // Create other instances that need access to the modules from above.
 let accessor = null
 try {
@@ -58,7 +58,7 @@ try {
   const msgHint = err.message.includes('Config schema violation')
     ? 'This seems to be an issue with your configuration file(s). '
     : ''
-  log.error(`Loading MarkText failed during initialization! ${msgHint}`, err)
+  log.error(`Loading Vien failed during initialization. ${msgHint}`, err)
 
   const EXIT_ON_ERROR = !!process.env.MARKTEXT_EXIT_ON_ERROR
   const SHOW_ERROR_DIALOG = !process.env.MARKTEXT_ERROR_INTERACTION
@@ -78,5 +78,5 @@ log.transports.file.sync = false
 // Register IPC handlers for preload bridge (replaces @electron/remote)
 registerWindowBridgeHandlers()
 
-const marktext = new App(accessor, args)
-marktext.init()
+const application = new App(accessor, args)
+application.init()

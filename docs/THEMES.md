@@ -1,3 +1,5 @@
 # Themes
 
-MarkText currently doesn't support user-defined application themes. This feature is planned for v0.17.0.
+Vien currently ships with built-in application themes and supports custom export themes.
+
+For export styling, see [EXPORT_THEMES.md](EXPORT_THEMES.md).

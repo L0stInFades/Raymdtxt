@@ -1,17 +1,17 @@
 [Desktop Entry]
-Name=MarkText
-Comment=Next generation markdown editor
-Exec=marktext %F
+Name=Vien
+Comment=Calm Markdown for long-form writing
+Exec=vien %F
 Terminal=false
 Type=Application
-Icon=marktext
+Icon=vien
 Categories=Office;TextEditor;Utility;
 MimeType=text/markdown;
-Keywords=marktext;
-StartupWMClass=marktext
+Keywords=vien;
+StartupWMClass=vien
 Actions=NewWindow;
 
 [Desktop Action NewWindow]
 Name=New Window
-Exec=marktext --new-window %F
-Icon=marktext
+Exec=vien --new-window %F
+Icon=vien

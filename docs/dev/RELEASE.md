@@ -1,28 +1,36 @@
-# Steps to release MarkText
+# Release Steps
 
-- Create a release candidate
-  - Create branch `release-v%version%`
-  - Set environment variable `MARKTEXT_IS_STABLE` to `1` (default on AppVeyor and Travis CI)
-  - Ensure [changelog](https://github.com/marktext/marktext/blob/master/.github/CHANGELOG.md) is up-to-date
-  - Bump version in `package.json` and changelog
-  - Update all `README.md` files
-  - Bump Flathub version ([marktext.appdata.xml](https://github.com/marktext/marktext/blob/master/resources/linux/marktext.appdata.xml))
-  - Create commit `release version %version%`
-  - Ensure all tests pass
-  - A new draft release should be available or create one
-- Publish GitHub release
-  - Add git tag `v%version%`
-  - Add changelog
-  - Add SHA256 checksums
-- Update website and documentation
-- Publish [Flathub package](https://github.com/flathub/com.github.marktext.marktext)
-  - Ensure native dependencies
-  - Update `runtime` and `SDK` if needed
-  - Bump version and update URLs
-  - Test the package (`scripts/build-bundle.sh && scripts/test-marktext.sh`)
-  - Create commit `Update to v%version%`
+Vien's current official release flow is macOS-only.
 
-## Work after releasing
+## Prepare the release candidate
 
-- Ensure all issues in the changelog are closed
-- :relaxed: :tada:
+1. Bump `package.json` and any release notes you maintain.
+2. Ensure branding, screenshots, links, and documentation are up to date.
+3. Run the verification suite:
+
+```sh
+pnpm run unit
+pnpm run test:specs
+MARKTEXT_EXIT_ON_ERROR=1 pnpm exec playwright test -c test/e2e/playwright.config.js test/e2e
+pnpm exec biome check src/
+```
+
+## Build the macOS release
+
+```sh
+pnpm run release:mac
+```
+
+Artifacts are written to `build/` and should include:
+
+- `vien-arm64.dmg`
+- `vien-arm64-mac.zip`
+- `vien-x64.dmg`
+- `vien-x64-mac.zip`
+
+## Publish
+
+1. Create or update the Git tag for the release version.
+2. Create a GitHub release in `L0stInFades/vien`.
+3. Upload the macOS artifacts from `build/`.
+4. Include checksums if you distribute outside GitHub releases as well.

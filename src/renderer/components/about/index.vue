@@ -47,11 +47,11 @@ export default {
     this.subtitle = 'One continuous surface for writing, reading, and revision.'
     this.inspirationLabel = 'Named after a track on Is Peace Wild?'
     this.inspirationCopy =
-      'Vien borrows from the album\'s temperament: spacious, nocturnal, emotionally clear, and calm under tension.'
+      "Vien borrows from the album's temperament: spacious, nocturnal, emotionally clear, and calm under tension."
     this.inspirationCredit =
       'Inspired by Ludwig Wandinger, the Berlin-based producer, drummer, performer, and visual artist behind the record.'
-    this.lineage = 'Built on the MarkText lineage, then refined into Vien by its contributors.'
-    this.copyright = `Copyright © 2017-${new Date().getFullYear()} Luo Ran`
+    this.lineage = 'Shaped from a long-standing Markdown editor lineage, then carried forward as Vien.'
+    this.copyright = `Copyright © ${new Date().getFullYear()} L0stInFades`
     this.logo = VienLogo
     return {
       showAboutDialog: false,

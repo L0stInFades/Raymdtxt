@@ -1,5 +1,6 @@
 productName: "Vien"
 appId: "com.github.l0stinfades.vien"
+copyright: "Copyright © 2026 L0stInFades"
 
 asar: true
 asarUnpack:

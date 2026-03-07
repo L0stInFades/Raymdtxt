@@ -48,7 +48,7 @@
     "default": "modified"
   },
   "startUpAction": {
-    "description": "General--The action after MarkText startup, open the last edited content, open the specified folder or blank page",
+    "description": "General--The action after Vien starts: open the last edited content, open a specified folder, or show a blank page",
     "enum": ["folder", "lastState", "blank"],
     "default": "blank"
   },
@@ -57,7 +57,7 @@
     "type": "string"
   },
   "language": {
-    "description": "General--The language MarkText use.",
+    "description": "General--The language Vien uses.",
     "type": "string",
     "default": "en"
   },
@@ -218,7 +218,7 @@
     "default": "."
   },
   "preferHeadingStyle": {
-    "description": "Markdown--The preferred heading style in MarkText",
+    "description": "Markdown--The preferred heading style in Vien",
     "enum": ["atx", "setext"],
     "default": "atx"
   },
@@ -263,7 +263,7 @@
     "default": "hand"
   },
   "theme": {
-    "description": "Theme--Select the theme used in MarkText",
+    "description": "Theme--Select the theme used in Vien",
     "type": "string",
     "default": "light"
   },
