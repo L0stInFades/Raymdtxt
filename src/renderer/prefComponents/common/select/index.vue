@@ -29,13 +29,13 @@
 export default {
   data() {
     return {
-      selectValue: this.value,
+      selectValue: this.currentValue,
     }
   },
   props: {
     description: String,
     notes: String,
-    value: String | Number,
+    currentValue: String | Number,
     options: Array,
     onChange: Function,
     more: String,
@@ -45,7 +45,7 @@ export default {
     },
   },
   watch: {
-    value: function (value, oldValue) {
+    currentValue: function (value, oldValue) {
       if (value !== oldValue) {
         this.selectValue = value
       }
@@ -66,30 +66,38 @@ export default {
 
 <style>
 .pref-select-item {
-  margin: 20px 0;
+  margin: 18px 0;
+  padding: 14px 16px;
   font-size: 14px;
   color: var(--editorColor);
+  border-radius: 18px;
+  border: 1px solid var(--panelSubtleBorderColor);
+  background: rgba(255, 255, 255, 0.52);
   & .notes {
     margin-top: 10px;
-    font-style: italic;
     font-size: 12px;
+    line-height: 1.6;
+    color: var(--panelMutedColor);
   }
   & .el-select {
     width: 100%;
   }
   & input.el-input__inner {
-    height: 30px;
-    background: transparent;
+    height: 42px;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(255, 255, 255, 0.66)),
+      var(--controlBgColor);
     color: var(--editorColor);
-    border-color: var(--editorColor10);
+    border-color: var(--controlBorderColor);
+    border-radius: 14px;
   }
   & .el-input__icon,
   & .el-input__inner {
-    line-height: 30px;
+    line-height: 42px;
   }
 }
 .pref-select-item .description {
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   & i {
     cursor: pointer;
     opacity: .7;
@@ -101,7 +109,8 @@ export default {
 }
 li.el-select-dropdown__item {
   color: var(--editorColor);
-  height: 30px;
+  height: 36px;
+  line-height: 36px;
 }
 li.el-select-dropdown__item.hover, li.el-select-dropdown__item:hover {
   background: var(--floatHoverColor);
@@ -109,6 +118,8 @@ li.el-select-dropdown__item.hover, li.el-select-dropdown__item:hover {
 div.el-select-dropdown {
   background: var(--floatBgColor);
   border-color: var(--floatBorderColor);
+  border-radius: 16px;
+  box-shadow: var(--floatShadow);
   & .popper__arrow {
     display: none;
   }

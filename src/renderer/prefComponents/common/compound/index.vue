@@ -24,24 +24,31 @@ export default {
   .pref-compound-item {
     font-size: 14px;
     user-select: none;
-    margin: 20px 0;
+    margin: 22px 0;
+    padding: 24px 24px 10px;
     color: var(--editorColor);
+    border-radius: 24px;
+    border: 1px solid var(--panelSubtleBorderColor);
+    background: rgba(255, 255, 255, 0.48);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.76);
 
     & .pref-compound-head h6.title {
-      font-weight: 400;
-      font-size: 1.1em;
-      padding-bottom: 6px;
+      margin: 0;
+      font-weight: 600;
+      font-size: 1rem;
+      letter-spacing: 0.01em;
+      color: var(--sideBarTitleColor);
+      padding-bottom: 2px;
     }
 
     & .pref-compound-body {
-      padding: 8px 16px 8px 16px;
-      margin-top: -12px;
-      background: rgba(0, 0, 0, .04);
-      border: 1px solid rgba(255, 255, 255, .03);
+      padding: 8px 0 2px;
+      margin-top: 4px;
     }
 
     & .description {
       margin-bottom: 10px;
+      color: var(--editorBodyColor);
       & i {
         cursor: pointer;
         opacity: .7;
@@ -54,8 +61,9 @@ export default {
 
     & .notes {
       margin-top: 10px;
-      font-style: italic;
       font-size: 12px;
+      line-height: 1.6;
+      color: var(--panelMutedColor);
     }
   }
 </style>

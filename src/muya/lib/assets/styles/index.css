@@ -146,9 +146,10 @@ div.ag-show-quick-insert-hint p.ag-paragraph.ag-active > span.ag-paragraph-conte
 *:not(.ag-hide)::selection,
 .ag-selection {
   background: var(--selectionColor);
-  color: var(--editorColor);
-  padding: 0 2px;
-  border-radius: 1px;
+  color: var(--selectionTextColor, var(--editorColor));
+  padding: 0 1px;
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 1px var(--selectionOutlineColor, transparent);
 }
 
 .ag-hide::selection {

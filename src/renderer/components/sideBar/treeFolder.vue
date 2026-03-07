@@ -129,27 +129,46 @@ export default {
       user-select: none;
       display: flex;
       align-items: center;
-      height: 30px;
-      padding-right: 15px;
+      min-height: 34px;
+      margin: 1px 0;
+      padding-right: 12px;
+      border-radius: 14px;
+      border: 1px solid transparent;
+      background: var(--sideBarRowBgColor);
+      transition:
+        background-color .18s ease,
+        border-color .18s ease,
+        transform .18s ease;
       & > svg {
         flex-shrink: 0;
         color: var(--sideBarIconColor);
-        margin-right: 5px;
+        width: 16px;
+        height: 16px;
+        margin-right: 8px;
       }
       &:hover {
         background: var(--sideBarItemHoverBgColor);
+        border-color: var(--sideBarRowBorderColor);
+        transform: translateX(1px);
+      }
+      &.active {
+        color: var(--sideBarTitleColor);
+        background: var(--sideBarRowCurrentBgColor);
+        border-color: var(--themeColor20);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.62);
       }
     }
   }
   .new-input, input.rename {
     outline: none;
-    height: 22px;
-    margin: 5px 0;
-    padding: 0 6px;
+    height: 34px;
+    margin: 4px 0;
+    padding: 0 12px;
     color: var(--sideBarColor);
-    border: 1px solid var(--floatBorderColor);
-    background: var(--floatBorderColor);
+    border: 1px solid var(--controlBorderColor);
+    background: var(--controlBgColor);
     width: 70%;
-    border-radius: 3px;
+    border-radius: 14px;
+    box-sizing: border-box;
   }
 </style>

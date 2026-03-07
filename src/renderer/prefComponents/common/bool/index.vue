@@ -29,13 +29,13 @@
 export default {
   data() {
     return {
-      status: this.bool,
+      status: this.isOn,
     }
   },
   props: {
     description: String,
     notes: String,
-    bool: Boolean,
+    isOn: Boolean,
     onChange: Function,
     more: String,
     detailedDescription: String,
@@ -45,7 +45,7 @@ export default {
     },
   },
   watch: {
-    bool: function (value, oldValue) {
+    isOn: function (value, oldValue) {
       if (value !== oldValue) {
         this.status = value
       }
@@ -68,13 +68,20 @@ export default {
   .pref-switch-item {
     font-size: 14px;
     user-select: none;
-    margin: 20px 0;
+    margin: 18px 0;
+    padding: 14px 16px;
     color: var(--editorColor);
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 16px;
+    border-radius: 18px;
+    border: 1px solid var(--panelSubtleBorderColor);
+    background: rgba(255, 255, 255, 0.52);
 
     & .description {
+      flex: 1;
+      line-height: 1.5;
       & i {
         cursor: pointer;
         opacity: .7;
@@ -92,16 +99,19 @@ export default {
   }
 
   span.el-switch__core::after {
-    top: 3px;
-    left: 7px;
-    width: 10px;
-    height: 10px;
+    top: 2px;
+    left: 4px;
+    width: 14px;
+    height: 14px;
   }
 
   .el-switch .el-switch__core {
-    border: 2px solid var(--iconColor);
-    background: transparent;
+    width: 42px !important;
+    height: 20px;
+    border: 1px solid var(--controlBorderColor);
+    background: rgba(126, 102, 76, 0.08);
     box-sizing: border-box;
+    border-radius: 999px;
   }
 
   span.el-switch__label {
@@ -109,6 +119,6 @@ export default {
   }
 
   .el-switch:not(.is-checked) .el-switch__core::after {
-    background: var(--iconColor);
+    background: rgba(126, 102, 76, 0.56);
   }
 </style>

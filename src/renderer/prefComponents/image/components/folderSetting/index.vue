@@ -1,7 +1,7 @@
 <template>
   <section class="image-folder">
     <h5>Global or relative image folder</h5>
-    <text-box description="Global image folder" :input="imageFolderPath"
+    <text-box description="Global image folder" :textValue="imageFolderPath"
       :regexValidator="/^(?:$|([a-zA-Z]:)?[\/\\].*$)/" :defaultValue="folderPathPlaceholder"
       :onChange="value => modifyImageFolderPath(value)"></text-box>
     <div>
@@ -12,11 +12,11 @@
       <template #head>
         <bool description="Prefer relative assets folder"
           more="https://github.com/L0stInFades/vien/blob/develop/docs/IMAGES.md"
-          :bool="imagePreferRelativeDirectory"
+          :isOn="imagePreferRelativeDirectory"
           :onChange="value => onSelectChange('imagePreferRelativeDirectory', value)"></bool>
       </template>
       <template #children>
-        <text-box description="Relative image folder name" :input="imageRelativeDirectoryName"
+        <text-box description="Relative image folder name" :textValue="imageRelativeDirectoryName"
           :regexValidator="/^(?:$|(?![a-zA-Z]:)[^\/\\].*$)/"
           :defaultValue="relativeDirectoryNamePlaceholder"
           :onChange="value => onSelectChange('imageRelativeDirectoryName', value)"></text-box>

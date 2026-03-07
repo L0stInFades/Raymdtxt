@@ -3,7 +3,7 @@
     v-show="showSideBar"
     class="side-bar"
     ref="sideBar"
-    :style="[ !rightColumn ? { 'min-width': '45px' } : {}, { 'width': `${finalSideBarWidth}px` } ]"
+    :style="[ !rightColumn ? { 'min-width': '86px' } : {}, { 'width': `${finalSideBarWidth}px` } ]"
   >
     <div class="left-column">
       <ul>
@@ -80,8 +80,8 @@ export default {
     finalSideBarWidth() {
       const { showSideBar, rightColumn, sideBarViewWidth } = this
       if (!showSideBar) return 0
-      if (rightColumn === '') return 45
-      return sideBarViewWidth < 220 ? 220 : sideBarViewWidth
+      if (rightColumn === '') return 86
+      return sideBarViewWidth < 260 ? 260 : sideBarViewWidth
     },
   },
   created() {
@@ -96,7 +96,7 @@ export default {
       const mouseUpHandler = (_event) => {
         document.removeEventListener('mousemove', mouseMoveHandler, false)
         document.removeEventListener('mouseup', mouseUpHandler, false)
-        this.$store.dispatch('CHANGE_SIDE_BAR_WIDTH', sideBarWidth < 220 ? 220 : sideBarWidth)
+        this.$store.dispatch('CHANGE_SIDE_BAR_WIDTH', sideBarWidth < 260 ? 260 : sideBarWidth)
       }
 
       const mouseMoveHandler = (event) => {
@@ -141,16 +141,23 @@ export default {
 <style scoped>
   .side-bar {
     display: flex;
+    gap: 12px;
     flex-shrink: 0;
     flex-grow: 0;
     width: 280px;
     height: 100vh;
-    min-width: 220px;
+    min-width: 260px;
     position: relative;
     color: var(--sideBarColor);
     user-select: none;
-    background: var(--sideBarBgColor);
-    border-right: 1px solid var(--itemBgColor);
+    padding: 16px 12px 16px 14px;
+    box-sizing: border-box;
+    background:
+      radial-gradient(circle at top left, rgba(255, 148, 117, 0.16), transparent 24%),
+      radial-gradient(circle at bottom right, rgba(73, 118, 206, 0.16), transparent 28%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0)),
+      var(--sideBarBgColor);
+    border-right: 1px solid var(--editorSurfaceEdge);
     & .left-column {
       & svg {
         fill: var(--iconColor);
@@ -160,41 +167,66 @@ export default {
 
   .left-column {
     height: 100%;
-    width: 45px;
+    width: 60px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding-top: 40px;
+    padding: 56px 8px 10px;
     box-sizing: border-box;
+    border-radius: 30px;
+    border: 1px solid var(--sideBarPanelBorderColor);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0.18)),
+      var(--sideBarRailBgColor);
+    box-shadow: var(--sideBarPanelShadow);
     & > ul {
       opacity: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
   }
 
   .left-column ul {
     list-style: none;
-    display: flex;
-    flex-direction: column;
     margin: 0;
     padding: 0;
     & > li {
-      width: 45px;
-      height: 45px;
+      width: 42px;
+      height: 42px;
       margin: 0;
       padding: 0;
       display: flex;
-      justify-content: space-around;
+      justify-content: center;
       align-items: center;
       cursor: pointer;
+      border-radius: 14px;
+      background: transparent;
+      transition:
+        background-color .18s ease,
+        box-shadow .18s ease,
+        transform .18s ease;
       & > svg {
         width: 18px;
         height: 18px;
         fill: var(--sideBarIconColor);
         opacity: 1;
-        transition: transform .25s ease-in-out;
+        transition:
+          transform .25s ease-in-out,
+          fill .18s ease;
+      }
+      &:hover {
+        background: rgba(255, 255, 255, 0.5);
+        transform: translateY(-1px);
       }
       &.active > svg {
         fill: var(--themeColor);
+      }
+      &.active {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.46));
+        box-shadow:
+          inset 0 0 0 1px var(--themeColor20),
+          0 10px 18px rgba(118, 94, 68, 0.08);
       }
     }
   }
@@ -204,19 +236,40 @@ export default {
   }
   .right-column {
     flex: 1;
-    width: calc(100% - 50px);
+    min-width: 0;
+    width: calc(100% - 72px);
     overflow: hidden;
+    border-radius: 30px;
+    border: 1px solid var(--sideBarPanelBorderColor);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.52)),
+      var(--sideBarPanelBgColor);
+    box-shadow: var(--sideBarPanelShadow);
   }
   .drag-bar {
     position: absolute;
-    top: 0;
+    top: 22px;
     right: 0;
-    bottom: 0;
-    height: 100%;
-    width: 3px;
+    bottom: 22px;
+    height: auto;
+    width: 12px;
     cursor: col-resize;
     &:hover {
-      border-right: 2px solid var(--iconColor);
+      &::after {
+        opacity: 1;
+      }
+    }
+    &::after {
+      content: '';
+      position: absolute;
+      top: 18px;
+      right: 4px;
+      bottom: 18px;
+      width: 3px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(96, 182, 126, 0.32), rgba(73, 118, 206, 0.22));
+      opacity: 0;
+      transition: opacity .2s ease;
     }
   }
 </style>

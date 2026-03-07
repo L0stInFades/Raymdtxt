@@ -38,24 +38,38 @@ export default {
   .opened-file {
     display: flex;
     user-select: none;
-    height: 28px;
-    line-height: 28px;
-    padding-left: 35px;
+    align-items: center;
+    min-height: 34px;
+    line-height: 1.4;
+    padding: 0 12px 0 36px;
     position: relative;
     color: var(--sideBarColor);
+    border-radius: 14px;
+    border: 1px solid transparent;
+    background: var(--sideBarRowBgColor);
+    transition:
+      background-color .18s ease,
+      border-color .18s ease,
+      transform .18s ease;
     & > svg {
-      display: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       width: 10px;
       height: 10px;
       position: absolute;
-      top: 9px;
-      left: 10px;
-    }
-    &:hover > svg {
-      display: inline-block;
+      top: 11px;
+      left: 12px;
+      opacity: 0;
+      transition: opacity .18s ease;
     }
     &:hover {
       background: var(--sideBarItemHoverBgColor);
+      border-color: var(--sideBarRowBorderColor);
+      transform: translateX(1px);
+    }
+    &:hover > svg {
+      opacity: 1;
     }
     & > span {
       overflow: hidden;
@@ -64,17 +78,20 @@ export default {
     }
   }
   .opened-file.active {
-    color: var(--highlightThemeColor);
+    color: var(--sideBarTitleColor);
+    background: var(--sideBarRowCurrentBgColor);
+    border-color: var(--themeColor20);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.62);
   }
   .unsaved.opened-file::before {
     content: '';
-    width: 7px;
-    height: 7px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
-    background: var(--highlightThemeColor);
+    background: var(--sideBarCurrentIndicator);
     position: absolute;
-    top: 11px;
-    left: 12px;
+    top: 13px;
+    left: 13px;
   }
   .unsaved.opened-file:hover::before {
     content: none;

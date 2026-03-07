@@ -14,35 +14,32 @@ export const useAutoUpdatesStore = defineStore('autoUpdates', () => {
 
     window.api.ipc.on('mt::UPDATE_NOT_AVAILABLE', (message: unknown) => {
       notice.notify({
-        title: 'Update not Available',
+        title: 'Up To Date',
         type: 'primary',
         message: message as string,
       })
     })
 
     window.api.ipc.on('mt::UPDATE_DOWNLOADED', (message: unknown) => {
-      notice.notify({
-        title: 'Update Downloaded',
-        type: 'info',
-        message: message as string,
-      })
-    })
-
-    window.api.ipc.on('mt::UPDATE_AVAILABLE', (message: unknown) => {
-      const msg = message as string
       notice
         .notify({
-          title: 'Update Available',
+          title: 'Update Ready',
           type: 'primary',
-          message: msg,
+          message: message as string,
           showConfirm: true,
         })
         .then(() => {
-          window.api.ipc.send('mt::NEED_UPDATE', { needUpdate: true })
+          window.api.ipc.send('mt::INSTALL_UPDATE_NOW')
         })
-        .catch(() => {
-          window.api.ipc.send('mt::NEED_UPDATE', { needUpdate: false })
-        })
+        .catch(() => {})
+    })
+
+    window.api.ipc.on('mt::UPDATE_AVAILABLE', (message: unknown) => {
+      notice.notify({
+        title: 'Update Available',
+        type: 'info',
+        message: message as string,
+      })
     })
   }
 

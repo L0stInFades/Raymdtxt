@@ -5,27 +5,27 @@
       <template #head>
         <bool
           description="Enable spell checking"
-          :bool="spellcheckerEnabled"
+          :isOn="spellcheckerEnabled"
           :onChange="handleSpellcheckerEnabled"
         ></bool>
       </template>
       <template #children>
         <bool
           description="Hide marks for spelling errors"
-          :bool="spellcheckerNoUnderline"
+          :isOn="spellcheckerNoUnderline"
           :disable="!spellcheckerEnabled"
           :onChange="value => onSelectChange('spellcheckerNoUnderline', value)"
         ></bool>
         <bool
           v-show="isOsx"
           description="Automatically detect document language"
-          :bool="true"
+          :isOn="true"
           :disable="true"
         ></bool>
         <cur-select
           v-show="!isOsx"
           description="Default language for spell checking"
-          :value="spellcheckerLanguage"
+          :currentValue="spellcheckerLanguage"
           :options="availableDictionaries"
           :disable="!spellcheckerEnabled"
           :onChange="handleSpellcheckerLanguage"

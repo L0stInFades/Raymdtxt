@@ -1,9 +1,5 @@
 <template>
   <div class="tree-view">
-    <div class="title">
-      <!-- Placeholder -->
-    </div>
-
     <!-- Opened tabs -->
     <div class="opened-files">
       <div class="title" data-testid="tree-opened-files-title">
@@ -187,18 +183,13 @@ export default {
     display: flex;
     flex-direction: column;
     height: 100%;
-  }
-  .tree-view > .title {
-    height: 35px;
-    line-height: 35px;
-    padding: 0 15px;
-    display: flex;
-    flex-shrink: 0;
-    flex-direction: row-reverse;
+    padding: 26px 16px 18px;
+    box-sizing: border-box;
+    overflow: hidden;
   }
 
   .icon-arrow {
-    margin-right: 5px;
+    margin-right: 8px;
     transition: all .25s ease-out;
     transform: rotate(90deg);
     fill: var(--sideBarTextColor);
@@ -211,29 +202,47 @@ export default {
   .opened-files,
   .project-tree {
     & > .title {
-      height: 30px;
-      line-height: 30px;
-      font-size: 14px;
+      height: 36px;
+      line-height: 36px;
+      font-size: 12px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--panelEyebrowColor);
+      background: var(--sideBarRowBgColor);
+      border: 1px solid var(--sideBarRowBorderColor);
+      border-radius: 16px;
+      padding: 0 14px;
+      box-sizing: border-box;
     }
   }
 
   .opened-files .title {
-    padding-right: 15px;
     display: flex;
     align-items: center;
     & > span {
       flex: 1;
+      min-width: 0;
     }
     & > a {
-      display: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       text-decoration: none;
       color: var(--sideBarColor);
       margin-left: 8px;
+      width: 24px;
+      height: 24px;
+      border-radius: 10px;
+      opacity: 0;
+      transition: opacity .18s ease, background-color .18s ease, color .18s ease;
+      &:hover {
+        background: rgba(255, 255, 255, 0.72);
+      }
     }
   }
   .opened-files div.title:hover > a,
   .opened-files div.title > a:hover {
-    display: block;
+    opacity: 1;
     &:hover {
       color: var(--highlightThemeColor);
     }
@@ -241,13 +250,19 @@ export default {
   .opened-files {
     display: flex;
     flex-direction: column;
+    gap: 8px;
+    padding-bottom: 14px;
   }
   .default-cursor {
     cursor: pointer;
   }
   .opened-files .opened-files-list {
-    max-height: 200px;
+    max-height: 236px;
     overflow: auto;
+    padding: 0 2px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
     &::-webkit-scrollbar:vertical {
       width: 8px;
     }
@@ -258,8 +273,9 @@ export default {
     display: flex;
     flex-direction: column;
     overflow: auto;
+    gap: 8px;
+    padding-top: 4px;
     & > .title {
-      padding-right: 15px;
       display: flex;
       align-items: center;
       & > span {
@@ -283,6 +299,10 @@ export default {
     & > .tree-wrapper {
       overflow: auto;
       flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 0 2px 12px;
       &::-webkit-scrollbar:vertical {
         width: 8px;
       }
@@ -295,14 +315,20 @@ export default {
   .open-project {
     flex: 1;
     display: flex;
-    flex-direction: column;
-    justify-content: space-around;
     align-items: center;
-    padding-bottom: 100px;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 48px;
     & .centered-group {
       display: flex;
       flex-direction: column;
       align-items: center;
+      gap: 18px;
+      padding: 28px 20px;
+      background: rgba(255, 255, 255, 0.52);
+      border: 1px solid var(--panelSubtleBorderColor);
+      border-radius: 24px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78);
     }
     & svg {
       width: 120px;
@@ -310,37 +336,42 @@ export default {
     }
     & button.button-primary {
       display: block;
-      margin-top: 20px;
     }
   }
   .new-input {
     outline: none;
-    height: 22px;
-    margin: 5px 0;
-    padding: 0 6px;
+    height: 34px;
+    margin: 4px 0;
+    padding: 0 12px;
     color: var(--sideBarColor);
-    border: 1px solid var(--floatBorderColor);
-    background: var(--floatBorderColor);
+    border: 1px solid var(--controlBorderColor);
+    background: var(--controlBgColor);
     width: calc(100% - 45px);
-    border-radius: 3px;
+    border-radius: 14px;
+    box-sizing: border-box;
   }
   .tree-wrapper {
     position: relative;
   }
   .empty-project {
-    position: absolute;
-    top: 0;
-    left: 0;
+    margin-top: 6px;
     font-size: 14px;
     display: flex;
     flex-direction: column;
-    padding-top: 40px;
     align-items: center;
+    justify-content: center;
+    padding: 22px 18px;
+    color: var(--panelMutedColor);
+    background: rgba(255, 255, 255, 0.52);
+    border: 1px solid var(--panelSubtleBorderColor);
+    border-radius: 20px;
+    line-height: 1.6;
     & > a {
       color: var(--highlightThemeColor);
       text-align: center;
-      margin-top: 15px;
+      margin-top: 12px;
       text-decoration: none;
+      font-weight: 600;
     }
   }
   .bold {

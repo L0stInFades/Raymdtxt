@@ -136,14 +136,19 @@ export default {
   .search-result-item {
     position: relative;
     user-select: none;
-    padding: 0 10px 8px 10px;
+    margin-bottom: 10px;
+    padding: 12px;
     color: var(--sideBarColor);
     font-size: 14px;
+    border-radius: 20px;
+    border: 1px solid var(--panelSubtleBorderColor);
+    background: rgba(255, 255, 255, 0.5);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
     & > .search-result {
       display: flex;
       align-items: center;
       & > svg:first-child {
-        margin-right: 3px;
+        margin-right: 8px;
       }
       & > .file-info {
         flex: 1;
@@ -161,20 +166,22 @@ export default {
       & ul {
         padding-left: 0;
         list-style-type: none;
+        margin: 10px 0 0;
         & li {
           display: block;
-          padding: 2px 16px;
-          padding-right: 0;
+          padding: 8px 12px;
           cursor: pointer;
           /* Hide space between inline spans */
           font-size: 0;
+          border-radius: 12px;
           & .highlight {
-            background: var(--highlightColor);
+            background: var(--selectionColor);
             line-height: 16px;
             height: 16px;
             display: inline-block;
-            color: var(--sideBarTextColor);
-            border-radius: 1px;
+            color: var(--sideBarTitleColor);
+            border-radius: 6px;
+            padding: 0 2px;
           }
           &:hover {
             background: var(--sideBarItemHoverBgColor);
@@ -219,12 +226,12 @@ export default {
       font-size: 12px;
       line-height: 18px;
       text-align: center;
-      min-width: 18px;
-      height: 18px;
-      border-radius: 9px;
+      min-width: 22px;
+      height: 22px;
+      border-radius: 11px;
       flex-shrink: 0;
-      background: var(--itemBgColor);
-      color: var(--sideBarTextColor);
+      background: rgba(255, 255, 255, 0.72);
+      color: var(--panelEyebrowColor);
     }
   }
 

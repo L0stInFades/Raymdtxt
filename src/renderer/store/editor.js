@@ -352,6 +352,12 @@ const mutations = {
 }
 
 const actions = {
+  ENSURE_BLANK_TAB({ state, dispatch }) {
+    if (state.tabs.length === 0) {
+      dispatch('NEW_UNTITLED_TAB', {})
+    }
+  },
+
   FORMAT_LINK_CLICK({ commit }, { data, dirname }) {
     window.api.ipc.send('mt::format-link-click', { data, dirname })
   },
@@ -406,6 +412,8 @@ const actions = {
     if (pathname) {
       window.api.ipc.send('mt::window-tab-closed', pathname)
     }
+
+    dispatch('ENSURE_BLANK_TAB')
   },
 
   EXCHANGE_TABS_BY_ID({ commit }, tabIDs) {
@@ -535,15 +543,16 @@ const actions = {
     })
   },
 
-  LISTEN_FOR_SAVE_CLOSE({ commit }) {
+  LISTEN_FOR_SAVE_CLOSE({ commit, dispatch }) {
     window.api.ipc.on('mt::force-close-tabs-by-id', (tabIdList) => {
       if (Array.isArray(tabIdList) && tabIdList.length) {
         commit('CLOSE_TABS', tabIdList)
+        dispatch('ENSURE_BLANK_TAB')
       }
     })
   },
 
-  ASK_FOR_SAVE_ALL({ commit, state }, closeTabs) {
+  ASK_FOR_SAVE_ALL({ commit, dispatch, state }, closeTabs) {
     const { tabs } = state
     const unsavedFiles = tabs
       .filter((file) => !(file.isSaved && /[^\n]/.test(file.markdown)))
@@ -565,6 +574,7 @@ const actions = {
           'CLOSE_TABS',
           tabs.map((f) => f.id),
         )
+        dispatch('ENSURE_BLANK_TAB')
       }
     } else {
       window.api.ipc.send('mt::save-tabs', unsavedFiles)
@@ -683,6 +693,8 @@ const actions = {
           isFirst = false
           dispatch('NEW_UNTITLED_TAB', { markdown, selected: isFirst })
         }
+      } else {
+        dispatch('NEW_UNTITLED_TAB', {})
       }
     })
   },

@@ -21,6 +21,8 @@ const initializeLogger = (appEnvironment) => {
 
 // -----------------------------------------------
 
+app.setName('Vien')
+
 // NOTE: We only support Linux, macOS and Windows but not BSD nor SunOS.
 if (!/^(darwin|win32|linux)$/i.test(process.platform)) {
   process.stdout.write(

@@ -102,6 +102,9 @@ importers:
       joplin-turndown-plugin-gfm:
         specifier: ^1.0.12
         version: 1.0.12
+      jsonfile:
+        specifier: ^6.1.0
+        version: 6.2.0
       katex:
         specifier: ^0.15.3
         version: 0.15.6
@@ -132,6 +135,9 @@ importers:
       prismjs:
         specifier: ^1.27.0
         version: 1.30.0
+      safer-buffer:
+        specifier: ^2.1.2
+        version: 2.1.2
       snabbdom:
         specifier: ^3.6.3
         version: 3.6.3
@@ -147,6 +153,9 @@ importers:
       underscore:
         specifier: ^1.13.2
         version: 1.13.8
+      universalify:
+        specifier: ^2.0.1
+        version: 2.0.1
       unsplash-js:
         specifier: ^7.0.15
         version: 7.0.20

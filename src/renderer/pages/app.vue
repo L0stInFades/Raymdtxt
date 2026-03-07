@@ -14,9 +14,6 @@
         :is-saved="isSaved"
       ></title-bar>
       <div class="editor-placeholder" v-if="!init"></div>
-      <recent
-        v-if="!hasCurrentFile && init"
-      ></recent>
       <editor-with-tabs
         v-if="hasCurrentFile && init"
         :markdown="markdown"
@@ -38,7 +35,6 @@
 
 <script>
 import { addStyles, addThemeStyle } from '@/util/theme'
-import Recent from '@/components/recent'
 import EditorWithTabs from '@/components/editorWithTabs'
 import TitleBar from '@/components/titleBar'
 import SideBar from '@/components/sideBar'
@@ -59,7 +55,6 @@ import { useTweetStore } from '@/store/pinia/tweet'
 export default {
   name: 'marktext',
   components: {
-    Recent,
     EditorWithTabs,
     TitleBar,
     SideBar,
@@ -231,6 +226,7 @@ export default {
     flex: 1;
     min-height: 100vh;
     position: relative;
+    background: var(--editorBgColor);
     & > .editor {
       flex: 1;
     }

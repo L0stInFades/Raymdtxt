@@ -9,7 +9,7 @@
           <i class="el-icon-info"></i>
         </el-tooltip>
       </div>
-      <CurSelect :value="imageInsertAction" :options="imageActions"
+      <CurSelect :currentValue="imageInsertAction" :options="imageActions"
         :onChange="value => onSelectChange('imageInsertAction', value)"></CurSelect>
     </section>
     <Separator />

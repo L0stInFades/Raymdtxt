@@ -1,6 +1,12 @@
 productName: "Vien"
 appId: "com.github.l0stinfades.vien"
 copyright: "Copyright © 2026 L0stInFades"
+publish:
+- provider: "github"
+  owner: "L0stInFades"
+  repo: "vien"
+  releaseType: "release"
+  vPrefixedTagName: true
 
 asar: true
 asarUnpack:

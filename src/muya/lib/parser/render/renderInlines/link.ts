@@ -2,7 +2,7 @@ import { CLASS_OR_ID } from '../../../config'
 import { isLengthEven, snakeToCamel } from '../../../utils'
 import { sanitizeHyperlink } from '../../../utils/url'
 import type { Block, Token } from '../../types'
-import type { Cursor, StateRenderContext } from '../renderContext'
+import type { Cursor, InlineRenderMethod, StateRenderContext } from '../renderContext'
 
 // 'link': /^(\[)((?:\[[^\]]*\]|[^\[\]]|\](?=[^\[]*\]))*?)(\\*)\]\((.*?)(\\*)\)/, // can nest
 export default function link(
@@ -44,6 +44,12 @@ export default function link(
   const lastBracket = this.highlight(h, block, end - 1, end, token)
   const firstBacklashStart = start + 1 + token.anchor.length
   const secondBacklashStart = end - 1 - token.backlash.second.length
+  const renderedChildren = []
+
+  for (const child of token.children ?? []) {
+    const renderInline = this[snakeToCamel(child.type as string)] as InlineRenderMethod
+    renderedChildren.push(...renderInline(h, cursor, block, child as Token, className))
+  }
 
   if (isLengthEven(token.backlash.first) && isLengthEven(token.backlash.second)) {
     if (!token.children.length && !token.backlash.first) {
@@ -81,34 +87,23 @@ export default function link(
               raw: token.raw,
             },
           },
-          [
-            // biome-ignore lint/performance/noAccumulatingSpread: performance warning, acceptable in this context
-            ...token.children.reduce((acc: unknown[], to: Record<string, unknown>) => {
-              const chunk = (this[snakeToCamel(to.type as string)] as Function)(h, cursor, block, to, className)
-              return Array.isArray(chunk) ? [...acc, ...chunk] : [...acc, chunk]
-            }, []),
-            ...this.backlashInToken(h, token.backlash.first, className, firstBacklashStart, token),
-          ],
+          [...renderedChildren, ...this.backlashInToken(h, token.backlash.first, className, firstBacklashStart, token)],
         ),
         h(`span.${className}.${CLASS_OR_ID.AG_REMOVE}`, middleBracket),
         h(
-          `span.$linkClassName.$CLASS_OR_ID.AG_REMOVE`,
+          `span.${linkClassName}.${CLASS_OR_ID.AG_REMOVE}`,
           {
             attrs: { spellcheck: 'false' },
           },
           [...hrefContent, ...this.backlashInToken(h, token.backlash.second, className, secondBacklashStart, token)],
         ),
-        h(`span.$className.$CLASS_OR_ID.AG_REMOVE`, lastBracket),
+        h(`span.${className}.${CLASS_OR_ID.AG_REMOVE}`, lastBracket),
       ]
     }
   } else {
     return [
       ...firstBracket,
-      // biome-ignore lint/performance/noAccumulatingSpread: performance warning, acceptable in this context
-      ...token.children.reduce((acc: unknown[], to: Record<string, unknown>) => {
-        const chunk = (this[snakeToCamel(to.type as string)] as Function)(h, cursor, block, to, className)
-        return Array.isArray(chunk) ? [...acc, ...chunk] : [...acc, chunk]
-      }, []),
+      ...renderedChildren,
       ...this.backlashInToken(h, token.backlash.first, className, firstBacklashStart, token),
       ...middleHref,
       ...this.backlashInToken(h, token.backlash.second, className, secondBacklashStart, token),

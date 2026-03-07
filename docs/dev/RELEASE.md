@@ -27,10 +27,12 @@ Artifacts are written to `build/` and should include:
 - `vien-arm64-mac.zip`
 - `vien-x64.dmg`
 - `vien-x64-mac.zip`
+- `latest-mac.yml`
+- `*.blockmap`
 
 ## Publish
 
-1. Create or update the Git tag for the release version.
-2. Create a GitHub release in `L0stInFades/vien`.
-3. Upload the macOS artifacts from `build/`.
-4. Include checksums if you distribute outside GitHub releases as well.
+1. Sign and notarize the build. Auto updates require the signed macOS app, not an unsigned local package.
+2. Push a `v*` git tag or run the macOS release workflow manually.
+3. The GitHub Actions workflow publishes the `.dmg`, `.zip`, `latest-mac.yml`, and blockmaps to the GitHub release in `L0stInFades/vien`.
+4. Installed Vien apps use those GitHub release assets for automatic background updates.

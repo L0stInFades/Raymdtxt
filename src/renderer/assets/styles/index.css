@@ -1,7 +1,7 @@
 /* Common CSS use by both light and dark themes */
 :root {
   --titleBarHeight: 32px;
-  --editorAreaWidth: 750px;
+  --editorAreaWidth: 680px;
 
   /*editor*/
   /*Theme color cluster*/
@@ -18,7 +18,9 @@
   --highlightThemeColor: var(--themeColor);
 
   --highlightColor: rgba(33, 181, 111, 0.4);
-  --selectionColor: rgba(0, 0, 0, 0.1);
+  --selectionColor: rgba(162, 188, 155, 0.34);
+  --selectionOutlineColor: rgba(120, 151, 113, 0.22);
+  --selectionTextColor: rgba(41, 35, 29, 0.96);
   --editorColor: rgba(0, 0, 0, 0.7);
   --editorColor80: rgba(0, 0, 0, 0.8);
   --editorColor60: rgba(0, 0, 0, 0.6);
@@ -27,11 +29,30 @@
   --editorColor30: rgba(0, 0, 0, 0.3);
   --editorColor10: rgba(0, 0, 0, 0.1);
   --editorColor04: rgba(0, 0, 0, 0.03);
-  --editorBgColor: rgba(255, 255, 255, 1);
+  --editorBgColor: #f6f1ea;
+  --editorBodyColor: rgba(74, 61, 48, 0.84);
+  --editorBodyMutedColor: rgba(92, 77, 62, 0.6);
+  --editorHeadingColor: rgba(31, 27, 23, 0.94);
+  --editorHeadingAccent: rgba(115, 146, 111, 0.18);
+  --editorRuleColor: rgba(126, 102, 76, 0.14);
+  --editorSurfaceColor: rgba(255, 251, 245, 0.98);
+  --editorSurfaceEdge: rgba(126, 102, 76, 0.08);
+  --editorSurfaceGlow: rgba(255, 255, 255, 0.76);
+  --editorAmbientWarm: rgba(244, 168, 118, 0.22);
+  --editorAmbientCool: rgba(157, 184, 224, 0.18);
+  --editorPaperShadow:
+    0 1px 0 rgba(255, 255, 255, 0.78) inset, 0 18px 40px rgba(118, 94, 68, 0.08), 0 4px 12px rgba(118, 94, 68, 0.05);
+  --editorPaperPaddingX: 72px;
+  --editorPaperPaddingTop: 56px;
+  --editorPaperPaddingBottom: 136px;
   --deleteColor: #ff6969;
   --iconColor: #6b737b;
   --codeBgColor: #d8d8d869;
-  --codeBlockBgColor: rgba(0, 0, 0, 0.03);
+  --codeBlockBgColor: rgba(245, 239, 231, 0.96);
+  --codeInlineBgColor: rgba(132, 104, 76, 0.08);
+  --codeBlockBorderColor: rgba(132, 104, 76, 0.14);
+  --codeBlockShadow: 0 10px 24px rgba(111, 90, 65, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.62);
+  --blockquoteBgColor: rgba(255, 255, 255, 0.44);
   --footnoteBgColor: rgba(0, 0, 0, 0.03);
   --inputBgColor: rgba(0, 0, 0, 0.06);
   --focusColor: var(--themeColor);
@@ -63,13 +84,33 @@
   --tableBorderColor: #e5e5e5;
 
   /*marktext*/
-  --sideBarColor: rgba(0, 0, 0, 0.6);
+  --sideBarColor: rgba(78, 65, 51, 0.74);
   --sideBarIconColor: var(--iconColor);
-  --sideBarTitleColor: rgba(0, 0, 0, 1);
-  --sideBarTextColor: rgba(0, 0, 0, 0.4);
-  --sideBarBgColor: rgba(242, 242, 242, 0.9);
-  --sideBarItemHoverBgColor: rgba(0, 0, 0, 0.03);
-  --itemBgColor: rgba(255, 255, 255, 0.6);
+  --sideBarTitleColor: rgba(31, 27, 23, 0.94);
+  --sideBarTextColor: rgba(92, 77, 62, 0.58);
+  --sideBarBgColor: rgba(251, 246, 239, 0.82);
+  --sideBarItemHoverBgColor: rgba(255, 255, 255, 0.62);
+  --itemBgColor: rgba(255, 255, 255, 0.72);
+  --sideBarRailBgColor: rgba(248, 242, 235, 0.7);
+  --sideBarPanelBgColor: rgba(255, 250, 244, 0.72);
+  --sideBarPanelBorderColor: rgba(126, 102, 76, 0.1);
+  --sideBarPanelShadow: 0 24px 52px rgba(118, 94, 68, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.76);
+  --sideBarRowBgColor: rgba(255, 255, 255, 0.26);
+  --sideBarRowBorderColor: rgba(126, 102, 76, 0.08);
+  --sideBarRowActiveBgColor: rgba(255, 255, 255, 0.76);
+  --sideBarRowCurrentBgColor: linear-gradient(135deg, rgba(96, 182, 126, 0.12), rgba(73, 118, 206, 0.1));
+  --sideBarCurrentIndicator: rgba(96, 182, 126, 0.82);
+
+  --panelSurfaceBgColor: rgba(255, 250, 244, 0.86);
+  --panelSurfaceBorderColor: rgba(126, 102, 76, 0.1);
+  --panelSurfaceShadow: 0 28px 64px rgba(118, 94, 68, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.78);
+  --panelSubtleBgColor: rgba(255, 255, 255, 0.58);
+  --panelSubtleBorderColor: rgba(126, 102, 76, 0.08);
+  --panelEyebrowColor: rgba(103, 147, 107, 0.88);
+  --panelMutedColor: rgba(92, 77, 62, 0.62);
+  --controlBgColor: rgba(255, 255, 255, 0.78);
+  --controlBorderColor: rgba(126, 102, 76, 0.12);
+  --controlFocusShadow: 0 0 0 1px var(--themeColor30), 0 14px 28px rgba(118, 94, 68, 0.06);
 
   --floatFontColor: rgba(0, 0, 0, 0.6);
   --floatBgColor: #fff;

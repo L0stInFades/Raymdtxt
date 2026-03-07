@@ -1,4 +1,5 @@
-import fs from 'fs-extra'
+import { readlinkSync } from 'node:fs'
+import { mkdir, writeFile as writeFileFs } from 'node:fs/promises'
 import path from 'node:path'
 import { isDirectory, isFile, isSymbolicLink } from 'common/filesystem'
 
@@ -12,7 +13,7 @@ import { isDirectory, isFile, isSymbolicLink } from 'common/filesystem'
 export const normalizeAndResolvePath = (pathname) => {
   if (isSymbolicLink(pathname)) {
     const absPath = path.dirname(pathname)
-    const targetPath = path.resolve(absPath, fs.readlinkSync(pathname))
+    const targetPath = path.resolve(absPath, readlinkSync(pathname))
     if (isFile(targetPath) || isDirectory(targetPath)) {
       return path.resolve(targetPath)
     }
@@ -28,5 +29,12 @@ export const writeFile = (pathname, content, extension, options = 'utf-8') => {
   }
   pathname = !extension || pathname.endsWith(extension) ? pathname : `${pathname}${extension}`
 
-  return fs.outputFile(pathname, content, options)
+  return mkdir(path.dirname(pathname), { recursive: true }).then(() => {
+    if (Buffer.isBuffer(content) || content instanceof Uint8Array) {
+      return writeFileFs(pathname, content)
+    }
+
+    const encoding = options === 'binary' ? 'latin1' : options
+    return writeFileFs(pathname, content, encoding)
+  })
 }

@@ -558,7 +558,9 @@ export default {
         })
       }
 
-      const { container } = (this.editor = new Muya(ele, options))
+      const editor = new Muya(ele, options)
+      this.editor = editor
+      const { container } = editor
 
       // Create spell check wrapper and enable spell checking if preferred.
       this.spellchecker = new SpellChecker(spellcheckerEnabled, spellcheckerLanguage)
@@ -1079,7 +1081,7 @@ export default {
     },
 
     // listen for `open-single-file` event, it will call this method only when open a new file.
-    setMarkdownToEditor({ id, markdown, cursor }) {
+    setMarkdownToEditor({ markdown, cursor }) {
       const { editor } = this
       if (editor) {
         editor.clearHistory()
@@ -1092,7 +1094,7 @@ export default {
     },
 
     // listen for markdown change form source mode or change tabs etc
-    handleFileChange({ id, markdown, cursor, renderCursor, history }) {
+    handleFileChange({ markdown, cursor, renderCursor, history }) {
       const { editor } = this
       this.$nextTick(() => {
         if (editor) {
@@ -1175,12 +1177,50 @@ export default {
     position: relative;
     flex: 1;
     color: var(--editorColor);
+    overflow: hidden;
+    background: var(--editorBgColor);
+    isolation: isolate;
     & .ag-dialog-table {
       & .el-button {
         font-size: 13px;
         width: 70px;
       }
     }
+  }
+
+  body:not(.dark) .editor-wrapper {
+    background:
+      radial-gradient(circle at top right, var(--editorAmbientWarm), transparent 34%),
+      radial-gradient(circle at left bottom, var(--editorAmbientCool), transparent 38%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0) 34%),
+      var(--editorBgColor);
+  }
+
+  body:not(.dark) .editor-wrapper::before,
+  body:not(.dark) .editor-wrapper::after {
+    content: '';
+    position: absolute;
+    pointer-events: none;
+    z-index: 0;
+    filter: blur(18px);
+  }
+
+  body:not(.dark) .editor-wrapper::before {
+    top: -12%;
+    right: -8%;
+    width: min(38vw, 520px);
+    height: min(38vw, 520px);
+    background: radial-gradient(circle, var(--editorAmbientWarm) 0%, transparent 72%);
+    opacity: .92;
+  }
+
+  body:not(.dark) .editor-wrapper::after {
+    left: -12%;
+    bottom: -18%;
+    width: min(42vw, 560px);
+    height: min(42vw, 560px);
+    background: radial-gradient(circle, var(--editorAmbientCool) 0%, transparent 70%);
+    opacity: .84;
   }
 
   .editor-wrapper.source {
@@ -1196,11 +1236,25 @@ export default {
     overflow: auto;
     box-sizing: border-box;
     cursor: default;
+    position: relative;
+    z-index: 1;
+    padding: 28px clamp(18px, 3.5vw, 40px) 48px;
+  }
+
+  body:not(.dark) .editor-component {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0));
   }
 
   .typewriter .editor-component {
     padding-top: calc(50vh - 136px);
     padding-bottom: calc(50vh - 54px);
+  }
+
+  @media (max-width: 1100px) {
+    .editor-component {
+      padding-inline: 16px;
+      padding-bottom: 36px;
+    }
   }
 
   .image-viewer {

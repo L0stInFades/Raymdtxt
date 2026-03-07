@@ -151,7 +151,12 @@ const closeElectron = async (app) => {
   }
 
   const trackedApp = launchedApps.get(app)
-  const electronProcess = app.process()
+  let electronProcess = null
+  try {
+    electronProcess = typeof app.process === 'function' ? app.process() : null
+  } catch (_error) {
+    electronProcess = null
+  }
   const waitForExit = electronProcess
     ? new Promise((resolve) => {
         if (electronProcess.exitCode !== null || electronProcess.signalCode !== null) {

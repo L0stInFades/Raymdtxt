@@ -8,12 +8,12 @@
       <template #children>
         <bool
           description="Automatically save document changes"
-          :bool="autoSave"
+          :isOn="autoSave"
           :onChange="value => onSelectChange('autoSave', value)"
         ></bool>
         <range
           description="Delay following document edit before automatically saving"
-          :value="autoSaveDelay"
+          :currentValue="autoSaveDelay"
           :min="1000"
           :max="10000"
           unit="ms"
@@ -32,28 +32,28 @@
           v-if="!isOsx"
           description="Title bar style"
           notes="Requires restart."
-          :value="titleBarStyle"
+          :currentValue="titleBarStyle"
           :options="titleBarStyleOptions"
           :onChange="value => onSelectChange('titleBarStyle', value)"
         ></cur-select>
         <bool
           description="Hide scrollbars"
-          :bool="hideScrollbar"
+          :isOn="hideScrollbar"
           :onChange="value => onSelectChange('hideScrollbar', value)"
         ></bool>
         <bool
           description="Open files in new window"
-          :bool="openFilesInNewWindow"
+          :isOn="openFilesInNewWindow"
           :onChange="value => onSelectChange('openFilesInNewWindow', value)"
         ></bool>
         <bool
           description="Open folders in new window"
-          :bool="openFolderInNewWindow"
+          :isOn="openFolderInNewWindow"
           :onChange="value => onSelectChange('openFolderInNewWindow', value)"
         ></bool>
         <cur-select
           description="Zoom"
-          :value="zoom"
+          :currentValue="zoom"
           :options="zoomOptions"
           :onChange="value => onSelectChange('zoom', value)"
         ></cur-select>
@@ -67,14 +67,14 @@
       <template #children>
         <bool
           description="Wrap text in table of contents"
-          :bool="wordWrapInToc"
+          :isOn="wordWrapInToc"
           :onChange="value => onSelectChange('wordWrapInToc', value)"
         ></bool>
 
         <!-- TODO: The description is very bad and the entry isn't used by the editor. -->
         <cur-select
           description="Sort field for files in open folders"
-          :value="fileSortBy"
+          :currentValue="fileSortBy"
           :options="fileSortByOptions"
           :onChange="value => onSelectChange('fileSortBy', value)"
           :disable="true"
@@ -108,7 +108,7 @@
       <template #children>
         <cur-select
           description="User interface language"
-          :value="language"
+          :currentValue="language"
           :options="languageOptions"
           :onChange="value => onSelectChange('language', value)"
           :disable="true"

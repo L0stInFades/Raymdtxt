@@ -8,7 +8,7 @@ const mutations = {}
 
 // mt::UPDATE_DOWNLOADED
 const actions = {
-  LISTEN_FOR_UPDATE({ commit }) {
+  LISTEN_FOR_UPDATE() {
     window.api.ipc.on('mt::UPDATE_ERROR', (message) => {
       notice.notify({
         title: 'Update',
@@ -19,34 +19,30 @@ const actions = {
     })
     window.api.ipc.on('mt::UPDATE_NOT_AVAILABLE', (message) => {
       notice.notify({
-        title: 'Update not Available',
+        title: 'Up To Date',
         type: 'primary',
         message,
       })
     })
     window.api.ipc.on('mt::UPDATE_DOWNLOADED', (message) => {
-      notice.notify({
-        title: 'Update Downloaded',
-        type: 'info',
-        message,
-      })
-    })
-    window.api.ipc.on('mt::UPDATE_AVAILABLE', (message) => {
       notice
         .notify({
-          title: 'Update Available',
+          title: 'Update Ready',
           type: 'primary',
           message,
           showConfirm: true,
         })
         .then(() => {
-          const needUpdate = true
-          window.api.ipc.send('mt::NEED_UPDATE', { needUpdate })
+          window.api.ipc.send('mt::INSTALL_UPDATE_NOW')
         })
-        .catch(() => {
-          const needUpdate = false
-          window.api.ipc.send('mt::NEED_UPDATE', { needUpdate })
-        })
+        .catch(() => {})
+    })
+    window.api.ipc.on('mt::UPDATE_AVAILABLE', (message) => {
+      notice.notify({
+        title: 'Update Available',
+        type: 'info',
+        message,
+      })
     })
   },
 }

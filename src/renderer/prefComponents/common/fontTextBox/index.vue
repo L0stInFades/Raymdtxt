@@ -47,15 +47,15 @@
 
 export default {
   data() {
-    this.defaultValue = this.value
+    this.defaultValue = this.selectedFont
     return {
       fontFamilies: [],
-      selectValue: this.value,
+      selectValue: this.selectedFont,
     }
   },
   props: {
     description: String,
-    value: String,
+    selectedFont: String,
     onChange: Function,
     more: String,
     disable: {
@@ -69,7 +69,7 @@ export default {
   },
 
   watch: {
-    value: function (value, oldValue) {
+    selectedFont: function (value, oldValue) {
       if (value !== oldValue) {
         this.defaultValue = value
         this.selectValue = value
@@ -140,29 +140,37 @@ export default {
 }
 
 .pref-font-input-item {
-  margin: 20px 0;
+  margin: 18px 0;
+  padding: 14px 16px;
   font-size: 14px;
   color: var(--editorColor);
+  border-radius: 18px;
+  border: 1px solid var(--panelSubtleBorderColor);
+  background: rgba(255, 255, 255, 0.52);
   & .font-autocomplete {
     width: 100%;
   }
   & input.el-input__inner {
-    height: 30px;
-    background: transparent;
+    height: 42px;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(255, 255, 255, 0.66)),
+      var(--controlBgColor);
     color: var(--editorColor);
-    border-color: var(--editorColor10);
+    border-color: var(--controlBorderColor);
+    border-radius: 14px;
   }
   & .el-input.is-active .el-input__inner,
   & .el-input__inner:focus {
     border-color: var(--themeColor);
+    box-shadow: var(--controlFocusShadow);
   }
   & .el-input__icon,
   & .el-input__inner {
-    line-height: 30px;
+    line-height: 42px;
   }
 }
 .pref-font-input-item .description {
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   & i {
     cursor: pointer;
     opacity: 0.7;

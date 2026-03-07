@@ -8,7 +8,7 @@
         it.</span>
     </section>
     <section class="configration">
-      <cur-select :value="currentUploader" :options="uploaderOptions"
+      <cur-select :currentValue="currentUploader" :options="uploaderOptions"
         :onChange="value => setCurrentUploader(value)"></cur-select>
       <div class="picgo" v-if="currentUploader === 'picgo'">
         <div v-if="!picgoExists" class="warning">

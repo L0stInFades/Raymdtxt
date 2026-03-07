@@ -21,12 +21,12 @@
 export default {
   data() {
     return {
-      selectValue: this.value,
+      selectValue: this.currentValue,
     }
   },
   props: {
     description: String,
-    value: String | Number,
+    currentValue: String | Number,
     min: Number,
     max: Number,
     onChange: Function,
@@ -39,7 +39,7 @@ export default {
     },
   },
   watch: {
-    value: function (value, oldValue) {
+    currentValue: function (value, oldValue) {
       if (value !== oldValue) {
         this.selectValue = value
       }
@@ -60,30 +60,46 @@ export default {
 
 <style>
 .pref-range-item {
-  margin: 20px 0;
+  margin: 18px 0;
   font-size: 14px;
   color: var(--editorColor);
   width: 100%;
+  padding: 14px 16px;
+  box-sizing: border-box;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.52);
+  border: 1px solid var(--panelSubtleBorderColor);
   & .value {
     text-align: right;
-    font-style: italic;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--panelEyebrowColor);
     float: right
+  }
+  & .description {
+    margin-bottom: 12px;
   }
   & .el-slider {
     width: 100%;
   }
   & .el-slider__runway,
   & .el-slider__bar {
-    height: 4px;
+    height: 6px;
+    border-radius: 999px;
+  }
+  & .el-slider__runway {
+    background: rgba(126, 102, 76, 0.1);
   }
   & .el-slider__button {
-    width: 12px;
-    height: 12px;
+    width: 14px;
+    height: 14px;
+    background: #fff;
+    box-shadow: 0 4px 10px rgba(118, 94, 68, 0.12);
   }
   & .el-slider__button-wrapper {
-    width: 20px;
-    height: 20px;
-    top: -9px;
+    width: 24px;
+    height: 24px;
+    top: -10px;
   }
 }
 .pref-select-item .description {

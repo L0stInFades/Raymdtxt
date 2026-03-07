@@ -6,10 +6,10 @@ import log from 'electron-log'
 import { app, BrowserWindow, clipboard, dialog, ipcMain, nativeImage, nativeTheme, shell } from 'electron'
 import { isChildOfDirectory } from 'common/filesystem/paths'
 import { isLinux, isOsx, isWindows } from '../config'
-import parseArgs from '../cli/parser'
 import { normalizeAndResolvePath } from '../filesystem'
 import { normalizeMarkdownPath } from '../filesystem/markdown'
 import { registerKeyboardListeners } from '../keyboard'
+import { setUpdateWindow, startAutoUpdateChecks } from '../menu/actions/marktext'
 import { selectTheme } from '../menu/actions/theme'
 import { dockMenu } from '../menu/templates'
 import registerSpellcheckerListeners from '../spellchecker'
@@ -17,6 +17,8 @@ import { watchers } from '../utils/imagePathAutoComplement'
 import { WindowType } from '../windows/base'
 import EditorWindow from '../windows/editor'
 import SettingWindow from '../windows/setting'
+import { parseSecondInstanceArgv } from './parseSecondInstanceArgv'
+import { revealOrCreateWindow } from './revealOrCreateWindow'
 
 class App {
   /**
@@ -29,6 +31,10 @@ class App {
     this._openFilesCache = []
     this._openFilesTimer = null
     this._windowManager = this._accessor.windowManager
+    this._windowManager.on('activeWindowChanged', () => {
+      const activeEditor = this._windowManager.getActiveEditor()
+      setUpdateWindow(activeEditor?.browserWindow ?? null)
+    })
     // this.launchScreenshotWin = null // The window which call the screenshot.
     // this.shortcutCapture = null
 
@@ -45,23 +51,18 @@ class App {
     }
 
     app.on('second-instance', (_event, argv, workingDirectory) => {
-      const { _openFilesCache, _windowManager } = this
-      const args = parseArgs(argv.slice(1))
+      const { _openFilesCache } = this
+      const { openInNewWindow, pathnames } = parseSecondInstanceArgv(argv)
 
       const buf = []
-      for (const pathname of args._) {
-        // Ignore all unknown flags
-        if (pathname.startsWith('--')) {
-          continue
-        }
-
+      for (const pathname of pathnames) {
         const info = normalizeMarkdownPath(path.resolve(workingDirectory, pathname))
         if (info) {
           buf.push(info)
         }
       }
 
-      if (args['--new-window']) {
+      if (openInNewWindow) {
         this._openPathList(buf, true)
         return
       }
@@ -70,10 +71,7 @@ class App {
       if (_openFilesCache.length) {
         this._openFilesToOpen()
       } else {
-        const activeWindow = _windowManager.getActiveWindow()
-        if (activeWindow) {
-          activeWindow.bringToFront()
-        }
+        this._revealOrCreateWindow()
       }
     })
 
@@ -94,11 +92,9 @@ class App {
 
     app.on('activate', () => {
       // macOS only
-      // On OS X it's common to re-create a window in the app when the
-      // dock icon is clicked and there are no other windows open.
-      if (this._windowManager.windowCount === 0) {
-        this.ready()
-      }
+      // On macOS re-activating the app should always reveal an existing window
+      // or create a fresh editor window if the process is still alive without one.
+      this._revealOrCreateWindow()
     })
 
     // Prevent to load webview and opening links or new windows via HTML/JS.
@@ -174,9 +170,12 @@ class App {
 
     if (isOsx) {
       app.dock.setMenu(dockMenu)
-      const dockIcon = nativeImage.createFromPath(path.join(__static, 'logo-96px.png'))
-      if (!dockIcon.isEmpty()) {
-        app.dock.setIcon(dockIcon)
+      for (const iconName of ['dock-icon.png', 'logo-96px.png']) {
+        const dockIcon = nativeImage.createFromPath(path.join(__static, iconName))
+        if (!dockIcon.isEmpty()) {
+          app.dock.setIcon(dockIcon)
+          break
+        }
       }
     } else if (isWindows) {
       app.setJumpList([
@@ -204,6 +203,11 @@ class App {
       this._openFilesToOpen()
     } else {
       this._createEditorWindow()
+    }
+
+    const activeEditor = this._windowManager.getActiveEditor()
+    if (activeEditor?.browserWindow) {
+      startAutoUpdateChecks(activeEditor.browserWindow)
     }
 
     // this.shortcutCapture = new ShortcutCapture()
@@ -279,6 +283,10 @@ class App {
     if (this._windowManager.windowCount === 1) {
       this._accessor.menu.setActiveWindow(setting.id)
     }
+  }
+
+  _revealOrCreateWindow() {
+    return revealOrCreateWindow(this._windowManager, () => this._createEditorWindow())
   }
 
   _openFilesToOpen() {

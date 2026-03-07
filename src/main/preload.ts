@@ -59,6 +59,7 @@ const ALLOWED_SEND_CHANNELS = [
   'mt::make-screenshot',
   'mt::check-for-update',
   'mt::NEED_UPDATE',
+  'mt::INSTALL_UPDATE_NOW',
   // Keybindings
   'mt::keybinding-debug-dump-keyboard-info',
   'mt::open-keybindings-config',

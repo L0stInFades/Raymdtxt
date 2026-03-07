@@ -17,7 +17,7 @@
           <div v-if="!isPrintable">
             <text-box
               description="The page title:"
-              :input="htmlTitle"
+              :textValue="htmlTitle"
               :emitTime="0"
               :onChange="value => onSelectChange('htmlTitle', value)"
             ></text-box>
@@ -29,7 +29,7 @@
               <cur-select
                 class="page-size-select"
                 description="Page size:"
-                :value="pageSize"
+                :currentValue="pageSize"
                 :options="pageSizeList"
                 :onChange="value => onSelectChange('pageSize', value)"
               ></cur-select>
@@ -41,7 +41,7 @@
 
               <bool
                 description="Landscape orientation:"
-                :bool="isLandscape"
+                :isOn="isLandscape"
                 :onChange="value => onSelectChange('isLandscape', value)"
               ></bool>
             </div>
@@ -64,18 +64,18 @@
         <el-tab-pane label="Style" name="style">
           <bool
             description="Overwrite theme font settings:"
-            :bool="fontSettingsOverwrite"
+            :isOn="fontSettingsOverwrite"
             :onChange="value => onSelectChange('fontSettingsOverwrite', value)"
           ></bool>
           <div v-if="fontSettingsOverwrite">
             <font-text-box
               description="Font family:"
-              :value="fontFamily"
+              :selectedFont="fontFamily"
               :onChange="value => onSelectChange('fontFamily', value)"
             ></font-text-box>
             <range
               description="Font size"
-              :value="fontSize"
+              :currentValue="fontSize"
               :min="8"
               :max="32"
               unit="px"
@@ -84,7 +84,7 @@
             ></range>
             <range
               description="Line height"
-              :value="lineHeight"
+              :currentValue="lineHeight"
               :min="1.0"
               :max="2.0"
               :step="0.1"
@@ -93,12 +93,12 @@
           </div>
           <bool
             description="Auto numbering headings:"
-            :bool="autoNumberingHeadings"
+            :isOn="autoNumberingHeadings"
             :onChange="value => onSelectChange('autoNumberingHeadings', value)"
           ></bool>
           <bool
             description="Show front matter:"
-            :bool="showFrontMatter"
+            :isOn="showFrontMatter"
             :onChange="value => onSelectChange('showFrontMatter', value)"
           ></bool>
         </el-tab-pane>
@@ -107,7 +107,7 @@
           <cur-select
             description="Theme:"
             more="https://github.com/L0stInFades/vien/blob/develop/docs/EXPORT_THEMES.md"
-            :value="theme"
+            :currentValue="theme"
             :options="themeList"
             :onChange="value => onSelectChange('theme', value)"
           ></cur-select>
@@ -116,75 +116,75 @@
           <div class="text">Headers and footers repeat across every page once they are defined.</div>
           <cur-select
             description="Header type:"
-            :value="headerType"
+            :currentValue="headerType"
             :options="headerFooterTypes"
             :onChange="value => onSelectChange('headerType', value)"
           ></cur-select>
           <text-box
             v-if="headerType === 2"
             description="The left header text:"
-            :input="headerTextLeft"
+            :textValue="headerTextLeft"
             :emitTime="0"
             :onChange="value => onSelectChange('headerTextLeft', value)"
           ></text-box>
           <text-box
             v-if="headerType !== 0"
             description="The main header text:"
-            :input="headerTextCenter"
+            :textValue="headerTextCenter"
             :emitTime="0"
             :onChange="value => onSelectChange('headerTextCenter', value)"
           ></text-box>
           <text-box
             v-if="headerType === 2"
             description="The right header text:"
-            :input="headerTextRight"
+            :textValue="headerTextRight"
             :emitTime="0"
             :onChange="value => onSelectChange('headerTextRight', value)"
           ></text-box>
 
           <cur-select
             description="Footer type:"
-            :value="footerType"
+            :currentValue="footerType"
             :options="headerFooterTypes"
             :onChange="value => onSelectChange('footerType', value)"
           ></cur-select>
           <text-box
             v-if="footerType === 2"
             description="The left footer text:"
-            :input="footerTextLeft"
+            :textValue="footerTextLeft"
             :emitTime="0"
             :onChange="value => onSelectChange('footerTextLeft', value)"
           ></text-box>
           <text-box
             v-if="footerType !== 0"
             description="The main footer text:"
-            :input="footerTextCenter"
+            :textValue="footerTextCenter"
             :emitTime="0"
             :onChange="value => onSelectChange('footerTextCenter', value)"
           ></text-box>
           <text-box
             v-if="footerType === 2"
             description="The right footer text:"
-            :input="footerTextRight"
+            :textValue="footerTextRight"
             :emitTime="0"
             :onChange="value => onSelectChange('footerTextRight', value)"
           ></text-box>
 
           <bool
             description="Customize style:"
-            :bool="headerFooterCustomize"
+            :isOn="headerFooterCustomize"
             :onChange="value => onSelectChange('headerFooterCustomize', value)"
           ></bool>
 
           <div v-if="headerFooterCustomize">
             <bool
               description="Allow styled header and footer:"
-              :bool="headerFooterStyled"
+              :isOn="headerFooterStyled"
               :onChange="value => onSelectChange('headerFooterStyled', value)"
             ></bool>
             <range
               description="Header and footer font size"
-              :value="headerFooterFontSize"
+              :currentValue="headerFooterFontSize"
               :min="8"
               :max="20"
               unit="px"
@@ -198,12 +198,12 @@
           <bool
             description="Include top heading:"
             detailedDescription="Includes the first heading level too."
-            :bool="tocIncludeTopHeading"
+            :isOn="tocIncludeTopHeading"
             :onChange="value => onSelectChange('tocIncludeTopHeading', value)"
           ></bool>
           <text-box
             description="Title:"
-            :input="tocTitle"
+            :textValue="tocTitle"
             :emitTime="0"
             :onChange="value => onSelectChange('tocTitle', value)"
           ></text-box>

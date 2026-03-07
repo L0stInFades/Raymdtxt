@@ -8,7 +8,7 @@
       <template #children>
         <range
           description="Font size"
-          :value="fontSize"
+          :currentValue="fontSize"
           :min="12"
           :max="32"
           unit="px"
@@ -17,7 +17,7 @@
         ></range>
         <range
           description="Line height"
-          :value="lineHeight"
+          :currentValue="lineHeight"
           :min="1.2"
           :max="2.0"
           :step="0.1"
@@ -25,13 +25,13 @@
         ></range>
         <font-text-box
           description="Font family"
-          :value="editorFontFamily"
+          :selectedFont="editorFontFamily"
           :onChange="value => onSelectChange('editorFontFamily', value)"
         ></font-text-box>
         <text-box
           description="Maximum width of text editor"
           notes="Leave empty for theme default, otherwise use number with unit suffix, which is one of 'ch' for characters, 'px' for pixels, or '%' for percentage."
-          :input="editorLineWidth"
+          :textValue="editorLineWidth"
           :regexValidator="/^(?:$|[0-9]+(?:ch|px|%)$)/"
           :onChange="value => onSelectChange('editorLineWidth', value)"
         ></text-box>
@@ -45,7 +45,7 @@
       <template #children>
         <range
           description="Font size"
-          :value="codeFontSize"
+          :currentValue="codeFontSize"
           :min="12"
           :max="28"
           unit="px"
@@ -55,19 +55,19 @@
         <font-text-box
           description="Font family"
           :onlyMonospace="true"
-          :value="codeFontFamily"
+          :selectedFont="codeFontFamily"
           :onChange="value => onSelectChange('codeFontFamily', value)"
         ></font-text-box>
         <!-- FIXME: Disabled due to #1648. -->
         <bool
           v-show="false"
           description="Show line numbers"
-          :bool="codeBlockLineNumbers"
+          :isOn="codeBlockLineNumbers"
           :onChange="value => onSelectChange('codeBlockLineNumbers', value)"
         ></bool>
         <bool
           description="Remove leading and trailing empty lines"
-          :bool="trimUnnecessaryCodeBlockEmptyLines"
+          :isOn="trimUnnecessaryCodeBlockEmptyLines"
           :onChange="value => onSelectChange('trimUnnecessaryCodeBlockEmptyLines', value)"
         ></bool>
       </template>
@@ -80,17 +80,17 @@
       <template #children>
         <bool
           description="Automatically close brackets when writing"
-          :bool="autoPairBracket"
+          :isOn="autoPairBracket"
           :onChange="value => onSelectChange('autoPairBracket', value)"
         ></bool>
         <bool
           description="Automatically complete markdown syntax"
-          :bool="autoPairMarkdownSyntax"
+          :isOn="autoPairMarkdownSyntax"
           :onChange="value => onSelectChange('autoPairMarkdownSyntax', value)"
         ></bool>
         <bool
           description="Automatically close quotation marks"
-          :bool="autoPairQuote"
+          :isOn="autoPairQuote"
           :onChange="value => onSelectChange('autoPairQuote', value)"
         ></bool>
       </template>
@@ -103,30 +103,30 @@
       <template #children>
         <cur-select
           description="Preferred tab width"
-          :value="tabSize"
+          :currentValue="tabSize"
           :options="tabSizeOptions"
           :onChange="value => onSelectChange('tabSize', value)"
         ></cur-select>
         <cur-select
           description="Line separator type"
-          :value="endOfLine"
+          :currentValue="endOfLine"
           :options="endOfLineOptions"
           :onChange="value => onSelectChange('endOfLine', value)"
         ></cur-select>
         <cur-select
           description="Default encoding"
-          :value="defaultEncoding"
+          :currentValue="defaultEncoding"
           :options="defaultEncodingOptions"
           :onChange="value => onSelectChange('defaultEncoding', value)"
         ></cur-select>
         <bool
           description="Automatically detect file encoding"
-          :bool="autoGuessEncoding"
+          :isOn="autoGuessEncoding"
           :onChange="value => onSelectChange('autoGuessEncoding', value)"
         ></bool>
         <cur-select
           description="Handling of trailing newline characters"
-          :value="trimTrailingNewline"
+          :currentValue="trimTrailingNewline"
           :options="trimTrailingNewlineOptions"
           :onChange="value => onSelectChange('trimTrailingNewline', value)"
         ></cur-select>
@@ -140,23 +140,23 @@
       <template #children>
         <cur-select
           description="Text direction"
-          :value="textDirection"
+          :currentValue="textDirection"
           :options="textDirectionOptions"
           :onChange="value => onSelectChange('textDirection', value)"
         ></cur-select>
         <bool
           description="Hide hint for selecting type of new paragraph"
-          :bool="hideQuickInsertHint"
+          :isOn="hideQuickInsertHint"
           :onChange="value => onSelectChange('hideQuickInsertHint', value)"
         ></bool>
         <bool
           description="Hide popup when cursor is over link"
-          :bool="hideLinkPopup"
+          :isOn="hideLinkPopup"
           :onChange="value => onSelectChange('hideLinkPopup', value)"
         ></bool>
         <bool
           description="Whether to automatically check any related tasks"
-          :bool="autoCheck"
+          :isOn="autoCheck"
           :onChange="value => onSelectChange('autoCheck', value)"
         ></bool>
       </template>

@@ -12,7 +12,7 @@
     <separator></separator>
     <cur-select
       description="Automatically adjust application theme according to system settings"
-      :value="autoSwitchTheme"
+      :currentValue="autoSwitchTheme"
       :options="autoSwitchThemeOptions"
       :onChange="value => onSelectChange('autoSwitchTheme', value)"
     ></cur-select>
@@ -81,20 +81,25 @@ export default {
 <style>
   .offcial-themes {
     margin-top: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
     & .theme {
       cursor: pointer;
       width: 248px;
-      height: 100px;
-      margin: 0px 20px 10px 20px;
+      height: 112px;
+      margin: 0;
       padding-left: 30px;
       padding-top: 20px;
       overflow: hidden;
       display: inline-block;
-      background: var(--editorBgColor);
+      background: rgba(255, 255, 255, 0.68);
       color: var(--editorColor);
       box-sizing: border-box;
-      box-shadow: 0 9px 28px -9px rgba(0, 0, 0, .4);
-      border-radius: 5px;
+      border: 1px solid var(--panelSubtleBorderColor);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.76), 0 10px 24px rgba(118, 94, 68, 0.06);
+      border-radius: 20px;
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
       &.dark {
         color: rgba(255, 255, 255, .7);
         background: #282828;
@@ -137,9 +142,14 @@ export default {
           color: rgb(12, 139, 186);
         }
       }
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.76), 0 18px 32px rgba(118, 94, 68, 0.08);
+      }
     }
     & .theme.active {
-      box-shadow: var(--floatShadow);
+      border-color: var(--themeColor20);
+      box-shadow: 0 18px 34px rgba(118, 94, 68, 0.1), inset 0 0 0 1px var(--themeColor20);
     }
     & h3 {
       margin: 0;

@@ -1,8 +1,9 @@
 const fs = require('node:fs')
 const os = require('node:os')
 const path = require('node:path')
+const { spawn } = require('node:child_process')
 const { expect, test } = require('@playwright/test')
-const { closeElectron, launchElectron } = require('./helpers')
+const { closeElectron, getElectronPath, launchElectron } = require('./helpers')
 
 const createTempDir = () => fs.mkdtempSync(path.join(os.tmpdir(), 'vien-feature-'))
 
@@ -12,6 +13,47 @@ const writeFile = (pathname, content) => {
 }
 
 test.describe('Feature regressions', () => {
+  test('the app opens directly into a blank page and identifies itself as Vien', async () => {
+    const userDataDir = createTempDir()
+    const { app, page } = await launchElectron({ userDataDir })
+
+    try {
+      await expect(page.locator('.editor-tabs li.active')).toContainText('Untitled-1')
+      await expect(page.locator('#ag-editor-id')).toBeVisible()
+
+      await app.evaluate(({ BrowserWindow }) => {
+        BrowserWindow.getAllWindows()[0].setSize(1240, 860)
+      })
+
+      await page.waitForTimeout(200)
+
+      const metrics = await page.evaluate(() => {
+        const root = document.querySelector('.editor-with-tabs')
+        const editor = document.querySelector('#ag-editor-id')
+        const rootRect = root.getBoundingClientRect()
+        const editorRect = editor.getBoundingClientRect()
+
+        return {
+          clientWidth: root.clientWidth,
+          scrollWidth: root.scrollWidth,
+          editorWithinViewport: editorRect.right <= rootRect.right + 1,
+          editorHasHeight: editorRect.height > 400,
+        }
+      })
+
+      expect(metrics.scrollWidth).toBeLessThanOrEqual(metrics.clientWidth + 1)
+      expect(metrics.editorWithinViewport).toBe(true)
+      expect(metrics.editorHasHeight).toBe(true)
+      await expect
+        .poll(async () => {
+          return app.evaluate(({ app: electronApp }) => electronApp.getName())
+        })
+        .toBe('Vien')
+    } finally {
+      await closeElectron(app)
+    }
+  })
+
   test('recent documents, about dialog, and settings persistence stay wired together', async () => {
     const userDataDir = createTempDir()
     const workspaceDir = createTempDir()
@@ -28,18 +70,26 @@ test.describe('Feature regressions', () => {
 
     try {
       await expect(page.locator('.editor-tabs li.active')).toContainText('Untitled-1')
-      await page.evaluate(() => {
-        window.api.localEmit('mt::editor-close-tab')
-      })
-      await expect(page.getByTestId('recent-view')).toBeVisible()
-      await expect(page.getByTestId('recent-item')).toHaveCount(2)
-      await expect(page.getByTestId('recent-item').nth(0)).toContainText('recent-note.md')
-      await expect(page.getByTestId('recent-item').nth(1)).toContainText('drafts')
+      await expect
+        .poll(() => page.evaluate(() => window.api.ipc.invoke('mt::get-recently-used-documents')))
+        .toEqual([
+          {
+            kind: 'file',
+            name: 'recent-note.md',
+            parentPath: workspaceDir,
+            pathname: recentFile,
+          },
+          {
+            kind: 'folder',
+            name: 'drafts',
+            parentPath: workspaceDir,
+            pathname: recentFolder,
+          },
+        ])
 
-      await page.getByTestId('recent-clear').click()
-      await expect(
-        page.getByText('No recent writing spaces yet. Open a markdown file or folder and Vien will keep it close.'),
-      ).toBeVisible()
+      await page.evaluate(() => {
+        window.api.ipc.send('mt::clear-recently-used-documents')
+      })
       await expect.poll(() => JSON.parse(fs.readFileSync(recentsPath, 'utf8'))).toEqual([])
 
       await app.evaluate(({ BrowserWindow }) => {
@@ -184,8 +234,7 @@ test.describe('Feature regressions', () => {
 
       await page.evaluate((defaultPath) => {
         const activeTab = document.querySelector('.editor-tabs li.active')
-        const filename =
-          activeTab?.querySelector('span')?.textContent?.trim() || 'Untitled-1'
+        const filename = activeTab?.querySelector('span')?.textContent?.trim() || 'Untitled-1'
         const id = activeTab?.getAttribute('data-id')
 
         if (!id) {
@@ -230,7 +279,7 @@ test.describe('Feature regressions', () => {
         window.api.localEmit('mt::editor-close-tab')
       })
 
-      await expect(page.getByTestId('recent-view')).toBeVisible()
+      await expect(page.locator('.editor-tabs li.active')).toContainText('Untitled-1')
       await expect
         .poll(async () => {
           return app.evaluate(({ BrowserWindow }) => {
@@ -246,6 +295,43 @@ test.describe('Feature regressions', () => {
           representedFilename: '',
         })
     } finally {
+      await closeElectron(app)
+    }
+  })
+
+  test('reopens a window when a second launch targets a running instance without windows', async () => {
+    const userDataDir = createTempDir()
+    const { app, page } = await launchElectron({ userDataDir })
+    let secondProcess = null
+
+    try {
+      await page.waitForLoadState('domcontentloaded')
+
+      await app.evaluate(({ BrowserWindow }) => {
+        const [window] = BrowserWindow.getAllWindows()
+        window.destroy()
+      })
+
+      await expect
+        .poll(async () => {
+          return app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().length)
+        })
+        .toBe(0)
+
+      secondProcess = spawn(getElectronPath(), ['dist/electron/main.js', '--user-data-dir', userDataDir], {
+        cwd: process.cwd(),
+        stdio: 'ignore',
+      })
+
+      await expect
+        .poll(async () => {
+          return app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().length)
+        })
+        .toBe(1)
+    } finally {
+      if (secondProcess && !secondProcess.killed) {
+        secondProcess.kill('SIGKILL')
+      }
       await closeElectron(app)
     }
   })

@@ -100,11 +100,21 @@ export default {
     align-items: center;
     cursor: default;
     user-select: none;
-    height: 30px;
+    min-height: 34px;
     box-sizing: border-box;
-    padding-right: 15px;
+    margin: 1px 0;
+    padding-right: 12px;
+    border-radius: 14px;
+    border: 1px solid transparent;
+    background: var(--sideBarRowBgColor);
+    transition:
+      background-color .18s ease,
+      border-color .18s ease,
+      transform .18s ease;
     &:hover {
       background: var(--sideBarItemHoverBgColor);
+      border-color: var(--sideBarRowBorderColor);
+      transform: translateX(1px);
     }
     & > span {
       overflow: hidden;
@@ -115,33 +125,44 @@ export default {
       content: '';
       position: absolute;
       display: block;
-      left: 0;
-      background: var(--themeColor);
-      width: 2px;
+      left: 6px;
+      background: var(--sideBarCurrentIndicator);
+      width: 4px;
       height: 0;
       top: 50%;
       transform: translateY(-50%);
+      border-radius: 999px;
       transition: all .2s ease;
     }
   }
   .side-bar-file.current::before {
-    height: 100%;
+    height: 18px;
   }
   .side-bar-file.current > span {
-    color: var(--themeColor);
+    color: var(--sideBarTitleColor);
+  }
+  .side-bar-file.current {
+    background: var(--sideBarRowCurrentBgColor);
+    border-color: var(--themeColor20);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.62);
   }
   .side-bar-file.active > span {
     color: var(--sideBarTitleColor);
   }
+  .side-bar-file.active {
+    background: var(--sideBarRowActiveBgColor);
+    border-color: var(--sideBarRowBorderColor);
+  }
   input.rename {
-    height: 22px;
+    height: 34px;
     outline: none;
-    margin: 5px 0;
-    padding: 0 8px;
+    margin: 4px 0;
+    padding: 0 12px;
     color: var(--sideBarColor);
-    border: 1px solid var(--floatBorderColor);
-    background: var(--floatBorderColor);
+    border: 1px solid var(--controlBorderColor);
+    background: var(--controlBgColor);
     width: 100%;
-    border-radius: 3px;
+    border-radius: 14px;
+    box-sizing: border-box;
   }
 </style>

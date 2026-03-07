@@ -4,7 +4,7 @@
       <div class="hero-orb hero-orb-warm"></div>
       <div class="hero-orb hero-orb-cool"></div>
       <div class="hero-inner">
-        <div>
+        <div class="hero-copy-column">
           <div class="brand-lockup">
             <img class="brand-logo" :src="logo" alt="Vien logo" />
             <div>
@@ -17,46 +17,50 @@
             Open a folder, return to a recent draft, or begin with a blank page.
             Vien keeps the room quiet so the writing can stay in front.
           </p>
+        </div>
 
-          <div class="action-grid">
-            <button class="action-card action-card-primary" @click="newFile">
+        <div class="hero-support-column">
+          <div class="primary-actions">
+            <button class="action-card action-card-primary" data-testid="welcome-new-draft" @click="newFile">
               <span class="action-kicker">Blank page</span>
               <span class="action-title">New Draft</span>
               <span class="action-meta">{{ newShortcut }}</span>
             </button>
-            <button class="action-card" @click="openFile">
+            <button class="action-card" data-testid="welcome-open-file" @click="openFile">
               <span class="action-kicker">From disk</span>
               <span class="action-title">Open File</span>
               <span class="action-meta">{{ openShortcut }}</span>
             </button>
-            <button class="action-card" @click="openFolder">
-              <span class="action-kicker">Writing room</span>
-              <span class="action-title">Open Folder</span>
-              <span class="action-meta">{{ openFolderShortcut }}</span>
+          </div>
+
+          <div class="secondary-actions">
+            <button class="secondary-action" data-testid="welcome-open-folder" @click="openFolder">
+              <span>Open Folder</span>
+              <span>{{ openFolderShortcut }}</span>
             </button>
-            <button class="action-card" @click="showCommandPalette">
-              <span class="action-kicker">Every command</span>
-              <span class="action-title">Command Palette</span>
-              <span class="action-meta">{{ commandPaletteShortcut }}</span>
+            <button class="secondary-action" data-testid="welcome-command-palette" @click="showCommandPalette">
+              <span>Command Palette</span>
+              <span>{{ commandPaletteShortcut }}</span>
+            </button>
+            <button class="secondary-action" data-testid="welcome-open-settings" @click="openSettings">
+              <span>Settings</span>
+              <span>{{ settingsShortcut }}</span>
             </button>
           </div>
-        </div>
 
-        <div class="feature-pills">
-          <span class="feature-pill">Focus</span>
-          <span class="feature-pill">Typewriter</span>
-          <span class="feature-pill">Source Mode</span>
-          <span class="feature-pill">Export</span>
+          <p class="hero-note">
+            {{ menuBarNote }}
+          </p>
         </div>
       </div>
     </section>
 
     <aside class="recent-panel">
-        <div class="panel-header">
-          <div>
-            <div class="panel-kicker">Return</div>
-            <h2>Go back to where the writing paused</h2>
-          </div>
+      <div class="panel-header">
+        <div>
+          <div class="panel-kicker">Recent</div>
+          <h2>Pick up where the writing paused</h2>
+        </div>
         <button
           v-if="recentItems.length"
           class="button tiny ghost-button"
@@ -68,7 +72,10 @@
       </div>
 
       <div v-if="loadingRecentDocuments" class="panel-empty">
-        Gathering recent pages...
+        <div class="panel-empty-copy">
+          <strong>Gathering recent pages...</strong>
+          <p>Vien is collecting the documents and folders you touched most recently.</p>
+        </div>
       </div>
       <div v-else-if="recentItems.length" class="recent-list">
         <button
@@ -88,7 +95,15 @@
         </button>
       </div>
       <div v-else class="panel-empty">
-        Nothing is close at hand yet. Open a markdown file or folder once, and Vien will keep it nearby.
+        <div class="panel-empty-copy">
+          <strong>Nothing is close at hand yet.</strong>
+          <p>Open a markdown file or folder once, and Vien will keep it nearby.</p>
+        </div>
+        <div class="panel-empty-rhythm">
+          <span>New Draft</span>
+          <span>Open File</span>
+          <span>Open Folder</span>
+        </div>
       </div>
     </aside>
   </div>
@@ -120,6 +135,14 @@ export default {
     commandPaletteShortcut() {
       return this.platform === 'darwin' ? 'Cmd+Shift+P' : 'Ctrl+Shift+P'
     },
+    settingsShortcut() {
+      return this.platform === 'darwin' ? 'Cmd+,' : 'Ctrl+,'
+    },
+    menuBarNote() {
+      return this.platform === 'darwin'
+        ? 'The menu bar keeps export, themes, and window controls exactly where a Mac app should.'
+        : 'Everything beyond the first draft stays in the menu bar and command palette.'
+    },
   },
   created() {
     this.loadRecentDocuments()
@@ -150,6 +173,9 @@ export default {
     showCommandPalette() {
       bus.emit('show-command-palette')
     },
+    openSettings() {
+      window.api.ipc.send('mt::open-setting-window')
+    },
     openRecentDocument(pathname) {
       window.api.ipc.send('mt::open-file-or-folder', pathname)
     },
@@ -166,14 +192,21 @@ export default {
     position: relative;
     flex: 1;
     display: grid;
-    grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+    grid-template-columns: minmax(0, 1.12fr) minmax(360px, 0.88fr);
+    grid-auto-rows: max-content;
+    align-items: start;
     gap: 28px;
-    padding: 34px 38px 38px;
-    overflow: auto;
+    padding: 28px 32px 32px;
+    overflow-x: hidden;
+    overflow-y: auto;
     background:
       radial-gradient(circle at top left, rgba(255, 143, 105, 0.08), transparent 32%),
       radial-gradient(circle at bottom right, rgba(73, 118, 206, 0.12), transparent 30%),
       var(--editorBgColor);
+  }
+
+  .recent-files-projects > * {
+    min-width: 0;
   }
 
   .welcome-hero,
@@ -187,18 +220,32 @@ export default {
   }
 
   .welcome-hero {
-    min-height: calc(100vh - 136px);
+    min-height: min(592px, calc(100vh - 138px));
   }
 
   .hero-inner {
     position: relative;
     z-index: 1;
     min-height: inherit;
-    padding: 44px;
+    padding: 40px 40px 34px;
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.8fr);
+    gap: 34px;
+    align-items: start;
+  }
+
+  .hero-copy-column {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    gap: 40px;
+    justify-content: flex-start;
+    min-width: 0;
+  }
+
+  .hero-support-column {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
   }
 
   .hero-orb {
@@ -259,41 +306,42 @@ export default {
   }
 
   .hero-title {
-    max-width: 10ch;
-    margin: 26px 0 16px;
-    font-size: clamp(38px, 5vw, 58px);
-    line-height: 1;
+    max-width: 10.8ch;
+    margin: 24px 0 18px;
+    font-size: clamp(40px, 4.6vw, 70px);
+    line-height: 0.92;
     letter-spacing: -0.04em;
     color: var(--sideBarTitleColor);
   }
 
   .hero-copy {
-    max-width: 620px;
+    max-width: 31rem;
     margin: 0;
-    font-size: 16px;
-    line-height: 1.8;
+    font-size: 17px;
+    line-height: 1.7;
     color: var(--sideBarColor);
   }
 
-  .action-grid {
+  .primary-actions {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 14px;
-    max-width: 560px;
-    margin-top: 28px;
+    margin-top: 8px;
   }
 
   .action-card {
     appearance: none;
     cursor: pointer;
     font: inherit;
-    padding: 18px 20px;
+    min-height: 136px;
+    padding: 20px 22px;
     border-radius: 22px;
     border: 1px solid var(--editorColor04);
     background: rgba(127, 127, 127, 0.05);
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    justify-content: flex-end;
+    gap: 8px;
     text-align: left;
     color: inherit;
     transition: transform .2s ease, border-color .2s ease, background-color .2s ease;
@@ -321,26 +369,58 @@ export default {
     color: var(--sideBarColor);
   }
 
-  .feature-pills {
-    display: flex;
-    flex-wrap: wrap;
+  .secondary-actions {
+    display: grid;
+    grid-template-columns: 1fr;
     gap: 10px;
   }
 
-  .feature-pill {
-    padding: 8px 12px;
-    border-radius: 999px;
+  .secondary-action {
+    appearance: none;
+    cursor: pointer;
+    font: inherit;
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 18px;
     border: 1px solid var(--editorColor04);
-    background: var(--itemBgColor);
+    background: rgba(127, 127, 127, 0.04);
     color: var(--sideBarColor);
     font-size: 13px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    transition: border-color .2s ease, background-color .2s ease, transform .2s ease;
+  }
+
+  .secondary-action:hover {
+    transform: translateY(-1px);
+    border-color: var(--themeColor20);
+    background: var(--itemBgColor);
+  }
+
+  .secondary-action span:last-child {
+    color: var(--editorColor50);
+    font-size: 12px;
+  }
+
+  .hero-note {
+    margin: 0;
+    padding: 16px 18px;
+    border: 1px solid var(--editorColor04);
+    border-radius: 20px;
+    background: rgba(127, 127, 127, 0.04);
+    color: var(--editorColor50);
+    font-size: 13px;
+    line-height: 1.7;
   }
 
   .recent-panel {
+    max-height: calc(100vh - 122px);
     padding: 28px;
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 20px;
   }
 
   .panel-header {
@@ -352,7 +432,8 @@ export default {
 
   .panel-header h2 {
     margin: 6px 0 0;
-    font-size: 24px;
+    font-size: 20px;
+    line-height: 1.2;
     color: var(--sideBarTitleColor);
   }
 
@@ -442,21 +523,57 @@ export default {
   }
 
   .panel-empty {
-    flex: 1;
-    display: grid;
-    place-items: center;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 18px;
     padding: 24px;
+    min-height: 196px;
     border-radius: 24px;
     border: 1px dashed var(--editorColor10);
     background: rgba(127, 127, 127, 0.04);
     color: var(--sideBarColor);
-    text-align: center;
-    line-height: 1.8;
+    text-align: left;
+    line-height: 1.7;
   }
 
-  @media (max-width: 1180px) {
+  .panel-empty-copy strong {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--sideBarTitleColor);
+  }
+
+  .panel-empty-copy p {
+    margin: 0;
+  }
+
+  .panel-empty-rhythm {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .panel-empty-rhythm span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 34px;
+    padding: 0 12px;
+    border-radius: 999px;
+    border: 1px solid var(--editorColor04);
+    background: var(--floatBgColor);
+    color: var(--editorColor50);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 1380px) {
     .recent-files-projects {
-      grid-template-columns: 1fr;
+      display: flex;
+      flex-direction: column;
       padding: 24px;
     }
 
@@ -466,13 +583,49 @@ export default {
 
     .hero-inner {
       min-height: auto;
-      padding: 32px;
+      padding: 34px;
+    }
+
+    .hero-support-column {
+      gap: 12px;
+    }
+
+    .primary-actions {
+      margin-top: 0;
+    }
+
+    .recent-panel {
+      max-height: none;
+    }
+  }
+
+  @media (max-width: 980px) {
+    .hero-inner {
+      grid-template-columns: 1fr;
+    }
+
+    .hero-support-column {
+      gap: 12px;
     }
   }
 
   @media (max-width: 760px) {
-    .action-grid {
+    .primary-actions {
       grid-template-columns: 1fr;
+    }
+
+    .hero-title {
+      max-width: 8.4ch;
+      font-size: clamp(38px, 11vw, 56px);
+    }
+
+    .hero-inner,
+    .recent-panel {
+      padding: 24px;
+    }
+
+    .secondary-action {
+      justify-content: space-between;
     }
   }
 </style>

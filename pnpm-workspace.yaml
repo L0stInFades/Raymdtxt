@@ -1,0 +1,13 @@
+packages:
+  - '.'
+
+onlyBuiltDependencies:
+  - ced
+  - electron
+  - esbuild
+  - fontmanager-redux
+  - highlight.js
+  - keytar
+  - native-keymap
+  - vscode-ripgrep
+  - vue-demi

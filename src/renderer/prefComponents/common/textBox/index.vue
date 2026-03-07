@@ -26,14 +26,14 @@ export default {
   data() {
     this.inputTimer = null
     return {
-      inputText: this.input,
+      inputText: this.textValue,
       invalidInput: false,
     }
   },
   props: {
     description: String,
     notes: String,
-    input: String,
+    textValue: String,
     onChange: Function,
     more: String,
     disable: {
@@ -56,7 +56,7 @@ export default {
     },
   },
   watch: {
-    input: function (value, oldValue) {
+    textValue: function (value, oldValue) {
       if (value !== oldValue) {
         this.inputText = value
       }
@@ -99,14 +99,23 @@ export default {
   .pref-text-box-item {
     font-size: 14px;
     user-select: none;
-    margin: 20px 0;
+    margin: 18px 0;
+    padding: 14px 16px;
     color: var(--editorColor);
     width: 100%;
+    box-sizing: border-box;
+    border-radius: 18px;
+    border: 1px solid var(--panelSubtleBorderColor);
+    background: rgba(255, 255, 255, 0.52);
+    width: 100%;
     & input.el-input__inner {
-      height: 30px;
-      background: transparent;
+      height: 42px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(255, 255, 255, 0.66)),
+        var(--controlBgColor);
       color: var(--editorColor);
-      border-color: var(--editorColor10);
+      border-color: var(--controlBorderColor);
+      border-radius: 14px;
       padding-right: 15px;
       &::placeholder {
         color: var(--editorColor30);
@@ -123,13 +132,14 @@ export default {
     & .el-input.is-active .el-input__inner,
     & .el-input__inner:focus {
       border-color: var(--themeColor);
+      box-shadow: var(--controlFocusShadow);
     }
     & .el-input__icon,
     & .el-input__inner {
-      line-height: 30px;
+      line-height: 42px;
     }
     & .description {
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
     & i {
       cursor: pointer;

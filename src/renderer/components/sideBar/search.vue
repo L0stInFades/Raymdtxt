@@ -332,15 +332,20 @@ export default {
     display: flex;
     flex-direction: column;
     height: 100%;
+    padding: 26px 16px 18px;
+    box-sizing: border-box;
   }
   .search-wrapper {
     display: flex;
-    margin: 37px 15px 10px 15px;
-    padding: 0 6px;
-    border-radius: 14px;
-    height: 28px;
-    border: 1px solid var(--floatBorderColor);
-    background: var(--inputBgColor);
+    margin: 0 0 12px;
+    padding: 0 10px;
+    border-radius: 18px;
+    min-height: 44px;
+    border: 1px solid var(--controlBorderColor);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.66)),
+      var(--controlBgColor);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78);
     box-sizing: border-box;
     align-items: center;
     & > input {
@@ -350,31 +355,40 @@ export default {
       flex: 1;
       border: none;
       outline: none;
-      padding: 0 8px;
-      font-size: 13px;
+      padding: 0 10px;
+      font-size: 14px;
       width: 50%;
     }
     & > .controls {
       display: flex;
       flex-shrink: 0;
-      margin-top: 3px;
+      gap: 4px;
       & > span {
         cursor: pointer;
-        width: 20px;
-        height: 20px;
-        margin-left: 2px;
-        margin-right: 2px;
+        width: 28px;
+        height: 28px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        transition: background-color .18s ease;
         &:hover {
+          background: rgba(255, 255, 255, 0.72);
           color: var(--sideBarIconColor);
         }
         & > svg {
           fill: var(--sideBarIconColor);
+          width: 16px;
+          height: 16px;
           &:hover {
             fill: var(--highlightThemeColor);
           }
         }
         &.active svg {
-            fill: var(--highlightThemeColor);
+          fill: var(--highlightThemeColor);
+        }
+        &.active {
+          background: linear-gradient(135deg, rgba(96, 182, 126, 0.12), rgba(73, 118, 206, 0.1));
         }
       }
     }
@@ -392,38 +406,53 @@ export default {
   }
   .cancel-area {
     text-align: center;
-    margin-bottom: 16px;
+    margin: 8px 0 16px;
   }
   .search-message-section {
     overflow-wrap: break-word;
   }
   .search-result-info,
   .search-message-section {
-    padding-left: 15px;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
     font-size: 12px;
-    color: var(--sideBarColor);
+    color: var(--panelMutedColor);
+  }
+  .search-result-info {
+    padding: 0 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--panelEyebrowColor);
+  }
+  .search-message-section {
+    padding: 12px 14px;
+    background: rgba(255, 255, 255, 0.46);
+    border: 1px solid var(--panelSubtleBorderColor);
+    border-radius: 16px;
   }
   .empty,
   .search-result {
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
+    padding: 0 2px 12px;
     &::-webkit-scrollbar:vertical {
       width: 8px;
     }
   }
   .empty {
-    font-size: 14px;
-    text-align: center;
     display: flex;
     flex-direction: column;
-    justify-content: space-around;
-    padding-bottom: 100px;
+    justify-content: center;
+    padding-bottom: 48px;
     & .no-data {
       display: flex;
       align-items: center;
       flex-direction: column;
+      gap: 18px;
+      padding: 28px 20px;
+      background: rgba(255, 255, 255, 0.5);
+      border: 1px solid var(--panelSubtleBorderColor);
+      border-radius: 24px;
     }
     & .no-data svg {
       fill: var(--themeColor);
@@ -431,7 +460,6 @@ export default {
     }
     & .no-data .button-primary {
       display: block;
-      margin-top: 20px;
     }
   }
 </style>

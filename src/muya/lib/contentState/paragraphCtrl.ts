@@ -23,18 +23,27 @@ const paragraphCtrl = (ContentState: { prototype: IContentState }) => {
       throw new Error('selectionChange: expected cursor but cursor is null.')
     }
     const cursorCoords = selection.getCursorCoords()
-    const startBlock = this.getBlock(start.key)
-    const endBlock = this.getBlock(end.key)
-    const startParents = this.getParents(startBlock!)
-    const endParents = this.getParents(endBlock!)
+    const fallbackBlock = this.getBlock(start.key) || this.getBlock(end.key) || this.blocks[0] || null
+    const startBlock = this.getBlock(start.key) || fallbackBlock
+    const endBlock = this.getBlock(end.key) || fallbackBlock
+    if (!startBlock || !endBlock) {
+      return {
+        start: start as SelectionCursorPos,
+        end: end as SelectionCursorPos,
+        affiliation: [],
+        cursorCoords,
+      }
+    }
+    const startParents = this.getParents(startBlock)
+    const endParents = this.getParents(endBlock)
     const affiliation = startParents
       .filter((p: Block) => endParents.includes(p))
       .filter((p: Block) => PARAGRAPH_TYPES.includes(p.type))
 
-    ;(start as SelectionCursorPos).type = startBlock!.type
-    ;(start as SelectionCursorPos).block = startBlock!
-    ;(end as SelectionCursorPos).type = endBlock!.type
-    ;(end as SelectionCursorPos).block = endBlock!
+    ;(start as SelectionCursorPos).type = startBlock.type
+    ;(start as SelectionCursorPos).block = startBlock
+    ;(end as SelectionCursorPos).type = endBlock.type
+    ;(end as SelectionCursorPos).block = endBlock
 
     return {
       start: start as SelectionCursorPos,

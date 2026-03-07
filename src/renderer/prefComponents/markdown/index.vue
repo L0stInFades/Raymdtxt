@@ -8,27 +8,27 @@
       <template #children>
         <bool
           description="Prefer loose list items"
-          :bool="preferLooseListItem"
+          :isOn="preferLooseListItem"
           :onChange="value => onSelectChange('preferLooseListItem', value)"
           more="https://spec.commonmark.org/0.29/#loose"
         ></bool>
         <cur-select
           description="Preferred marker for bullet lists"
-          :value="bulletListMarker"
+          :currentValue="bulletListMarker"
           :options="bulletListMarkerOptions"
           :onChange="value => onSelectChange('bulletListMarker', value)"
           more="https://spec.commonmark.org/0.29/#bullet-list-marker"
         ></cur-select>
         <cur-select
           description="Preferred marker for ordered lists"
-          :value="orderListDelimiter"
+          :currentValue="orderListDelimiter"
           :options="orderListDelimiterOptions"
           :onChange="value => onSelectChange('orderListDelimiter', value)"
           more="https://spec.commonmark.org/0.29/#ordered-list"
         ></cur-select>
         <cur-select
           description="Preferred list indentation"
-          :value="listIndentation"
+          :currentValue="listIndentation"
           :options="listIndentationOptions"
           :onChange="value => onSelectChange('listIndentation', value)"
         ></cur-select>
@@ -42,20 +42,20 @@
       <template #children>
         <cur-select
           description="Front matter format"
-          :value="frontmatterType"
+          :currentValue="frontmatterType"
           :options="frontmatterTypeOptions"
           :onChange="value => onSelectChange('frontmatterType', value)"
         ></cur-select>
         <bool
           description="Enable Pandoc-style superscript and subscript"
-          :bool="superSubScript"
+          :isOn="superSubScript"
           :onChange="value => onSelectChange('superSubScript', value)"
           more="https://pandoc.org/MANUAL.html#superscripts-and-subscripts"
         ></bool>
         <bool
           description="Enable Pandoc-style footnotes"
           notes="Requires restart."
-          :bool="footnote"
+          :isOn="footnote"
           :onChange="value => onSelectChange('footnote', value)"
           more="https://pandoc.org/MANUAL.html#footnotes"
         ></bool>
@@ -69,12 +69,12 @@
       <template #children>
         <bool
           description="Enable HTML rendering"
-          :bool="isHtmlEnabled"
+          :isOn="isHtmlEnabled"
           :onChange="value => onSelectChange('isHtmlEnabled', value)"
         ></bool>
         <bool
           description="Enable GitLab compatibility mode"
-          :bool="isGitlabCompatibilityEnabled"
+          :isOn="isGitlabCompatibilityEnabled"
           :onChange="value => onSelectChange('isGitlabCompatibilityEnabled', value)"
         ></bool>
       </template>
@@ -87,7 +87,7 @@
       <template #children>
         <cur-select
           description="Sequence diagram theme"
-          :value="sequenceTheme"
+          :currentValue="sequenceTheme"
           :options="sequenceThemeOptions"
           :onChange="value => onSelectChange('sequenceTheme', value)"
           more="https://bramp.github.io/js-sequence-diagrams/"
@@ -102,7 +102,7 @@
       <template #children>
         <cur-select
           description="Preferred heading style"
-          :value="preferHeadingStyle"
+          :currentValue="preferHeadingStyle"
           :options="preferHeadingStyleOptions"
           :onChange="value => onSelectChange('preferHeadingStyle', value)"
           :disable="true"

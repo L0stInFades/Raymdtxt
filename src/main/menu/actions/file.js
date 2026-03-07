@@ -1,4 +1,4 @@
-import fs from 'fs-extra'
+import { rename as renameFs } from 'node:fs'
 import path from 'node:path'
 import { BrowserWindow, app, dialog, ipcMain, shell } from 'electron'
 import log from 'electron-log'
@@ -353,7 +353,7 @@ ipcMain.on('mt::rename', async (e, { id, pathname, newPathname }) => {
   const win = BrowserWindow.fromWebContents(e.sender)
 
   const doRename = () => {
-    fs.rename(pathname, newPathname, (err) => {
+    renameFs(pathname, newPathname, (err) => {
       if (err) {
         log.error(`mt::rename: Cannot rename "${pathname}" to "${newPathname}".\n${err.stack}`)
         return
@@ -395,7 +395,7 @@ ipcMain.on('mt::response-file-move-to', async (e, { id, pathname }) => {
   })
 
   if (filePath && !canceled) {
-    fs.rename(pathname, filePath, (err) => {
+    renameFs(pathname, filePath, (err) => {
       if (err) {
         log.error(`mt::rename: Cannot rename "${pathname}" to "${filePath}".\n${err.stack}`)
         return
