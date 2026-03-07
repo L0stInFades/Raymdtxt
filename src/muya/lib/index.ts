@@ -333,7 +333,7 @@ class Muya {
     this.contentState.insertImage(imageInfo)
   }
 
-  search(value: string, opt: SearchOptions): SearchMatches {
+  search(value: string, opt: SearchOptions = {}): SearchMatches {
     const { selectHighlight } = opt
     this.contentState.search(value, opt)
     this.contentState.render(!!selectHighlight)

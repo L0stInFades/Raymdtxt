@@ -25,30 +25,40 @@ const updateCtrl = (ContentState: { prototype: IContentState }) => {
   ContentState.prototype.checkNeedRender = function (this: IContentState, cursor: Cursor = this.cursor) {
     const { labels } = this.stateRender
     const { start: cStart, end: cEnd, anchor, focus } = cursor
-    const startBlock = this.getBlock(cStart ? cStart.key : anchor!.key)
-    const endBlock = this.getBlock(cEnd ? cEnd.key : focus!.key)
-    const startOffset = cStart ? cStart.offset : anchor!.offset
-    const endOffset = cEnd ? cEnd.offset : focus!.offset
+    const startCursor = cStart || anchor
+    const endCursor = cEnd || focus
+    if (!startCursor || !endCursor) {
+      return false
+    }
+
+    const startBlock = this.getBlock(startCursor.key)
+    const endBlock = this.getBlock(endCursor.key)
+    if (!startBlock || !endBlock) {
+      return false
+    }
+
+    const startOffset = startCursor.offset
+    const endOffset = endCursor.offset
     const NO_NEED_TOKEN_REG = /text|hard_line_break|soft_line_break/
 
-    for (const token of tokenizer(startBlock!.text, {
+    for (const token of tokenizer(startBlock.text, {
       labels,
       options: this.muya.options,
     }) as Token[]) {
       if (NO_NEED_TOKEN_REG.test(token.type)) continue
       const { start, end } = token.range
-      const textLen = startBlock!.text.length
+      const textLen = startBlock.text.length
       if (conflict([Math.max(0, start - 1), Math.min(textLen, end + 1)], [startOffset, startOffset])) {
         return true
       }
     }
-    for (const token of tokenizer(endBlock!.text, {
+    for (const token of tokenizer(endBlock.text, {
       labels,
       options: this.muya.options,
     }) as Token[]) {
       if (NO_NEED_TOKEN_REG.test(token.type)) continue
       const { start, end } = token.range
-      const textLen = endBlock!.text.length
+      const textLen = endBlock.text.length
       if (conflict([Math.max(0, start - 1), Math.min(textLen, end + 1)], [endOffset, endOffset])) {
         return true
       }

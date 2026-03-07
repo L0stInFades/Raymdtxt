@@ -35,6 +35,7 @@
 
 <script>
 import { addStyles, addThemeStyle } from '@/util/theme'
+import { getDroppedPaths, shouldUseWindowFileDropOverlay } from '@/util/windowDragDrop'
 import EditorWithTabs from '@/components/editorWithTabs'
 import TitleBar from '@/components/titleBar'
 import SideBar from '@/components/sideBar'
@@ -67,7 +68,10 @@ export default {
   },
   mixins: [loadingPageMixins],
   data() {
-    return {}
+    return {
+      dragDepth: 0,
+      windowDragListeners: null,
+    }
   },
   computed: {
     ...mapState({
@@ -159,41 +163,89 @@ export default {
     // module: notification (Pinia)
     useNotificationStore().listen()
 
-    // prevent Chromium's default behavior and try to open the first file
-    window.addEventListener(
-      'dragover',
-      (e) => {
-        // Cancel to allow tab drag&drop.
-        if (!e.dataTransfer.types.length) return
+    this.windowDragListeners = {
+      dragenter: (event) => this.handleWindowDragEnter(event),
+      dragover: (event) => this.handleWindowDragOver(event),
+      dragleave: (event) => this.handleWindowDragLeave(event),
+      drop: (event) => this.handleWindowDrop(event),
+    }
 
-        if (e.dataTransfer.types.indexOf('Files') >= 0) {
-          if (e.dataTransfer.items.length === 1 && e.dataTransfer.items[0].type.indexOf('image') > -1) {
-            // Do nothing, because we already drag/drop image in muya.
-          } else {
-            e.preventDefault()
-            if (this.timer) {
-              clearTimeout(this.timer)
-            }
-            this.timer = setTimeout(() => {
-              bus.emit('importDialog', false)
-            }, 300)
-            bus.emit('importDialog', true)
-          }
-
-          e.dataTransfer.dropEffect = 'copy'
-        } else {
-          e.stopPropagation()
-          e.dataTransfer.dropEffect = 'none'
-        }
-      },
-      false,
-    )
+    for (const [eventName, listener] of Object.entries(this.windowDragListeners)) {
+      window.addEventListener(eventName, listener, false)
+    }
 
     this.$nextTick(() => {
       const style = window.marktext.initialState || DEFAULT_STYLE
       addStyles(style)
       this.hideLoadingPage()
     })
+  },
+  beforeUnmount() {
+    if (this.windowDragListeners) {
+      for (const [eventName, listener] of Object.entries(this.windowDragListeners)) {
+        window.removeEventListener(eventName, listener, false)
+      }
+    }
+    this.resetWindowDragState()
+  },
+  methods: {
+    showImportOverlay(active = false) {
+      bus.emit('importDialog', { visible: true, active })
+    },
+    resetWindowDragState() {
+      this.dragDepth = 0
+      bus.emit('importDialog', { visible: false })
+    },
+    isLeavingWindow(event) {
+      return (
+        event.clientX <= 0 ||
+        event.clientY <= 0 ||
+        event.clientX >= window.innerWidth ||
+        event.clientY >= window.innerHeight
+      )
+    },
+    handleWindowDragEnter(event) {
+      if (!shouldUseWindowFileDropOverlay(event.dataTransfer)) {
+        return
+      }
+
+      event.preventDefault()
+      this.dragDepth += 1
+      event.dataTransfer.dropEffect = 'copy'
+      this.showImportOverlay()
+    },
+    handleWindowDragOver(event) {
+      if (!shouldUseWindowFileDropOverlay(event.dataTransfer)) {
+        return
+      }
+
+      event.preventDefault()
+      event.dataTransfer.dropEffect = 'copy'
+      this.showImportOverlay(true)
+    },
+    handleWindowDragLeave(event) {
+      if (!shouldUseWindowFileDropOverlay(event.dataTransfer)) {
+        return
+      }
+
+      this.dragDepth = Math.max(0, this.dragDepth - 1)
+      if (this.dragDepth === 0 || this.isLeavingWindow(event)) {
+        this.resetWindowDragState()
+      }
+    },
+    handleWindowDrop(event) {
+      if (!shouldUseWindowFileDropOverlay(event.dataTransfer)) {
+        return
+      }
+
+      event.preventDefault()
+      const fileList = getDroppedPaths(event.dataTransfer)
+      this.resetWindowDragState()
+
+      if (fileList.length > 0) {
+        window.api.ipc.send('mt::window::drop', fileList)
+      }
+    },
   },
 }
 </script>

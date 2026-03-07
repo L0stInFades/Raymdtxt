@@ -103,7 +103,7 @@ import notice from '@/services/notification'
 import Printer from '@/services/printService'
 import { SpellcheckerLanguageCommand } from '@/commands'
 import { SpellChecker } from '@/spellchecker'
-import { isOsx, animatedScrollTo } from '@/util'
+import { isOsx, animatedScrollTo, getScrollTopForElement } from '@/util'
 import { moveImageToFolder, moveToRelativeFolder, uploadImage } from '@/util/fileSystem'
 import { guessClipboardFilePath } from '@/util/clipboard'
 import { getCssForOptions, getHtmlToc } from '@/util/pdf'
@@ -895,13 +895,13 @@ export default {
       }
     },
 
-    handleSearch(value, opt) {
+    handleSearch(value, opt = {}) {
       const searchMatches = this.editor.search(value, opt)
       this.$store.dispatch('SEARCH', searchMatches)
       this.scrollToHighlight()
     },
 
-    handReplace(value, opt) {
+    handReplace(value, opt = {}) {
       const searchMatches = this.editor.replace(value, opt)
       this.$store.dispatch('SEARCH', searchMatches)
     },
@@ -920,22 +920,39 @@ export default {
     },
 
     scrollToHighlight() {
-      return this.scrollToElement('.ag-highlight')
+      return this.scrollToElement({ selector: '.ag-highlight' })
     },
 
     scrollToHeader(slug) {
-      return this.scrollToElement(`#${slug}`)
+      return this.scrollToElement({ id: slug })
     },
 
-    scrollToElement(selector) {
-      // Scroll to search highlight word
+    scrollToElement({ selector = null, id = null } = {}) {
       const { container } = this.editor
-      const anchor = document.querySelector(selector)
-      if (anchor) {
-        const { y } = anchor.getBoundingClientRect()
-        const DURATION = 300
-        animatedScrollTo(container, container.scrollTop + y - STANDAR_Y, DURATION)
+      const DURATION = 300
+      const offset = Math.min(STANDAR_Y, Math.round(container.clientHeight * 0.35))
+      const resolveTarget = () => {
+        if (id) {
+          return document.getElementById(id)
+        }
+
+        return selector ? container.querySelector(selector) : null
       }
+
+      this.$nextTick(() => {
+        const anchor = resolveTarget()
+        if (!anchor) {
+          requestAnimationFrame(() => {
+            const retryTarget = resolveTarget()
+            if (retryTarget) {
+              animatedScrollTo(container, getScrollTopForElement(container, retryTarget, offset), DURATION)
+            }
+          })
+          return
+        }
+
+        animatedScrollTo(container, getScrollTopForElement(container, anchor, offset), DURATION)
+      })
     },
 
     handleFindAction(action) {
@@ -1202,7 +1219,6 @@ export default {
     position: absolute;
     pointer-events: none;
     z-index: 0;
-    filter: blur(18px);
   }
 
   body:not(.dark) .editor-wrapper::before {
@@ -1211,7 +1227,7 @@ export default {
     width: min(38vw, 520px);
     height: min(38vw, 520px);
     background: radial-gradient(circle, var(--editorAmbientWarm) 0%, transparent 72%);
-    opacity: .92;
+    opacity: .64;
   }
 
   body:not(.dark) .editor-wrapper::after {
@@ -1220,7 +1236,7 @@ export default {
     width: min(42vw, 560px);
     height: min(42vw, 560px);
     background: radial-gradient(circle, var(--editorAmbientCool) 0%, transparent 70%);
-    opacity: .84;
+    opacity: .56;
   }
 
   .editor-wrapper.source {

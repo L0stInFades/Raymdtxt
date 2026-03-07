@@ -19,14 +19,18 @@ export default function htmlTag(
   const openContent = this.highlight(h, block, start, start + openTag.length, token)
   const closeContent = closeTag ? this.highlight(h, block, end - closeTag.length, end, token) : ''
 
-  const anchor =
-    Array.isArray(children) && tag !== 'ruby' // important
-      ? // biome-ignore lint/performance/noAccumulatingSpread: performance warning, acceptable in this context
-        children.reduce((acc, to) => {
-          const chunk = (this[snakeToCamel(to.type)] as InlineRenderMethod)(h, cursor, block, to, className)
-          return Array.isArray(chunk) ? [...acc, ...chunk] : [...acc, chunk]
-        }, [])
-      : ''
+  let anchor: unknown[] | '' = ''
+  if (Array.isArray(children) && tag !== 'ruby') {
+    anchor = []
+    for (const to of children) {
+      const chunk = (this[snakeToCamel(to.type)] as InlineRenderMethod).call(this, h, cursor, block, to, className)
+      if (Array.isArray(chunk)) {
+        anchor.push(...chunk)
+      } else {
+        anchor.push(chunk)
+      }
+    }
+  }
 
   switch (tag) {
     // Handle html img.

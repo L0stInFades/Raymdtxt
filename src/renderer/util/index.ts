@@ -96,12 +96,7 @@ export const adjustCursor = (
   return newCursor
 }
 
-export const animatedScrollTo = (
-  element: HTMLElement,
-  to: number,
-  duration: number,
-  callback?: () => void,
-): void => {
+export const animatedScrollTo = (element: HTMLElement, to: number, duration: number, callback?: () => void): void => {
   const start = element.scrollTop
   const change = to - start
   const animationStart = Date.now()
@@ -136,6 +131,15 @@ export const animatedScrollTo = (
   }
 
   requestAnimationFrame(animateScroll)
+}
+
+export const getScrollTopForElement = (container: HTMLElement, target: Element, offset = 0): number => {
+  const containerRect = container.getBoundingClientRect()
+  const targetRect = target.getBoundingClientRect()
+  const rawScrollTop = container.scrollTop + (targetRect.top - containerRect.top) - offset
+  const maxScrollTop = Math.max(0, container.scrollHeight - container.clientHeight)
+
+  return Math.max(0, Math.min(rawScrollTop, maxScrollTop))
 }
 
 export const getUniqueId = (): string => {

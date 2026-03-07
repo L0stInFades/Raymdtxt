@@ -118,8 +118,11 @@ export default function renderLeafBlock(
     }
     children = []
     for (const token of tokens) {
-      // biome-ignore lint/complexity/noBannedTypes: dynamic method dispatch requires Function type
-      const result = (this[snakeToCamel(token.type as string)] as Function)(h, cursor, block, token)
+      const renderer = this[snakeToCamel(token.type as string)]
+      if (typeof renderer !== 'function') {
+        continue
+      }
+      const result = renderer.call(this, h, cursor, block, token)
       if (Array.isArray(result)) {
         children.push(...result)
       } else {

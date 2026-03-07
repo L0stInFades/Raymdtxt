@@ -48,7 +48,7 @@ export default function link(
 
   for (const child of token.children ?? []) {
     const renderInline = this[snakeToCamel(child.type as string)] as InlineRenderMethod
-    renderedChildren.push(...renderInline(h, cursor, block, child as Token, className))
+    renderedChildren.push(...renderInline.call(this, h, cursor, block, child as Token, className))
   }
 
   if (isLengthEven(token.backlash.first) && isLengthEven(token.backlash.second)) {
