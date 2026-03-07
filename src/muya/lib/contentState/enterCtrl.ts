@@ -187,9 +187,12 @@ const enterCtrl = (ContentState: { prototype: IContentState }) => {
     if (!start || !end) {
       return event.preventDefault()
     }
-    let block = this.getBlock(start.key)!
+    let block = this.getBlock(start.key)
+    const endBlock = this.getBlock(end.key)
+    if (!block || !endBlock) {
+      return event.preventDefault()
+    }
     const { text } = block
-    const endBlock = this.getBlock(end.key)!
     let parent = this.getParent(block)
 
     event.preventDefault()

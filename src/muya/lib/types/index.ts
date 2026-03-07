@@ -396,8 +396,8 @@ export interface IContentState {
   selectionChange(cursor?: unknown): SelectionInfo
   selectionFormats(cursor?: { start?: CursorPosition; end?: CursorPosition }): SelectionFormatsResult
   checkNeedRender(cursor: unknown): boolean
-  checkEditLanguage(): { lang: string | null; paragraph: HTMLElement }
-  selectLanguage(paragraph: HTMLElement, name: string): void
+  checkEditLanguage(): { lang: string | null; paragraph: HTMLElement | null }
+  selectLanguage(paragraph: HTMLElement | null, name: string): void
 
   // Table
   tableToolBarClick(type: string | null): void

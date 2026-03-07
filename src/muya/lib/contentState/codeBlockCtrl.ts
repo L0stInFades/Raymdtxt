@@ -19,6 +19,8 @@ const requestLanguageLoad = (lang: string) => {
     })
 }
 
+const EMPTY_EDIT_LANGUAGE = { lang: null, paragraph: null as HTMLElement | null }
+
 const codeBlockCtrl = (ContentState: { prototype: IContentState }) => {
   /**
    * check edit language
@@ -26,9 +28,12 @@ const codeBlockCtrl = (ContentState: { prototype: IContentState }) => {
   ContentState.prototype.checkEditLanguage = function (this: IContentState) {
     const { start } = selection.getCursorRange()
     if (!start) {
-      return { lang: null, paragraph: null as unknown as HTMLElement }
+      return EMPTY_EDIT_LANGUAGE
     }
-    const startBlock = this.getBlock(start.key)!
+    const startBlock = this.getBlock(start.key)
+    if (!startBlock) {
+      return EMPTY_EDIT_LANGUAGE
+    }
     const paragraph = document.querySelector(`#${start.key}`) as HTMLElement | null
     let lang: string | null = ''
     const { text } = startBlock
@@ -45,11 +50,17 @@ const codeBlockCtrl = (ContentState: { prototype: IContentState }) => {
         }
       }
     }
-    return { lang, paragraph: paragraph as HTMLElement }
+    return { lang, paragraph }
   }
 
-  ContentState.prototype.selectLanguage = function (this: IContentState, paragraph: HTMLElement, lang: string) {
-    const block = this.getBlock(paragraph.id)!
+  ContentState.prototype.selectLanguage = function (this: IContentState, paragraph: HTMLElement | null, lang: string) {
+    if (!paragraph) {
+      return
+    }
+    const block = this.getBlock(paragraph.id)
+    if (!block) {
+      return
+    }
     if (lang === 'math' && this.isGitlabCompatibilityEnabled && this.updateMathBlock(block)) {
       return
     }

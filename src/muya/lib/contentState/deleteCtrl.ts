@@ -23,7 +23,10 @@ const deleteCtrl = (ContentState: { prototype: IContentState }) => {
     if (!start || !end) {
       return
     }
-    const startBlock = this.getBlock(start.key)!
+    const startBlock = this.getBlock(start.key)
+    if (!startBlock) {
+      return
+    }
     const nextBlock = this.findNextBlockInLocation(startBlock)
 
     // TODO: @jocs It will delete all the editor and cause error in console when there is only one empty table. same as #67

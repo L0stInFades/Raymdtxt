@@ -5,7 +5,10 @@ import type { IContentState } from '../types'
 const emojiCtrl = (ContentState: { prototype: IContentState }) => {
   ContentState.prototype.setEmoji = function (this: IContentState, item: { aliases: string[] }) {
     let { key, offset } = this.cursor.start
-    const startBlock = this.getBlock(key)!
+    const startBlock = this.getBlock(key)
+    if (!startBlock) {
+      return
+    }
     const { text } = startBlock
     const tokens = tokenizer(text, {
       options: this.muya.options,

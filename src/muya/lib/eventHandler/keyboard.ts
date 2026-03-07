@@ -213,7 +213,7 @@ class Keyboard {
       }
 
       const { lang, paragraph } = contentState.checkEditLanguage()
-      if (lang) {
+      if (lang && paragraph) {
         eventCenter.dispatch('muya-code-picker', {
           reference: getParagraphReference(paragraph, paragraph.id),
           lang,
