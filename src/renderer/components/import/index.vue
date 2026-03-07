@@ -14,11 +14,11 @@
               <use :xlink:href="importIcon.url" />
             </svg>
           </div>
-          <div class="eyebrow">Bring Writing In</div>
-          <h3>Open markdown or import richer formats.</h3>
+          <div class="eyebrow">From Elsewhere</div>
+          <h3>Open markdown, or carry another format across.</h3>
           <p>
-            Drag files into Vien, open a markdown document directly, or use Pandoc-backed import
-            when the source comes from somewhere less tidy.
+            If the file is already markdown, let it in directly. If it comes from Word, HTML,
+            LaTeX, or somewhere rougher, Vien can translate it first.
           </p>
         </div>
         <div
@@ -29,16 +29,16 @@
           @drop="dropHandler"
         >
           <div class="drop-content">
-            <div class="drop-kicker">Drop files to open or import</div>
-            <div class="drop-title">Markdown opens directly. Everything else goes through import.</div>
-            <p>Supported sources include plain markdown, HTML, Office files, LaTeX, and wiki text.</p>
+            <div class="drop-kicker">Drop a file here</div>
+            <div class="drop-title">Markdown opens as-is. Other formats come through import.</div>
+            <p>Supported sources include markdown, HTML, Office files, LaTeX, and wiki text.</p>
           </div>
           <div class="action-row">
             <button class="button-primary" data-testid="import-open-markdown" @click.stop="openMarkdown">
               Open Markdown
             </button>
             <button class="button" data-testid="import-document" @click.stop="importDocument">
-              Import Document
+              Import Through Pandoc
             </button>
           </div>
         </div>

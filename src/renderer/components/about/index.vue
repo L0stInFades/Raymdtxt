@@ -12,7 +12,7 @@
           <div class="logo-halo"></div>
           <img class="logo" :src="logo" alt="Vien logo" data-testid="about-logo" />
         </div>
-        <div class="eyebrow">Calm Markdown Editor</div>
+        <div class="eyebrow">For Long Stretches Of Attention</div>
           <h3 class="title" data-testid="about-title">{{ name }}</h3>
           <div class="version" data-testid="about-version">Version {{ appVersion }}</div>
         <p class="subtitle">{{ subtitle }}</p>
@@ -44,13 +44,13 @@ import VienLogo from '../../assets/images/logo.png'
 export default {
   data() {
     this.name = 'Vien'
-    this.subtitle = 'One continuous surface for writing, reading, and revision.'
-    this.inspirationLabel = 'Named after a track on Is Peace Wild?'
+    this.subtitle = 'A quiet desktop editor for writing, reading, and revision in one continuous surface.'
+    this.inspirationLabel = 'After A Track On Is Peace Wild?'
     this.inspirationCopy =
-      "Vien borrows from the album's temperament: spacious, nocturnal, emotionally clear, and calm under tension."
+      'The name comes from a record that keeps calm and tension in the same hand. Vien tries to keep that balance on the page.'
     this.inspirationCredit =
-      'Inspired by Ludwig Wandinger, the Berlin-based producer, drummer, performer, and visual artist behind the record.'
-    this.lineage = 'Shaped from a long-standing Markdown editor lineage, then carried forward as Vien.'
+      'Ludwig Wandinger works across percussion, electronics, and visual form with unusual restraint. That sense of space matters here.'
+    this.lineage = 'Built from an open Markdown lineage, then pared back into something quieter.'
     this.copyright = `Copyright © ${new Date().getFullYear()} L0stInFades`
     this.logo = VienLogo
     return {

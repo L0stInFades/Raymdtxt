@@ -7,10 +7,10 @@
       custom-class="ag-dialog-table"
       width="500px"
     >
-      <h3 data-testid="export-dialog-title">Export Options</h3>
+      <h3 data-testid="export-dialog-title">Export</h3>
       <el-tabs v-model="activeName">
-        <el-tab-pane label="Info" name="info">
-          <span class="text">Please customize the page appearance and click on "export" to continue.</span>
+        <el-tab-pane label="Overview" name="info">
+          <span class="text">Set the page, then let it leave in one piece.</span>
         </el-tab-pane>
         <el-tab-pane label="Page" name="page">
           <!-- HTML -->
@@ -103,7 +103,7 @@
           ></bool>
         </el-tab-pane>
         <el-tab-pane label="Theme" name="theme">
-          <div class="text">You can change the document appearance by choosing a theme or create a handcrafted one.</div>
+          <div class="text">Choose a theme for the exported page, or bring in one you made yourself.</div>
           <cur-select
             description="Theme:"
             more="https://github.com/L0stInFades/vien/blob/develop/docs/EXPORT_THEMES.md"
@@ -113,7 +113,7 @@
           ></cur-select>
         </el-tab-pane>
         <el-tab-pane v-if="isPrintable" label="Header & Footer" name="header">
-          <div class="text">The text appear on all pages if header and/or footer is defined.</div>
+          <div class="text">Headers and footers repeat across every page once they are defined.</div>
           <cur-select
             description="Header type:"
             :value="headerType"

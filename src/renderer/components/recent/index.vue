@@ -8,34 +8,34 @@
           <div class="brand-lockup">
             <img class="brand-logo" :src="logo" alt="Vien logo" />
             <div>
-              <div class="eyebrow">Quiet Markdown Editor</div>
+              <div class="eyebrow">For Long Stretches Of Attention</div>
               <div class="brand-name">Vien</div>
             </div>
           </div>
-          <h1 class="hero-title">Write in a calmer space.</h1>
+          <h1 class="hero-title">Leave the noise outside the page.</h1>
           <p class="hero-copy">
-            A focused markdown workspace for notes, drafts, and long-form writing.
-            Open a folder, pick up a recent file, or start a blank page without the interface fighting you.
+            Open a folder, return to a recent draft, or begin with a blank page.
+            Vien keeps the room quiet so the writing can stay in front.
           </p>
 
           <div class="action-grid">
             <button class="action-card action-card-primary" @click="newFile">
-              <span class="action-kicker">Start fresh</span>
-              <span class="action-title">New Note</span>
+              <span class="action-kicker">Blank page</span>
+              <span class="action-title">New Draft</span>
               <span class="action-meta">{{ newShortcut }}</span>
             </button>
             <button class="action-card" @click="openFile">
-              <span class="action-kicker">Markdown</span>
+              <span class="action-kicker">From disk</span>
               <span class="action-title">Open File</span>
               <span class="action-meta">{{ openShortcut }}</span>
             </button>
             <button class="action-card" @click="openFolder">
-              <span class="action-kicker">Workspace</span>
+              <span class="action-kicker">Writing room</span>
               <span class="action-title">Open Folder</span>
               <span class="action-meta">{{ openFolderShortcut }}</span>
             </button>
             <button class="action-card" @click="showCommandPalette">
-              <span class="action-kicker">Power tool</span>
+              <span class="action-kicker">Every command</span>
               <span class="action-title">Command Palette</span>
               <span class="action-meta">{{ commandPaletteShortcut }}</span>
             </button>
@@ -43,20 +43,20 @@
         </div>
 
         <div class="feature-pills">
-          <span class="feature-pill">Typewriter</span>
           <span class="feature-pill">Focus</span>
+          <span class="feature-pill">Typewriter</span>
           <span class="feature-pill">Source Mode</span>
-          <span class="feature-pill">Pandoc Import</span>
+          <span class="feature-pill">Export</span>
         </div>
       </div>
     </section>
 
     <aside class="recent-panel">
-      <div class="panel-header">
-        <div>
-          <div class="panel-kicker">Recent</div>
-          <h2>Pick up where you left off</h2>
-        </div>
+        <div class="panel-header">
+          <div>
+            <div class="panel-kicker">Return</div>
+            <h2>Go back to where the writing paused</h2>
+          </div>
         <button
           v-if="recentItems.length"
           class="button tiny ghost-button"
@@ -68,7 +68,7 @@
       </div>
 
       <div v-if="loadingRecentDocuments" class="panel-empty">
-        Loading recent documents...
+        Gathering recent pages...
       </div>
       <div v-else-if="recentItems.length" class="recent-list">
         <button
@@ -80,15 +80,15 @@
           @click="openRecentDocument(item.pathname)"
         >
           <div class="recent-item-top">
-            <span class="recent-kind" :class="item.kind">{{ item.kind === 'folder' ? 'Folder' : 'Markdown' }}</span>
-            <span class="recent-open">Open</span>
+            <span class="recent-kind" :class="item.kind">{{ item.kind === 'folder' ? 'Folder' : 'Draft' }}</span>
+            <span class="recent-open">Resume</span>
           </div>
           <strong class="recent-name">{{ item.name }}</strong>
           <span class="recent-path">{{ item.parentPath }}</span>
         </button>
       </div>
       <div v-else class="panel-empty">
-        No recent writing spaces yet. Open a markdown file or folder and Vien will keep it close.
+        Nothing is close at hand yet. Open a markdown file or folder once, and Vien will keep it nearby.
       </div>
     </aside>
   </div>
