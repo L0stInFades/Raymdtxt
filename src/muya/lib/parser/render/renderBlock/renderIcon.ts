@@ -39,7 +39,12 @@ const FUNCTION_TYPE_HASH: Record<string, string> = {
   footnote: footnoteIcon,
 }
 
-export default function renderIcon(block: { parent?: unknown; type: string; functionType?: string; listType?: string }) {
+export default function renderIcon(block: {
+  parent?: unknown
+  type: string
+  functionType?: string
+  listType?: string
+}) {
   if (block.parent) {
     console.error('Only top most block can render front icon button.')
   }

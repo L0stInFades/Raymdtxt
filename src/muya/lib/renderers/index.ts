@@ -5,6 +5,7 @@ const rendererCache = new Map<string, unknown>()
  */
 const loadRenderer = async (name: string) => {
   if (!rendererCache.has(name)) {
+    // biome-ignore lint/suspicious/noImplicitAnyLet: dynamic module loading pattern
     let m
     switch (name) {
       case 'sequence':

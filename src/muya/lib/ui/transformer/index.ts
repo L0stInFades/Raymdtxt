@@ -16,17 +16,17 @@ interface ImageInfo {
 
 class Transformer {
   static pluginName = 'transformer'
-  container: HTMLDivElement;
-  eventId: string[];
-  imageInfo: ImageInfo | null;
-  lastScrollTop: number | null;
-  movingAnchor: string | null;
-  muya: IMuya;
-  options: TransformerOptions;
-  reference: HTMLElement | null;
-  resizing: boolean;
-  status: boolean;
-  width: number | null;
+  container: HTMLDivElement
+  eventId: string[]
+  imageInfo: ImageInfo | null
+  lastScrollTop: number | null
+  movingAnchor: string | null
+  muya: IMuya
+  options: TransformerOptions
+  reference: HTMLElement | null
+  resizing: boolean
+  status: boolean
+  width: number | null
   constructor(muya: IMuya, options: TransformerOptions) {
     this.muya = muya
     this.options = options
@@ -38,7 +38,8 @@ class Transformer {
     this.eventId = []
     this.lastScrollTop = null
     this.resizing = false
-    const container = (this.container = document.createElement('div'))
+    this.container = document.createElement('div')
+    const container = this.container
     container.classList.add('ag-transformer')
     document.body.appendChild(container)
     this.listen()
@@ -52,12 +53,22 @@ class Transformer {
         return
       }
       // only when scoll distance great than 50px, then hide the float box.
-      if (!this.resizing && this.status && Math.abs((event.target as HTMLElement).scrollTop - this.lastScrollTop) > 50) {
+      if (
+        !this.resizing &&
+        this.status &&
+        Math.abs((event.target as HTMLElement).scrollTop - this.lastScrollTop) > 50
+      ) {
         this.hide()
       }
     }
     eventCenter.attachDOMEvent(document, 'click', this.hide.bind(this))
-    eventCenter.subscribe('muya-transformer', (({ reference, imageInfo }: { reference: HTMLElement | null; imageInfo?: ImageInfo }) => {
+    eventCenter.subscribe('muya-transformer', (({
+      reference,
+      imageInfo,
+    }: {
+      reference: HTMLElement | null
+      imageInfo?: ImageInfo
+    }) => {
       this.reference = reference
       if (reference) {
         this.imageInfo = imageInfo ?? null
@@ -70,7 +81,8 @@ class Transformer {
     }) as (...args: unknown[]) => void)
 
     eventCenter.attachDOMEvent(container, 'scroll', scrollHandler)
-    eventCenter.attachDOMEvent(this.container, 'dragstart', ((event: DragEvent) => event.preventDefault()) as EventListener)
+    eventCenter.attachDOMEvent(this.container, 'dragstart', ((event: DragEvent) =>
+      event.preventDefault()) as EventListener)
     eventCenter.attachDOMEvent(document.body, 'mousedown', this.mouseDown as EventListener)
   }
 
@@ -186,7 +198,9 @@ class Transformer {
   hide() {
     const { eventCenter } = this.muya
     const circles = this.container.querySelectorAll('.circle')
-    Array.from(circles).forEach((c) => c.remove())
+    Array.from(circles).forEach((c) => {
+      c.remove()
+    })
     this.status = false
     eventCenter.dispatch('muya-float', this, false)
   }

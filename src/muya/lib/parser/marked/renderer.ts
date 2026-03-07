@@ -1,4 +1,5 @@
 import defaultOptions from './options'
+// biome-ignore lint/suspicious/noShadowRestrictedNames: intentional import naming
 import { cleanUrl, escape } from './utils'
 
 interface RendererOptions {
@@ -83,22 +84,25 @@ Renderer.prototype.script = (content: string, marker: string) => {
   return `<${tagName}>${content}</${tagName}>`
 }
 
-Renderer.prototype.footnoteIdentifier = (identifier: string, {
-  footnoteId,
-  footnoteIdentifierId,
-  order
-}: FootnoteInfo) =>
+Renderer.prototype.footnoteIdentifier = (
+  identifier: string,
+  { footnoteId, footnoteIdentifierId, order }: FootnoteInfo,
+) =>
   `<a href="#${footnoteId ? `fn${footnoteId}` : ''}" class="footnote-ref" id="fnref${footnoteIdentifierId}" role="doc-noteref"><sup>${order || identifier}</sup></a>`
 
-Renderer.prototype.footnote = (footnote: string) => `<section class="footnotes" role="doc-endnotes">\n<hr />\n<ol>\n${footnote}</ol>\n</section>\n`
+Renderer.prototype.footnote = (footnote: string) =>
+  `<section class="footnotes" role="doc-endnotes">\n<hr />\n<ol>\n${footnote}</ol>\n</section>\n`
 
-Renderer.prototype.footnoteItem = (content: string, {
-  footnoteId,
-  footnoteIdentifierId
-}: FootnoteInfo) =>
+Renderer.prototype.footnoteItem = (content: string, { footnoteId, footnoteIdentifierId }: FootnoteInfo) =>
   `<li id="fn${footnoteId}" role="doc-endnote">${content}<a href="#${footnoteIdentifierId ? `fnref${footnoteIdentifierId}` : ''}" class="footnote-back" role="doc-backlink">↩︎</a></li>`
 
-Renderer.prototype.code = function (this: { options: RendererOptions }, code: string, infostring: string, escaped: boolean, codeBlockStyle: string) {
+Renderer.prototype.code = function (
+  this: { options: RendererOptions },
+  code: string,
+  infostring: string,
+  escaped: boolean,
+  codeBlockStyle: string,
+) {
   const lang = (infostring || '').match(/\S*/)?.[0] ?? ''
   if (this.options.highlight) {
     const out = this.options.highlight(code, lang)
@@ -118,7 +122,14 @@ Renderer.prototype.blockquote = (quote: string) => `<blockquote>\n${quote}</bloc
 
 Renderer.prototype.html = (html: string) => html
 
-Renderer.prototype.heading = function (this: { options: RendererOptions }, text: string, level: number, raw: string, slugger: { slug: (raw: string) => string }, headingStyle: string) {
+Renderer.prototype.heading = function (
+  this: { options: RendererOptions },
+  text: string,
+  level: number,
+  raw: string,
+  slugger: { slug: (raw: string) => string },
+  headingStyle: string,
+) {
   if (this.options.headerIds) {
     return (
       '<h' +
@@ -149,7 +160,11 @@ Renderer.prototype.list = (body: string, ordered: boolean, start: number, _taskL
   return `<${type}${startatt}>\n${body}</${type}>\n`
 }
 
-Renderer.prototype.listitem = function (this: { options: RendererOptions }, text: string, checked: boolean | undefined) {
+Renderer.prototype.listitem = function (
+  this: { options: RendererOptions },
+  text: string,
+  checked: boolean | undefined,
+) {
   // normal list
   if (checked === undefined) {
     return `<li>${text}</li>\n`
@@ -196,7 +211,12 @@ Renderer.prototype.br = function (this: { options: RendererOptions }) {
 
 Renderer.prototype.del = (text: string) => `<del>${text}</del>`
 
-Renderer.prototype.link = function (this: { options: RendererOptions }, href: string, title: string | null, text: string) {
+Renderer.prototype.link = function (
+  this: { options: RendererOptions },
+  href: string,
+  title: string | null,
+  text: string,
+) {
   const cleanedHref = cleanUrl(this.options.sanitize ?? false, this.options.baseUrl ?? null, href)
   if (cleanedHref === null) {
     return text
@@ -209,7 +229,12 @@ Renderer.prototype.link = function (this: { options: RendererOptions }, href: st
   return out
 }
 
-Renderer.prototype.image = function (this: { options: RendererOptions }, href: string, title: string | null, text: string) {
+Renderer.prototype.image = function (
+  this: { options: RendererOptions },
+  href: string,
+  title: string | null,
+  text: string,
+) {
   if (!href) {
     return text
   }

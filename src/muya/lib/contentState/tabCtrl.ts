@@ -14,7 +14,7 @@ const parseSelector = (str = '') => {
   let id = ''
   let className = ''
   let isVoid = false
-  let cap
+  let cap: RegExpExecArray | null
   for (const tagName of HTML_TAGS) {
     if (str.startsWith(tagName) && (!str[tagName.length] || /#|\./.test(str[tagName.length]))) {
       tag = tagName
@@ -128,7 +128,7 @@ const tabCtrl = (ContentState: { prototype: IContentState }) => {
 
     // Now we know it's a list item. Check whether we can indent the list item.
     const list = this.getParent(listItem)
-    return !!(list && /ol|ul/.test(list.type) && listItem.preSibling);
+    return !!(list && /ol|ul/.test(list.type) && listItem.preSibling)
   }
 
   ContentState.prototype.unindentListItem = function (block: Block, type: string) {
@@ -250,7 +250,9 @@ const tabCtrl = (ContentState: { prototype: IContentState }) => {
             case 'image':
             case 'link': {
               const linkTitleLen = ((srcAndTitle as string) || (hrefAndTitle as string)).length
-              const secondLashLen = (backlash as Record<string, unknown>)?.second ? ((backlash as Record<string, unknown>).second as string).length : 0
+              const secondLashLen = (backlash as Record<string, unknown>)?.second
+                ? ((backlash as Record<string, unknown>).second as string).length
+                : 0
               if (offset === end - 3 - (linkTitleLen + secondLashLen)) {
                 result = {
                   offset: 2,
@@ -267,7 +269,9 @@ const tabCtrl = (ContentState: { prototype: IContentState }) => {
             case 'reference_image':
             case 'reference_link': {
               const labelLen = label ? (label as string).length : 0
-              const secondLashLen = (backlash as Record<string, unknown>)?.second ? ((backlash as Record<string, unknown>).second as string).length : 0
+              const secondLashLen = (backlash as Record<string, unknown>)?.second
+                ? ((backlash as Record<string, unknown>).second as string).length
+                : 0
               if (isFullLink) {
                 if (offset === end - 3 - labelLen - secondLashLen) {
                   result = {
@@ -412,7 +416,7 @@ const tabCtrl = (ContentState: { prototype: IContentState }) => {
     }
 
     // Handle `tab` key in table cell.
-    let nextCell
+    let nextCell: Block | null | undefined
     if (start.key === end.key && startBlock.functionType === 'cellContent') {
       nextCell = event.shiftKey ? this.findPreviousCell(startBlock) : this.findNextCell(startBlock)
     } else if (endBlock.functionType === 'cellContent') {

@@ -3,10 +3,10 @@ import { UNDO_DEPTH } from '../config'
 import type { IContentState, IHistoryState as HistoryState } from '../types'
 
 class History {
-  contentState: IContentState;
-  index: number;
-  pending: HistoryState | null;
-  stack: HistoryState[];
+  contentState: IContentState
+  index: number
+  pending: HistoryState | null
+  stack: HistoryState[]
   constructor(contentState: IContentState) {
     this.stack = []
     this.index = -1

@@ -9,12 +9,17 @@ import Theme from '@/prefComponents/theme'
 import Image from '@/prefComponents/image'
 import Keybindings from '@/prefComponents/keybindings'
 
+const SETTINGS_CATEGORIES = new Set(['general', 'editor', 'markdown', 'spelling', 'theme', 'image', 'keybindings'])
+
 const parseSettingsPage = (type) => {
-  let pageUrl = '/preference'
-  if (/\/spelling$/.test(type)) {
-    pageUrl += '/spelling'
+  const match = /^settings\/([^/]+)$/.exec(type)
+  const category = match?.[1]
+
+  if (category && SETTINGS_CATEGORIES.has(category)) {
+    return `/preference/${category}`
   }
-  return pageUrl
+
+  return '/preference'
 }
 
 const routes = (type) => createRouter({

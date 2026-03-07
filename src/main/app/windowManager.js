@@ -383,6 +383,16 @@ class WindowManager extends EventEmitter {
       this._appMenu.updateAlwaysOnTopMenu(win.id, flag)
     })
 
+    ipcMain.on('mt::window-document-state', (e, documentState) => {
+      const win = BrowserWindow.fromWebContents(e.sender)
+      const editor = this.get(win.id)
+      if (!editor || typeof editor.updateDocumentState !== 'function') {
+        log.error(`Cannot find window id "${win.id}" to sync document state.`)
+        return
+      }
+      editor.updateDocumentState(documentState)
+    })
+
     // --- local events ---------------
 
     ipcMain.on('watcher-unwatch-all-by-id', (windowId) => {

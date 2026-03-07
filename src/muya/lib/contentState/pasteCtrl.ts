@@ -259,7 +259,12 @@ const pasteCtrl = (ContentState: { prototype: IContentState }) => {
   }
 
   // Handle `normal` and `pasteAsPlainText` paste for preview mode.
-  ContentState.prototype.pasteHandler = async function (event: ClipboardEvent, type = 'normal', rawText: string | null = null, rawHtml: string | null = null) {
+  ContentState.prototype.pasteHandler = async function (
+    event: ClipboardEvent,
+    type = 'normal',
+    rawText: string | null = null,
+    rawHtml: string | null = null,
+  ) {
     event.preventDefault()
     event.stopPropagation()
 
@@ -473,9 +478,13 @@ const pasteCtrl = (ContentState: { prototype: IContentState }) => {
           // No matter copy loose list to tight list or vice versa, the result is one loose list.
           if (targetListType !== originListType) {
             if (!targetListType) {
-              firstFragment.children.forEach((item: Block) => item.isLooseListItem = true)
+              firstFragment.children.forEach((item: Block) => {
+                item.isLooseListItem = true
+              })
             } else {
-              originList!.children.forEach((item: Block) => item.isLooseListItem = true)
+              originList!.children.forEach((item: Block) => {
+                item.isLooseListItem = true
+              })
             }
           }
 

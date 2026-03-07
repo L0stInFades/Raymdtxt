@@ -233,21 +233,29 @@ const updateCtrl = (ContentState: { prototype: IContentState }) => {
     ) {
       this.appendChild(preSibling, newListItemBlock)
       const partChildren = nextSibling.children.splice(0)
-      partChildren.forEach((b: Block) => this.appendChild(preSibling, b))
+      partChildren.forEach((b: Block) => {
+        this.appendChild(preSibling, b)
+      })
       this.removeBlock(nextSibling)
       this.removeBlock(block)
       const isLooseListItem = preSibling.children.some((c: Block) => c.isLooseListItem)
-      preSibling.children.forEach((c: Block) => (c.isLooseListItem = isLooseListItem))
+      preSibling.children.forEach((c: Block) => {
+        c.isLooseListItem = isLooseListItem
+      })
     } else if (preSibling && this.checkSameMarkerOrDelimiter(preSibling, bulletMarkerOrDelimiter)) {
       this.appendChild(preSibling, newListItemBlock)
       this.removeBlock(block)
       const isLooseListItem = preSibling.children.some((c: Block) => c.isLooseListItem)
-      preSibling.children.forEach((c: Block) => (c.isLooseListItem = isLooseListItem))
+      preSibling.children.forEach((c: Block) => {
+        c.isLooseListItem = isLooseListItem
+      })
     } else if (nextSibling && this.checkSameMarkerOrDelimiter(nextSibling, bulletMarkerOrDelimiter)) {
       this.insertBefore(newListItemBlock, nextSibling.children[0])
       this.removeBlock(block)
       const isLooseListItem = nextSibling.children.some((c: Block) => c.isLooseListItem)
-      nextSibling.children.forEach((c: Block) => (c.isLooseListItem = isLooseListItem))
+      nextSibling.children.forEach((c: Block) => {
+        c.isLooseListItem = isLooseListItem
+      })
     } else {
       // Create a new list when changing list type, bullet or list delimiter
       const listBlock = this.createBlock(wrapperTag, {
@@ -267,6 +275,7 @@ const updateCtrl = (ContentState: { prototype: IContentState }) => {
     // key point
     this.appendChild(newListItemBlock, block)
     const TASK_LIST_REG = /^\[[x ]\] {1,4}/i
+    if (!block.children.length || !block.children[0]) return block
     const listItemText = block.children[0].text
     const { key } = block.children[0]
     const delta = marker.length + preParagraphLines.join('\n').length + 1
@@ -299,11 +308,11 @@ const updateCtrl = (ContentState: { prototype: IContentState }) => {
     const { start, end } = this.cursor
 
     this.insertBefore(checkbox, block)
-    block.children[0].text = block.children[0].text.substring(marker.length)
+    if (block.children[0]) block.children[0].text = block.children[0].text.substring(marker.length)
     parent!.listItemType = 'task'
     parent!.isLooseListItem = preferLooseListItem
 
-    let taskListWrapper
+    let taskListWrapper: Block | undefined
     if (this.isOnlyChild(parent!)) {
       grandpa!.listType = 'task'
     } else if (this.isFirstChild(parent!) || this.isLastChild(parent!)) {
@@ -479,7 +488,7 @@ const updateCtrl = (ContentState: { prototype: IContentState }) => {
         quoteLines.push(l)
       }
     }
-    let quoteParagraphBlock
+    let quoteParagraphBlock: Block | undefined
     if (/^h\d/.test(block.type)) {
       quoteParagraphBlock = this.createBlock(block.type, {
         headingStyle: block.headingStyle,

@@ -26,8 +26,18 @@ const tableSelectCellsCtrl = (ContentState: { prototype: IContentState }) => {
       selectedCells: [],
     }
 
-    const mouseMoveId = eventCenter.attachDOMEvent(document.body, 'mousemove', (this.handleCellMouseMove as Function).bind(this)) as string
-    const mouseUpId = eventCenter.attachDOMEvent(document.body, 'mouseup', (this.handleCellMouseUp as Function).bind(this)) as string
+    const mouseMoveId = eventCenter.attachDOMEvent(
+      document.body,
+      'mousemove',
+      // biome-ignore lint/complexity/noBannedTypes: method binding requires Function type
+      (this.handleCellMouseMove as Function).bind(this),
+    ) as string
+    const mouseUpId = eventCenter.attachDOMEvent(
+      document.body,
+      'mouseup',
+      // biome-ignore lint/complexity/noBannedTypes: method binding requires Function type
+      (this.handleCellMouseUp as Function).bind(this),
+    ) as string
     this.cellSelectEventIds.push(mouseMoveId, mouseUpId)
   }
 
@@ -96,8 +106,8 @@ const tableSelectCellsCtrl = (ContentState: { prototype: IContentState }) => {
       const endRowIndex = Math.max(anchor!.row, focus.row)
       const startColIndex = Math.min(anchor!.column, focus.column)
       const endColIndex = Math.max(anchor!.column, focus.column)
-      let i
-      let j
+      let i: number
+      let j: number
       for (i = startRowIndex; i <= endRowIndex; i++) {
         const row = cells![i]
         for (j = startColIndex; j <= endColIndex; j++) {
@@ -106,7 +116,7 @@ const tableSelectCellsCtrl = (ContentState: { prototype: IContentState }) => {
           this.cellSelectInfo!.selectedCells!.push({
             ele: cell,
             key: cell.id,
-            text: cellBlock!.children[0].text,
+            text: cellBlock?.children?.[0]?.text ?? '',
             align: cellBlock!.align,
             top: i === startRowIndex,
             right: j === endColIndex,
@@ -131,7 +141,13 @@ const tableSelectCellsCtrl = (ContentState: { prototype: IContentState }) => {
     }
 
     for (const cell of selectedCells!) {
-      const { ele, top, right, bottom, left } = cell as unknown as { ele: HTMLElement; top: boolean; right: boolean; bottom: boolean; left: boolean }
+      const { ele, top, right, bottom, left } = cell as unknown as {
+        ele: HTMLElement
+        top: boolean
+        right: boolean
+        bottom: boolean
+        left: boolean
+      }
       ele.classList.add('ag-cell-selected')
       if (top) {
         ele.classList.add('ag-cell-border-top')
@@ -164,7 +180,7 @@ const tableSelectCellsCtrl = (ContentState: { prototype: IContentState }) => {
       const rowBlock = this.getParent(cellBlock)
       const { column: cellColumn } = cellBlock
       rows.add(rowBlock)
-      if (cellBlock.children[0].text) {
+      if (cellBlock.children?.[0]?.text) {
         hasContent = true
       }
       if (typeof lastColumn === 'object') {
@@ -172,12 +188,13 @@ const tableSelectCellsCtrl = (ContentState: { prototype: IContentState }) => {
       } else if (cellColumn !== lastColumn) {
         isSameColumn = false
       }
-      cellBlock.children[0].text = ''
+      if (cellBlock.children?.[0]) cellBlock.children[0].text = ''
     }
 
     const isOneColumnSelected = rows.size === +(row ?? 0) + 1 && isSameColumn
     const isOneRowSelected = cells.length === +(column ?? 0) + 1 && rows.size === 1
-    const isWholeTableSelected = rows.size === +(row ?? 0) + 1 && cells.length === (+(row ?? 0) + 1) * (+(column ?? 0) + 1)
+    const isWholeTableSelected =
+      rows.size === +(row ?? 0) + 1 && cells.length === (+(row ?? 0) + 1) * (+(column ?? 0) + 1)
 
     if (isCut && isWholeTableSelected) {
       this.selectedTableCells = null
@@ -190,7 +207,8 @@ const tableSelectCellsCtrl = (ContentState: { prototype: IContentState }) => {
       return this.muya.dispatchChange()
     } else {
       const cellKey = cells[0].key
-      const cellBlock = this.getBlock(cellKey)!
+      const cellBlock = this.getBlock(cellKey)
+      if (!cellBlock || !cellBlock.children?.[0]) return
       const cellContentKey = cellBlock.children[0].key
       this.selectedTableCells = null
       if (isOneColumnSelected) {

@@ -2,7 +2,14 @@ import type { StateRenderContext } from '../renderContext'
 import { CLASS_OR_ID } from '../../../config'
 import type { Block, Token } from '../../types'
 
-export default function referenceDefinition(this: StateRenderContext, h: typeof import('snabbdom').h, _cursor: unknown, block: Block, token: Token, _outerClass: string) {
+export default function referenceDefinition(
+  this: StateRenderContext,
+  h: typeof import('snabbdom').h,
+  _cursor: unknown,
+  block: Block,
+  token: Token,
+  _outerClass: string,
+) {
   const className = CLASS_OR_ID.AG_REFERENCE_MARKER
   const {
     leftBracket,

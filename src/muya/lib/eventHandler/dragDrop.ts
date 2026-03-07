@@ -1,7 +1,7 @@
 import type { IMuya } from '../types'
 
 class DragDrop {
-  muya: IMuya;
+  muya: IMuya
   constructor(muya: IMuya) {
     this.muya = muya
     this.dragOverBinding()

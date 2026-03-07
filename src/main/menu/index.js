@@ -46,7 +46,6 @@ class AppMenu {
     const { isOsxOrWindows, RECENTS_PATH } = this
 
     if (isOsxOrWindows) app.addRecentDocument(filePath)
-    if (isOsx) return
 
     const recentDocuments = this.getRecentlyUsedDocuments()
     const index = recentDocuments.indexOf(filePath)
@@ -104,7 +103,6 @@ class AppMenu {
   clearRecentlyUsedDocuments() {
     const { isOsxOrWindows, RECENTS_PATH } = this
     if (isOsxOrWindows) app.clearRecentDocuments()
-    if (isOsx) return
 
     const recentDocuments = []
     this.updateAppMenu(recentDocuments)
@@ -309,7 +307,9 @@ class AppMenu {
         return
       }
 
-      themeMenus.submenu.items.forEach((item) => (item.checked = false))
+      themeMenus.submenu.items.forEach((item) => {
+        item.checked = false
+      })
       themeMenus.submenu.items.forEach((item) => {
         if (item.id && item.id === theme) {
           item.checked = true
@@ -366,6 +366,24 @@ class AppMenu {
   }
 
   _listenForIpcMain() {
+    ipcMain.handle('mt::get-recently-used-documents', () => {
+      return this.getRecentlyUsedDocuments().map((pathname) => {
+        const isDirectory = isDirectory2(pathname)
+        let name = path.basename(pathname)
+
+        if (!name) {
+          name = pathname
+        }
+
+        return {
+          pathname,
+          name,
+          parentPath: path.dirname(pathname),
+          kind: isDirectory ? 'folder' : 'file',
+        }
+      })
+    })
+
     ipcMain.on('mt::add-recently-used-document', (_e, pathname) => {
       this.addRecentlyUsedDocument(pathname)
     })
@@ -403,6 +421,9 @@ class AppMenu {
 
     ipcMain.on('menu-add-recently-used', (pathname) => {
       this.addRecentlyUsedDocument(pathname)
+    })
+    ipcMain.on('mt::clear-recently-used-documents', () => {
+      this.clearRecentlyUsedDocuments()
     })
     ipcMain.on('menu-clear-recently-used', () => {
       this.clearRecentlyUsedDocuments()

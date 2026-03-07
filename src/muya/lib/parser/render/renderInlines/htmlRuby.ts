@@ -3,7 +3,14 @@ import { htmlToVNode } from '../snabbdom'
 import type { Block, Token } from '../../types'
 import type { Cursor, StateRenderContext } from '../renderContext'
 
-export default function htmlRuby(this: StateRenderContext, h: typeof import('snabbdom').h, cursor: Cursor, block: Block, token: Token, outerClass: string) {
+export default function htmlRuby(
+  this: StateRenderContext,
+  h: typeof import('snabbdom').h,
+  cursor: Cursor,
+  block: Block,
+  token: Token,
+  outerClass: string,
+) {
   const className = this.getClassName(outerClass, block, token, cursor)
   const { children } = token
   const { start, end } = token.range

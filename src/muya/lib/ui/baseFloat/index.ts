@@ -23,17 +23,17 @@ const defaultOptions = (): FloatOptions => ({
 })
 
 class BaseFloat {
-  cb: (...args: unknown[]) => void;
-  container: HTMLDivElement;
-  floatBox: HTMLDivElement;
-  lastScrollTop: number | null;
-  muya: IMuya;
-  name: string;
-  options: FloatOptions;
-  popper: InstanceType<typeof Popper> | null;
+  cb: (...args: unknown[]) => void
+  container: HTMLDivElement
+  floatBox: HTMLDivElement
+  lastScrollTop: number | null
+  muya: IMuya
+  name: string
+  options: FloatOptions
+  popper: InstanceType<typeof Popper> | null
   // biome-ignore lint/suspicious/noExplicitAny: element-resize-detector has no types
-  resizeDetector: any;
-  status: boolean;
+  resizeDetector: any
+  status: boolean
   constructor(muya: IMuya, name: string, options: FloatOptions = {}) {
     this.name = name
     this.muya = muya

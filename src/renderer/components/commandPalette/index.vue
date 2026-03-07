@@ -1,7 +1,7 @@
 <template>
   <div class="command-palette">
     <el-dialog
-      v-model:visible="showCommandPalette"
+      v-model="showCommandPalette"
       :show-close="false"
       :modal="true"
       @close="handleDialogClose"

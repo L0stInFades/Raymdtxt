@@ -4,10 +4,10 @@ type CopyType = 'normal' | 'copyAsMarkdown' | 'copyAsHtml' | 'copyBlock' | 'copy
 type PasteType = 'normal' | 'pasteAsPlainText'
 
 class Clipboard {
-  _copyInfo: unknown;
-  _copyType: CopyType;
-  _pasteType: PasteType;
-  muya: IMuya;
+  _copyInfo: unknown
+  _copyType: CopyType
+  _pasteType: PasteType
+  muya: IMuya
   constructor(muya: IMuya) {
     this.muya = muya
     this._copyType = 'normal' // `normal` or `copyAsMarkdown` or `copyAsHtml`

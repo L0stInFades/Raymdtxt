@@ -10,19 +10,13 @@ export interface CursorConstructorArgs {
 }
 
 class Cursor {
-  anchor: CursorPosition;
-  end: CursorPosition;
-  focus: CursorPosition;
-  noHistory: boolean;
-  start: CursorPosition;
+  anchor: CursorPosition
+  end: CursorPosition
+  focus: CursorPosition
+  noHistory: boolean
+  start: CursorPosition
   // You need to provide either `anchor`&&`focus` or `start`&&`end` or all.
-  constructor({
-    anchor,
-    focus,
-    start,
-    end,
-    noHistory = false
-  }: CursorConstructorArgs) {
+  constructor({ anchor, focus, start, end, noHistory = false }: CursorConstructorArgs) {
     if (anchor && focus && start && end) {
       this.anchor = anchor
       this.focus = focus
@@ -40,8 +34,9 @@ class Cursor {
           this.end = this.anchor
         }
       } else {
-        const anchorParagraph = document.querySelector(`#${anchor.key}`)
-        const focusParagraph = document.querySelector(`#${focus.key}`)
+        // Guard against empty keys that would cause querySelector('#') to crash
+        const anchorParagraph = anchor.key ? document.querySelector(`#${anchor.key}`) : null
+        const focusParagraph = focus.key ? document.querySelector(`#${focus.key}`) : null
         let order = true
         if (anchorParagraph && focusParagraph) {
           order = !!compareParagraphsOrder(anchorParagraph, focusParagraph)

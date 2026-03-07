@@ -4,6 +4,8 @@
   >
     <div
       class="folder-name" @click="folderNameClick"
+      data-testid="tree-folder"
+      :data-pathname="folder.pathname"
       :style="{'padding-left': `${(depth * 20) + 20}px`}"
       :class="[{ 'active': folder.id === activeItem.id }]"
       :title="folder.pathname"
@@ -50,6 +52,7 @@
 </template>
 
 <script>
+import File from './treeFile.vue'
 import { mapState } from 'vuex'
 import { showContextMenu } from '../../contextMenu/sideBar'
 import bus from '../../bus'
@@ -75,7 +78,7 @@ export default {
     },
   },
   components: {
-    File: () => import('./treeFile.vue'),
+    File,
   },
   computed: {
     ...mapState({

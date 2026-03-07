@@ -14,37 +14,22 @@ import { validEmoji } from '../ui/emojis'
 import type { IMuya } from '../types'
 
 interface ExportOptions {
-  printOptimization?: boolean;
-  toc?: string;
-  title?: string;
-  extraCss?: string;
-  header?: { type: number; left: string; center: string; right: string };
-  footer?: { type: number; left: string; center: string; right: string };
-  headerFooterStyled?: boolean;
-}
-
-interface MarkedOptions {
-  superSubScript?: boolean;
-  footnote?: boolean;
-  isGitlabCompatibilityEnabled?: boolean;
-  highlight?: (code: string, lang: string) => string;
-  emojiRenderer?: (emoji: string) => string;
-  mathRenderer?: (math: string, displayMode: boolean) => string;
-  tocRenderer?: () => string;
-}
-
-export const getSanitizeHtml = (markdown: string, options: Record<string, unknown>) => {
-  const html = marked(markdown, options)
-  return sanitize(html, EXPORT_DOMPURIFY_CONFIG, false)
+  printOptimization?: boolean
+  toc?: string
+  title?: string
+  extraCss?: string
+  header?: { type: number; left: string; center: string; right: string }
+  footer?: { type: number; left: string; center: string; right: string }
+  headerFooterStyled?: boolean
 }
 
 const DIAGRAM_TYPE = ['mermaid', 'flowchart', 'sequence', 'plantuml', 'vega-lite']
 
 class ExportHtml {
-  exportContainer: HTMLDivElement | null;
-  markdown: string;
-  mathRendererCalled: boolean;
-  muya: IMuya | undefined;
+  exportContainer: HTMLDivElement | null
+  markdown: string
+  mathRendererCalled: boolean
+  muya: IMuya | undefined
   constructor(markdown: string, muya?: IMuya) {
     this.markdown = markdown
     this.muya = muya
@@ -79,12 +64,7 @@ class ExportHtml {
 
   async renderDiagram() {
     const selector = 'code.language-vega-lite, code.language-flowchart, code.language-sequence, code.language-plantuml'
-    const RENDER_MAP: Record<string, unknown> = {
-      flowchart: await loadRenderer('flowchart'),
-      sequence: await loadRenderer('sequence'),
-      plantuml: await loadRenderer('plantuml'),
-      'vega-lite': await loadRenderer('vega-lite'),
-    }
+    const renderers = new Map<string, unknown>()
     const codes = this.exportContainer!.querySelectorAll(selector)
     for (const code of codes) {
       const rawCode = unescapeHTML(code.innerHTML)
@@ -99,8 +79,11 @@ class ExportHtml {
           return 'vega-lite'
         }
       })()
+      if (!renderers.has(functionType)) {
+        renderers.set(functionType, await loadRenderer(functionType))
+      }
       // biome-ignore lint/suspicious/noExplicitAny: diagram renderers have heterogeneous APIs
-      const render = RENDER_MAP[functionType] as any
+      const render = renderers.get(functionType) as any
       const preParent = code.parentNode as HTMLElement
       const diagramContainer = document.createElement('div')
       diagramContainer.classList.add(functionType)
@@ -130,8 +113,9 @@ class ExportHtml {
         if (functionType === 'vega-lite') {
           await render(diagramContainer, JSON.parse(rawCode), options)
         }
-      } catch (_err) {
-        diagramContainer.innerHTML = '< Invalid Diagram >'
+      } catch (err) {
+        console.error('Failed to render diagram:', err)
+        diagramContainer.innerHTML = '<pre class="invalid-diagram">Invalid Diagram</pre>'
       }
     }
   }
@@ -193,7 +177,8 @@ class ExportHtml {
 
     html = sanitize(html, EXPORT_DOMPURIFY_CONFIG, false)
 
-    const exportContainer = (this.exportContainer = document.createElement('div'))
+    this.exportContainer = document.createElement('div')
+    const exportContainer = this.exportContainer
     exportContainer.classList.add('ag-render-container')
     exportContainer.innerHTML = html
     document.body.appendChild(exportContainer)

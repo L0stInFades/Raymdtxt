@@ -1,6 +1,7 @@
 // __MARKTEXT_ONLY__
-import { deepClone } from '../utils'
 import type { Cursor, CursorPosition } from '../types'
+
+const deepClone = <T>(value: T): T => JSON.parse(JSON.stringify(value))
 
 // Source: https://github.com/Microsoft/vscode/blob/master/src/vs/editor/common/model/wordHelper.ts
 // /(-?\d*\.\d\w*)|([^\`\~\!\@\#\$\%\^\&\*\(\)\-\=\+\[\{\]\}\\\|\;\:\'\"\,\.\<\>\/\?\s]+)/
@@ -34,9 +35,9 @@ export const offsetToWordCursor = (lineCursor: Cursor, left: number, right: numb
  * @param {*} selection The preview editor selection range.
  */
 export const validateLineCursor = (selection: {
-  start: CursorPosition & { block?: { functionType?: string; lang?: string } };
-  end: CursorPosition;
-  affiliation?: Array<{ type: string }>;
+  start: CursorPosition & { block?: { functionType?: string; lang?: string } }
+  end: CursorPosition
+  affiliation?: Array<{ type: string }>
 }): boolean => {
   // Validate selection range.
   if (
@@ -86,7 +87,8 @@ export const extractWord = (text: string, offset: number) => {
   WORD_DEFINITION.lastIndex = text.lastIndexOf(' ', offset - 1) + 1
   let match = null
   let left = -1
-  while ((match = WORD_DEFINITION.exec(text))) {
+  match = WORD_DEFINITION.exec(text)
+  while (match) {
     // eslint-disable-line
     if (match && match.index <= offset) {
       if (WORD_DEFINITION.lastIndex > offset) {
@@ -95,6 +97,7 @@ export const extractWord = (text: string, offset: number) => {
     } else {
       break
     }
+    match = WORD_DEFINITION.exec(text)
   }
   WORD_DEFINITION.lastIndex = 0
 

@@ -30,12 +30,12 @@ interface SubMenuItem {
 class FrontMenu extends BaseFloat {
   static pluginName = 'frontMenu'
 
-  endBlock: Block | null;
-  frontMenuContainer: HTMLDivElement;
-  oldVnode: VNode | null;
-  outmostBlock: Block | null;
-  reference: HTMLElement | null;
-  startBlock: Block | null;
+  endBlock: Block | null
+  frontMenuContainer: HTMLDivElement
+  oldVnode: VNode | null
+  outmostBlock: Block | null
+  reference: HTMLElement | null
+  startBlock: Block | null
 
   constructor(muya: IMuya, options = {}) {
     const name = 'ag-front-menu'
@@ -47,7 +47,8 @@ class FrontMenu extends BaseFloat {
     this.endBlock = null
     this.options = opts
     this.reference = null
-    const frontMenuContainer = (this.frontMenuContainer = document.createElement('div'))
+    this.frontMenuContainer = document.createElement('div')
+    const frontMenuContainer = this.frontMenuContainer
     Object.assign((this.container.parentNode as HTMLElement).style, {
       overflow: 'visible',
     })
@@ -58,7 +59,17 @@ class FrontMenu extends BaseFloat {
   listen() {
     const { eventCenter } = this.muya
     super.listen()
-    eventCenter.subscribe('muya-front-menu', (({ reference, outmostBlock, startBlock, endBlock }: { reference: HTMLElement | null; outmostBlock: Block; startBlock: Block; endBlock: Block }) => {
+    eventCenter.subscribe('muya-front-menu', (({
+      reference,
+      outmostBlock,
+      startBlock,
+      endBlock,
+    }: {
+      reference: HTMLElement | null
+      outmostBlock: Block
+      startBlock: Block
+      endBlock: Block
+    }) => {
       if (reference) {
         this.outmostBlock = outmostBlock
         this.startBlock = startBlock
@@ -185,9 +196,7 @@ class FrontMenu extends BaseFloat {
     this.oldVnode = vnode
   }
 
-  selectItem(event: Event, {
-    label
-  }: { label: string }) {
+  selectItem(event: Event, { label }: { label: string }) {
     event.preventDefault()
     event.stopPropagation()
     if (!this.outmostBlock) return

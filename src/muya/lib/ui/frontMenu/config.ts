@@ -14,10 +14,14 @@ interface QuickInsertItem {
   icon: string
 }
 
-const wholeSubMenu: QuickInsertItem[] = Object.keys(quickInsertObj).reduce<QuickInsertItem[]>((acc, key) => {
-  const items = quickInsertObj[key as keyof typeof quickInsertObj]
-  return [...acc, ...items]
-}, [])
+const wholeSubMenu: QuickInsertItem[] = (() => {
+  const result: QuickInsertItem[] = []
+  for (const key of Object.keys(quickInsertObj)) {
+    const items = quickInsertObj[key as keyof typeof quickInsertObj]
+    result.push(...items)
+  }
+  return result
+})()
 
 const COMMAND_KEY = isOsx ? '⌘' : '⌃'
 
@@ -132,7 +136,7 @@ export const getSubMenu = (block: Block, startBlock: Block, endBlock: Block) => 
         const REG_EXP = startBlock.key === endBlock.key ? /front-matter|hr|table/ : /front-matter|hr|table|heading/
 
         return !REG_EXP.test(menuItem.label)
-      });
+      })
     }
     case 'h1':
     case 'h2':
@@ -141,14 +145,14 @@ export const getSubMenu = (block: Block, startBlock: Block, endBlock: Block) => 
     case 'h5':
     case 'h6': {
       return wholeSubMenu.filter((menuItem: QuickInsertItem) => {
-        return /heading|paragraph/.test(menuItem.label);
-      });
+        return /heading|paragraph/.test(menuItem.label)
+      })
     }
     case 'ul':
     case 'ol': {
       return wholeSubMenu.filter((menuItem: QuickInsertItem) => {
-        return /ul|ol/.test(menuItem.label);
-      });
+        return /ul|ol/.test(menuItem.label)
+      })
     }
     default:
       return []

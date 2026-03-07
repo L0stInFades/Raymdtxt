@@ -4,10 +4,10 @@ import type { IContentState, Block, BlockAlign, CursorPosition } from '../types'
 const TABLE_BLOCK_REG = /^\|.*?(\\*)\|.*?(\\*)\|/
 
 const tableBlockCtrl = (ContentState: { prototype: IContentState }) => {
-  ContentState.prototype.createTableInFigure = function ({
-    rows,
-    columns
-  }: { rows: number; columns: number }, tableContents: Array<Array<{ text: string; align: string }>> = []) {
+  ContentState.prototype.createTableInFigure = function (
+    { rows, columns }: { rows: number; columns: number },
+    tableContents: Array<Array<{ text: string; align: string }>> = [],
+  ) {
     const table = this.createBlock('table', {
       row: rows - 1, // zero base
       column: columns - 1,
@@ -15,15 +15,15 @@ const tableBlockCtrl = (ContentState: { prototype: IContentState }) => {
     const tHead = this.createBlock('thead')
     const tBody = this.createBlock('tbody')
 
-    let i
-    let j
+    let i: number
+    let j: number
     for (i = 0; i < rows; i++) {
       const rowBlock = this.createBlock('tr')
       i === 0 ? this.appendChild(tHead, rowBlock) : this.appendChild(tBody, rowBlock)
       const rowContents = tableContents[i]
       for (j = 0; j < columns; j++) {
         const cell = this.createBlock(i === 0 ? 'th' : 'td', {
-          align: rowContents ? rowContents[j].align as BlockAlign : '',
+          align: rowContents ? (rowContents[j].align as BlockAlign) : '',
           column: j,
         })
         const cellContent = this.createBlock('span', {
@@ -44,10 +44,7 @@ const tableBlockCtrl = (ContentState: { prototype: IContentState }) => {
     return table
   }
 
-  ContentState.prototype.createFigure = function ({
-    rows,
-    columns
-  }: { rows: number; columns: number }) {
+  ContentState.prototype.createFigure = function ({ rows, columns }: { rows: number; columns: number }) {
     const { end } = this.cursor
     const table = this.createTableInFigure({ rows, columns })
     const figureBlock = this.createBlock('figure', {
@@ -83,10 +80,11 @@ const tableBlockCtrl = (ContentState: { prototype: IContentState }) => {
   }
 
   ContentState.prototype.initTable = function (block: Block) {
+    if (!block.children.length || !block.children[0]) return false
     const { text } = block.children[0]
-    const rowHeader = []
+    const rowHeader: string[] = []
     const len = text.length
-    let i
+    let i: number
     for (i = 0; i < len; i++) {
       const char = text[i]
       if (/^[^|]$/.test(char)) {
@@ -247,11 +245,8 @@ const tableBlockCtrl = (ContentState: { prototype: IContentState }) => {
   // insert/remove row/column
   ContentState.prototype.editTable = function (
     this: IContentState,
-    {
-      location,
-      action,
-      target
-    }: { location: string; action: string; target: string }, cellContentKey: string | null
+    { location, action, target }: { location: string; action: string; target: string },
+    cellContentKey: string | null,
   ) {
     let block: Block
     let start: CursorPosition | undefined
@@ -291,7 +286,9 @@ const tableBlockCtrl = (ContentState: { prototype: IContentState }) => {
           this.insertBefore(newRow, currentRow)
           if (cellBlock.type === 'th') {
             this.removeBlock(currentRow)
-            currentRow.children.forEach((cell: Block) => cell.type = 'td')
+            currentRow.children.forEach((cell: Block) => {
+              cell.type = 'td'
+            })
             const firstRow = tbody.children[0]
             this.insertBefore(currentRow, firstRow)
           }
@@ -313,7 +310,9 @@ const tableBlockCtrl = (ContentState: { prototype: IContentState }) => {
             if (!currentRow.nextSibling) return
             this.removeBlock(headRow)
             this.removeBlock(currentRow)
-            currentRow.children.forEach((cell: Block) => cell.type = 'th')
+            currentRow.children.forEach((cell: Block) => {
+              cell.type = 'th'
+            })
             this.appendChild(thead, currentRow)
           } else {
             const preRow = this.getPreSibling(currentRow)!
@@ -325,7 +324,9 @@ const tableBlockCtrl = (ContentState: { prototype: IContentState }) => {
             this.removeBlock(currentRow)
             this.removeBlock(firstRow)
             this.appendChild(thead, firstRow)
-            firstRow.children.forEach((cell: Block) => cell.type = 'th')
+            firstRow.children.forEach((cell: Block) => {
+              cell.type = 'th'
+            })
             cursorBlock = firstRow.children[columnIndex].children[0]
           }
           if (cellBlock.type === 'td' && (currentRow.preSibling || currentRow.nextSibling)) {

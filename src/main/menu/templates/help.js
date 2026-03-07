@@ -35,40 +35,28 @@ export default function () {
       {
         label: 'Quick Start...',
         click() {
-          shell.openExternal('https://github.com/marktext/marktext/blob/master/docs/README.md')
+          shell.openExternal('https://github.com/L0stInFades/vien/blob/develop/README.md')
         },
       },
       {
         label: 'Markdown Reference...',
         click() {
-          shell.openExternal('https://github.com/marktext/marktext/blob/master/docs/MARKDOWN_SYNTAX.md')
+          shell.openExternal('https://github.com/L0stInFades/vien/blob/develop/docs/MARKDOWN_SYNTAX.md')
         },
       },
       {
         label: 'Changelog...',
         click() {
-          shell.openExternal('https://github.com/marktext/marktext/blob/master/.github/CHANGELOG.md')
+          shell.openExternal('https://github.com/L0stInFades/vien/blob/develop/.github/CHANGELOG.md')
         },
       },
       {
         type: 'separator',
       },
       {
-        label: 'Donate via Open Collective...',
-        click(_item, _win) {
-          shell.openExternal('https://opencollective.com/marktext')
-        },
-      },
-      {
-        label: 'Feedback via Twitter...',
-        click(_item, win) {
-          actions.showTweetDialog(win, 'twitter')
-        },
-      },
-      {
         label: 'Report Issue or Request Feature...',
         click() {
-          shell.openExternal('https://github.com/marktext/marktext/issues')
+          shell.openExternal('https://github.com/L0stInFades/vien/issues')
         },
       },
       {
@@ -77,25 +65,13 @@ export default function () {
       {
         label: 'Website...',
         click() {
-          shell.openExternal('https://github.com/marktext/marktext')
+          shell.openExternal('https://github.com/L0stInFades/vien')
         },
       },
       {
         label: 'Watch on GitHub...',
         click() {
-          shell.openExternal('https://github.com/marktext/marktext')
-        },
-      },
-      {
-        label: 'Follow us on Github...',
-        click() {
-          shell.openExternal('https://github.com/Jocs')
-        },
-      },
-      {
-        label: 'Follow us on Twitter...',
-        click() {
-          shell.openExternal('https://twitter.com/marktextapp')
+          shell.openExternal('https://github.com/L0stInFades/vien')
         },
       },
       {
@@ -104,7 +80,7 @@ export default function () {
       {
         label: 'License...',
         click() {
-          shell.openExternal('https://github.com/marktext/marktext/blob/master/LICENSE')
+          shell.openExternal('https://github.com/L0stInFades/vien/blob/develop/LICENSE')
         },
       },
     ],
@@ -130,7 +106,7 @@ export default function () {
         type: 'separator',
       },
       {
-        label: 'About MarkText...',
+        label: 'About Vien...',
         click(_menuItem, browserWindow) {
           actions.showAboutDialog(browserWindow)
         },

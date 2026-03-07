@@ -9,7 +9,13 @@
       :class="[{ 'active': active }, { 'tabs-visible': showTabBar }, { 'frameless': titleBarStyle === 'custom' }, { 'isOsx': isOsx }]"
     >
       <div class="title" @dblclick.stop="toggleMaxmizeOnMacOS">
-        <span v-if="!filename">MarkText</span>
+        <span v-if="!filename" class="brand-title">
+          <img class="brand-mark" :src="brandLogo" alt="Vien logo" />
+          <span class="brand-copy">
+            <span class="brand-name">Vien</span>
+            <span v-if="projectName" class="brand-context">{{ projectName }}</span>
+          </span>
+        </span>
         <span v-else>
           <span
             v-for="(path, index) of paths"
@@ -100,6 +106,7 @@ import { mapState } from 'vuex'
 import { minimizePath, restorePath, maximizePath, closePath } from '../../assets/window-controls.js'
 import { PATH_SEPARATOR } from '../../config'
 import { isOsx } from '@/util'
+import VienLogo from '@/assets/images/logo.png'
 
 export default {
   data() {
@@ -118,9 +125,12 @@ export default {
       windowIconRestore: restorePath,
       windowIconMaximize: maximizePath,
       windowIconClose: closePath,
+      brandLogo: VienLogo,
     }
   },
   async created() {
+    this.updateDocumentTitle()
+    this.syncWindowDocumentState()
     // Initialize window state via preload API (with fallback if window.api not ready)
     if (window.api) {
       this.isFullScreen = await window.api.window.isFullScreen()
@@ -150,25 +160,48 @@ export default {
       const pathnameToken = this.pathname.split(PATH_SEPARATOR).filter((i) => i)
       return pathnameToken.slice(0, pathnameToken.length - 1).slice(-3)
     },
+    projectName() {
+      return this.project?.name || ''
+    },
     showCustomTitleBar() {
       return this.titleBarStyle === 'custom' && !this.isOsx
     },
   },
   watch: {
-    filename: function (value) {
-      // Set filename when hover on dock
-      const hasOpenFolder = this.project?.name
-      let title = ''
-      if (value) {
-        title = hasOpenFolder ? `${value} - ${this.project.name}` : `${value} - MarkText`
-      } else {
-        title = hasOpenFolder ? this.project.name : 'MarkText'
-      }
-
-      document.title = title
+    filename() {
+      this.updateDocumentTitle()
+      this.syncWindowDocumentState()
+    },
+    pathname() {
+      this.syncWindowDocumentState()
+    },
+    isSaved() {
+      this.syncWindowDocumentState()
+    },
+    projectName() {
+      this.updateDocumentTitle()
     },
   },
   methods: {
+    updateDocumentTitle() {
+      if (this.filename) {
+        document.title = this.projectName ? `${this.filename} - ${this.projectName}` : `${this.filename} - Vien`
+      } else {
+        document.title = this.projectName || 'Vien'
+      }
+    },
+
+    syncWindowDocumentState() {
+      if (!window.api?.ipc) {
+        return
+      }
+      window.api.ipc.send('mt::window-document-state', {
+        filename: this.filename || '',
+        pathname: this.pathname || '',
+        isSaved: typeof this.isSaved === 'boolean' ? this.isSaved : true,
+      })
+    },
+
     handleWordClick() {
       const ITEMS = ['word', 'paragraph', 'character', 'all']
       const len = ITEMS.length
@@ -232,6 +265,7 @@ export default {
   .title-bar-editor-bg {
     height: var(--titleBarHeight);
     background: var(--editorBgColor);
+    box-shadow: inset 0 -1px 0 var(--editorColor04);
     position: relative;
     left: 0;
     top: 0;
@@ -249,16 +283,12 @@ export default {
     top: 0;
     right: 0;
     z-index: 2;
+    backdrop-filter: blur(18px);
     transition: color .4s ease-in-out;
     cursor: default;
   }
   .active {
     color: var(--editorColor);
-  }
-  img {
-    height: 90%;
-    margin-top: 1px;
-    vertical-align: top;
   }
   .title {
     padding: 0 142px;
@@ -278,6 +308,7 @@ export default {
       width: 100%;
       z-index: 1;
       -webkit-app-region: no-drag;
+      background: linear-gradient(90deg, transparent, var(--editorColor10), transparent);
     }
   }
   div.title > span {
@@ -286,6 +317,47 @@ export default {
     direction: rtl;
     overflow: hidden;
     text-overflow: clip;
+    white-space: nowrap;
+  }
+  div.title > span.brand-title {
+    direction: ltr;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    max-width: min(48vw, 340px);
+    margin: 0 auto;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: var(--itemBgColor);
+    box-shadow: 0 12px 30px rgba(15, 15, 15, 0.06);
+  }
+  .brand-mark {
+    width: 18px;
+    height: 18px;
+    margin-top: 0;
+    border-radius: 6px;
+    flex-shrink: 0;
+    vertical-align: top;
+  }
+  .brand-copy {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 8px;
+    min-width: 0;
+  }
+  .brand-name {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .brand-context {
+    max-width: 16vw;
+    font-size: 12px;
+    opacity: .55;
+    overflow: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
   }
 
@@ -307,7 +379,7 @@ export default {
     visibility: visible;
   }
   .title:hover {
-    color: var(sideBarTitleColor);
+    color: var(--sideBarTitleColor);
   }
 
   .left-toolbar {
@@ -318,6 +390,7 @@ export default {
     left: 0;
     width: 118px; /* + 2*10px padding*/
     display: flex;
+    align-items: center;
     flex-direction: row;
   }
   .right-toolbar {
@@ -344,11 +417,14 @@ export default {
     box-sizing: border-box;
     transition: all .25s ease-in-out;
     & > .text-center-vertical {
-      padding: 2px 5px;
-      border-radius: 3px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      background: rgba(127, 127, 127, 0.06);
     }
     &:hover > span {
       background: var(--sideBarBgColor);
+      border-color: var(--editorColor04);
       color: var(--sideBarTitleColor);
     }
   }

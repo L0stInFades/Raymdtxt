@@ -8,15 +8,32 @@
 // ---------------------------------------------------------------------------
 
 export type BlockType =
-  | 'span' | 'p' | 'div'
-  | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
-  | 'pre' | 'code'
-  | 'ul' | 'ol' | 'li'
+  | 'span'
+  | 'p'
+  | 'div'
+  | 'h1'
+  | 'h2'
+  | 'h3'
+  | 'h4'
+  | 'h5'
+  | 'h6'
+  | 'pre'
+  | 'code'
+  | 'ul'
+  | 'ol'
+  | 'li'
   | 'blockquote'
-  | 'figure' | 'table' | 'thead' | 'tbody' | 'tr' | 'td' | 'th'
-  | 'hr' | 'input'
+  | 'figure'
+  | 'table'
+  | 'thead'
+  | 'tbody'
+  | 'tr'
+  | 'td'
+  | 'th'
+  | 'hr'
+  | 'input'
   | 'root'
-  | string  // allow unknown block types from extensions
+  | string // allow unknown block types from extensions
 
 export type BlockFunctionType =
   | 'paragraphContent'
@@ -317,14 +334,34 @@ export interface IContentState {
 
   // Misc
   removeTextOrBlock(block: Block): void
-  getPositionReference(): { getBoundingClientRect(): { x: number; y: number; top: number; left: number; right: number; bottom: number; height: number; width: number }; clientWidth: number; clientHeight: number; id: string | null }
+  getPositionReference(): {
+    getBoundingClientRect(): {
+      x: number
+      y: number
+      top: number
+      left: number
+      right: number
+      bottom: number
+      height: number
+      width: number
+    }
+    clientWidth: number
+    clientHeight: number
+    id: string | null
+  }
 
   // Cursor property (mutable, used by event handlers)
   cursor: Cursor
 
   // Selected state
   selectedImage: unknown
-  selectedTableCells: { tableId: string; row: number; column: number; cells: Array<{ key: string; [key: string]: unknown }>; [key: string]: unknown } | null
+  selectedTableCells: {
+    tableId: string
+    row: number
+    column: number
+    cells: Array<{ key: string; [key: string]: unknown }>
+    [key: string]: unknown
+  } | null
 
   // Event handler methods (keyboard/clipboard/click/mouse/drag controllers)
   inputHandler(event: Event): void
@@ -343,7 +380,12 @@ export interface IContentState {
   docCutHandler(event: ClipboardEvent): void
   copyHandler(event: ClipboardEvent, copyType: string, copyInfo: unknown): void
   cutHandler(): void
-  pasteHandler(event: ClipboardEvent, type?: string, rawText?: string | null, rawHtml?: string | null): Promise<void> | void
+  pasteHandler(
+    event: ClipboardEvent,
+    type?: string,
+    rawText?: string | null,
+    rawHtml?: string | null,
+  ): Promise<void> | void
   dragoverHandler(event: DragEvent): void
   dropHandler(event: DragEvent): void
   dragleaveHandler(event: DragEvent): void
@@ -412,7 +454,12 @@ export interface IContentState {
   // Misc (mixin-provided)
   selectAll(): void
   extractImages(markdown: string): unknown
-  replaceWordInline(line: LineCursor, wordCursor: { start: CursorPosition; end: CursorPosition }, replacement: string, setCursor?: boolean): void
+  replaceWordInline(
+    line: LineCursor,
+    wordCursor: { start: CursorPosition; end: CursorPosition },
+    replacement: string,
+    setCursor?: boolean,
+  ): void
   _replaceCurrentWordInlineUnsafe(word: string, replacement: string): unknown
 
   // Arrow / cell navigation (arrowCtrl, tableBlockCtrl)
@@ -467,7 +514,7 @@ export interface IContentState {
   clearBlockFormat(block: Block, range: unknown, formatType: string | undefined): void
 
   // HTML block
-  initHtmlBlock(block: Block): Block
+  initHtmlBlock(block: Block): Block | false
   insertHtmlBlock(block: Block): void
 
   // Input (inputCtrl)
@@ -605,7 +652,7 @@ export interface IEventCenter {
 
   // DOM event management (from EventCenter class)
   // biome-ignore lint/suspicious/noExplicitAny: EventListener accepts Event but callers pass specific subtypes (KeyboardEvent, etc.)
-  attachDOMEvent(target: EventTarget, event: string, listener: ((event: any) => void), capture?: boolean): string | false
+  attachDOMEvent(target: EventTarget, event: string, listener: (event: any) => void, capture?: boolean): string | false
   detachDOMEvent(eventId: string): void
   detachAllDomEvents(): void
 
@@ -626,9 +673,16 @@ export interface IStateRender {
   tokenCache: Map<string, unknown>
   urlMap: Map<string, unknown>
   labels: Map<string, { href: string; title: string }>
+  setContainer(container: HTMLElement): void
   collectLabels(blocks: Block[]): void
   render(blocks: Block[], activeBlocks: Block[], matches: SearchMatch[]): void
-  partialRender(blocks: Block[], activeBlocks: Block[], matches: SearchMatch[], startKey: string | null, endKey: string | null): void
+  partialRender(
+    blocks: Block[],
+    activeBlocks: Block[],
+    matches: SearchMatch[],
+    startKey: string | null,
+    endKey: string | null,
+  ): void
   singleRender(block: Block, activeBlocks: Block[], matches: SearchMatch[]): void
   invalidateImageCache(): void
 }

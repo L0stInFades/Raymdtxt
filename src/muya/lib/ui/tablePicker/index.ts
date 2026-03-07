@@ -13,11 +13,11 @@ interface TableSize {
 class TablePicker extends BaseFloat {
   static pluginName = 'tablePicker'
 
-  checkerCount: TableSize;
-  current: TableSize | null;
-  oldVnode: VNode | null;
-  select: TableSize | null;
-  tableContainer: HTMLDivElement;
+  checkerCount: TableSize
+  current: TableSize | null
+  oldVnode: VNode | null
+  select: TableSize | null
+  tableContainer: HTMLDivElement
 
   constructor(muya: IMuya) {
     const name = 'ag-table-picker'
@@ -29,7 +29,8 @@ class TablePicker extends BaseFloat {
     this.oldVnode = null
     this.current = null
     this.select = null
-    const tableContainer = (this.tableContainer = document.createElement('div'))
+    this.tableContainer = document.createElement('div')
+    const tableContainer = this.tableContainer
     this.container.appendChild(tableContainer)
     this.listen()
   }
@@ -37,7 +38,11 @@ class TablePicker extends BaseFloat {
   listen() {
     const { eventCenter } = this.muya
     super.listen()
-    eventCenter.subscribe('muya-table-picker', ((data: TableSize, reference: HTMLElement, cb: (...args: unknown[]) => void) => {
+    eventCenter.subscribe('muya-table-picker', ((
+      data: TableSize,
+      reference: HTMLElement,
+      cb: (...args: unknown[]) => void,
+    ) => {
       if (!this.status) {
         this.showTable(data, reference, cb)
         this.render()
@@ -54,10 +59,10 @@ class TablePicker extends BaseFloat {
     const { row: sRow, column: sColumn } = this.select
     const { tableContainer, oldVnode } = this
     const tableRows = []
-    let i
-    let j
+    let i: number
+    let j: number
     for (i = 0; i < row; i++) {
-      let rowSelector = 'div.ag-table-picker-row'
+      const rowSelector = 'div.ag-table-picker-row'
       const cells = []
       for (j = 0; j < column; j++) {
         let cellSelector = 'span.ag-table-picker-cell'

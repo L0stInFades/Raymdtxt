@@ -1,8 +1,17 @@
 import { HAS_TEXT_BLOCK_REG, DEFAULT_TURNDOWN_CONFIG } from '../config'
-import type { Block, IContentState, IMuya, SearchMatches, MuyaOptions, Cursor as CursorInterface, IDragInfo, ICellSelectInfo } from '../types'
+import type {
+  Block,
+  IContentState,
+  IStateRender,
+  IMuya,
+  SearchMatches,
+  MuyaOptions,
+  Cursor as CursorInterface,
+  IDragInfo,
+  ICellSelectInfo,
+} from '../types'
 import { getUniqueId, deepCopy } from '../utils'
 import selection from '../selection'
-import StateRender from '../parser/render'
 import type { CursorConstructorArgs } from '../selection/cursor'
 import enterCtrl from './enterCtrl'
 import updateCtrl from './updateCtrl'
@@ -36,6 +45,30 @@ import importMarkdown from '../utils/importMarkdown'
 import Cursor from '../selection/cursor'
 import escapeCharactersMap, { escapeCharacters } from '../parser/escapeCharacter'
 
+class StateRenderStub implements IStateRender {
+  tokenCache = new Map<string, unknown>()
+  urlMap = new Map<string, unknown>()
+  labels = new Map<string, { href: string; title: string }>()
+
+  setContainer(_container: HTMLElement) {}
+
+  collectLabels(_blocks: Block[]) {}
+
+  render(_blocks: Block[], _activeBlocks: Block[], _matches: SearchMatches['matches']) {}
+
+  partialRender(
+    _blocks: Block[],
+    _activeBlocks: Block[],
+    _matches: SearchMatches['matches'],
+    _startKey: string | null,
+    _endKey: string | null,
+  ) {}
+
+  singleRender(_block: Block, _activeBlocks: Block[], _matches: SearchMatches['matches']) {}
+
+  invalidateImageCache() {}
+}
+
 const prototypes = [
   coreApi,
   marktextApi,
@@ -68,27 +101,33 @@ const prototypes = [
 ]
 
 class ContentState {
-  _selectedImage: unknown;
-  _selectedTableCells: { tableId: string; row: number; column: number; cells: Array<{ key: string; [key: string]: unknown }>; [key: string]: unknown } | null;
-  blocks: Block[];
-  cellSelectEventIds: string[];
-  cellSelectInfo: ICellSelectInfo | null;
-  currentCursor: Cursor | null;
-  dragEventIds: string[];
-  dragInfo: IDragInfo | null;
-  dropAnchor: { position: string; anchor: Block } | null;
-  exemption: Set<string>;
-  history: History;
-  historyTimer: ReturnType<typeof setTimeout> | null;
-  isDragTableBar: boolean;
-  muya: IMuya;
-  prevCursor: Cursor | null;
-  renderRange: [string | null, string | null];
-  resizeLineNumber!: () => void;
-  searchMatches!: SearchMatches;
-  selectedBlock: Block | null;
-  stateRender: StateRender;
-  turndownConfig: Record<string, unknown>;
+  _selectedImage: unknown
+  _selectedTableCells: {
+    tableId: string
+    row: number
+    column: number
+    cells: Array<{ key: string; [key: string]: unknown }>
+    [key: string]: unknown
+  } | null
+  blocks: Block[]
+  cellSelectEventIds: string[]
+  cellSelectInfo: ICellSelectInfo | null
+  currentCursor: Cursor | null
+  dragEventIds: string[]
+  dragInfo: IDragInfo | null
+  dropAnchor: { position: string; anchor: Block } | null
+  exemption: Set<string>
+  history: History
+  historyTimer: ReturnType<typeof setTimeout> | null
+  isDragTableBar: boolean
+  muya: IMuya
+  prevCursor: Cursor | null
+  renderRange: [string | null, string | null]
+  resizeLineNumber!: () => void
+  searchMatches!: SearchMatches
+  selectedBlock: Block | null
+  stateRender: IStateRender
+  turndownConfig: Record<string, unknown>
   constructor(muya: IMuya, options: MuyaOptions) {
     const { bulletListMarker } = options
 
@@ -98,8 +137,7 @@ class ContentState {
     // Use to cache the keys which you don't want to remove.
     this.exemption = new Set()
     this.blocks = [this.createBlockP()]
-    // Cast: IMuya satisfies MuyaInstance structurally (contentState.cursor, selectedBlock etc.)
-    this.stateRender = new StateRender(muya as unknown as ConstructorParameters<typeof StateRender>[0])
+    this.stateRender = new StateRenderStub()
     this.renderRange = [null, null]
     this.currentCursor = null
     // you'll select the outmost block of current cursor when you click the front icon.
@@ -119,6 +157,10 @@ class ContentState {
     this._selectedTableCells = null
     this.cellSelectEventIds = []
     this.init()
+  }
+
+  setStateRender(stateRender: IStateRender) {
+    this.stateRender = stateRender
   }
 
   set selectedTableCells(info) {
@@ -175,7 +217,8 @@ class ContentState {
     if (!normalizedCursor.noHistory) {
       if (
         this.prevCursor &&
-        (this.prevCursor.start.key !== normalizedCursor.start.key || this.prevCursor.end.key !== normalizedCursor.end.key)
+        (this.prevCursor.start.key !== normalizedCursor.start.key ||
+          this.prevCursor.end.key !== normalizedCursor.end.key)
       ) {
         // Push history immediately
         this.history.push(getHistoryState())
@@ -218,10 +261,7 @@ class ContentState {
     return { stack, index }
   }
 
-  setHistory({
-    stack,
-    index
-  }: { stack: unknown[]; index: number }) {
+  setHistory({ stack, index }: { stack: unknown[]; index: number }) {
     Object.assign(this.history, { stack, index })
   }
 
@@ -234,8 +274,10 @@ class ContentState {
 
   setNextRenderRange() {
     const { start, end } = this.cursor
-    const startBlock = this.getBlock(start.key)!
-    const endBlock = this.getBlock(end.key)!
+    const startBlock = this.getBlock(start.key)
+    const endBlock = this.getBlock(end.key)
+    if (!startBlock || !endBlock) return
+
     const startOutMostBlock = this.findOutMostBlock(startBlock)
     const endOutMostBlock = this.findOutMostBlock(endBlock)
 
@@ -411,7 +453,7 @@ class ContentState {
       const { children } = block
       const len = children.length
       if (children && len) {
-        let i
+        let i: number
         for (i = 0; i < len; i++) {
           const b = children[i]
           const preB = i >= 1 ? children[i - 1] : null
@@ -488,7 +530,7 @@ class ContentState {
         if (children.some((child: Block) => this.exemption.has(child.key))) {
           return true
         } else {
-          return children.some((child: Block) => checkerOut(child));
+          return children.some((child: Block) => checkerOut(child))
         }
       } else {
         return false
@@ -499,7 +541,9 @@ class ContentState {
       block.text = ''
       const { children } = block
       if (children.length) {
-        children.forEach((child: Block) => this.removeTextOrBlock(child))
+        children.forEach((child: Block) => {
+          this.removeTextOrBlock(child)
+        })
       }
     } else if (block.editable) {
       this.removeBlock(block)
@@ -564,7 +608,7 @@ class ContentState {
   removeBlock(block: Block, fromBlocks: Block[] | { children: Block[] } = this.blocks) {
     const remove = (blocks: Block[], b: Block) => {
       const len = blocks.length
-      let i
+      let i: number
       for (i = 0; i < len; i++) {
         if (blocks[i].key === b.key) {
           const preSibling: Block | null = this.getBlock(b.preSibling)
@@ -694,9 +738,11 @@ class ContentState {
   isOnlyRemoveableChild(block: Block) {
     if (block.editable === false) return false
     const parent = this.getParent(block)
-    return (parent ? parent.children : this.blocks).filter(
-      (child: Block) => child.editable && child.functionType !== 'languageInput',
-    ).length === 1;
+    return (
+      (parent ? parent.children : this.blocks).filter(
+        (child: Block) => child.editable && child.functionType !== 'languageInput',
+      ).length === 1
+    )
   }
 
   getLastChild(block: Block) {
@@ -741,7 +787,13 @@ class ContentState {
   findPreBlockInLocation(block: Block): Block | null {
     const parent = this.getParent(block)
     const preBlock = this.getPreSibling(block)
-    if (block.preSibling && preBlock && preBlock.type !== 'input' && preBlock.type !== 'div' && preBlock.editable !== false) {
+    if (
+      block.preSibling &&
+      preBlock &&
+      preBlock.type !== 'input' &&
+      preBlock.type !== 'div' &&
+      preBlock.editable !== false
+    ) {
       // handle task item and table
       return this.lastInDescendant(preBlock)
     } else if (parent) {
@@ -826,9 +878,10 @@ class ContentState {
 }
 
 // Tell TypeScript that ContentState has all IContentState prototype methods (added via mixins above).
-// biome-ignore lint/suspicious/noRedeclare: interface merging for mixin typing
 interface ContentState extends IContentState {}
 
-prototypes.forEach((ctrl) => ctrl(ContentState as unknown as { prototype: IContentState }))
+prototypes.forEach((ctrl) => {
+  ctrl(ContentState as unknown as { prototype: IContentState })
+})
 
 export default ContentState

@@ -4,7 +4,14 @@ import { snakeToCamel } from '../../../utils'
 import { sanitizeHyperlink } from '../../../utils/url'
 import type { Block, Token } from '../../types'
 
-export default function referenceLink(this: StateRenderContext, h: typeof import('snabbdom').h, cursor: Cursor, block: Block, token: Token, outerClass: string) {
+export default function referenceLink(
+  this: StateRenderContext,
+  h: typeof import('snabbdom').h,
+  cursor: Cursor,
+  block: Block,
+  token: Token,
+  outerClass: string,
+) {
   const className = this.getClassName(outerClass, block, token, cursor)
   const labelClass = className === CLASS_OR_ID.AG_GRAY ? CLASS_OR_ID.AG_REFERENCE_LABEL : className
 
@@ -13,6 +20,7 @@ export default function referenceLink(this: StateRenderContext, h: typeof import
   const MARKER = '['
   const key = (label + backlash.second).toLowerCase()
   const backlashStart = start + MARKER.length + anchor.length
+  // biome-ignore lint/performance/noAccumulatingSpread: performance warning, acceptable in this context
   const content = [
     ...children.reduce((acc: unknown[], to: Record<string, unknown>) => {
       const method = this[snakeToCamel(to.type as string)] as InlineRenderMethod

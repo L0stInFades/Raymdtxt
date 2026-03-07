@@ -1,73 +1,152 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <script>
       // Provide a minimal `process` global for Node.js polyfills (util, stream, etc.)
       // that run in the browser context. Electron's preload cannot expose `process`
       // because contextIsolation is enabled and nodeIntegration is off.
       if (typeof process === 'undefined') {
-        window.process = { env: {}, browser: true, version: 'v22.0.0', versions: {}, platform: 'browser', nextTick: function(fn) { Promise.resolve().then(fn) } }
+        window.process = { env: {}, browser: true, version: 'v22.0.0', versions: {}, platform: 'browser', nextTick: (fn) => { Promise.resolve().then(fn) } }
       } else if (!process.env) {
         process.env = {}
       }
     </script>
     <meta charset="utf-8">
-    <title>MarkText</title>
+    <link rel="icon" href="./assets/images/logo.png">
+    <title>Vien</title>
     <style>
+      :root {
+        --loading-accent: rgba(33, 181, 111, 1);
+        --loading-accent-soft: rgba(33, 181, 111, 0.18);
+        --loading-text: rgba(22, 28, 45, 0.88);
+        --loading-muted: rgba(22, 28, 45, 0.58);
+      }
+
       html, body {
+        width: 100%;
+        height: 100%;
         margin: 0;
         padding: 0;
       }
 
+      body {
+        overflow: hidden;
+      }
+
       #loading-page {
         position: absolute;
-        background: transparent;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: radial-gradient(circle at top, rgba(255, 255, 255, 0.96), rgba(245, 248, 252, 0.95) 42%, rgba(232, 237, 244, 0.92));
         -webkit-app-region: drag;
-        left: 0;
-        right: 0;
-        top: 0;
-        bottom: 0;
       }
 
-      .spinner {
-        width: 40px;
-        height: 40px;
+      .loading-shell {
+        position: relative;
+        width: min(360px, calc(100vw - 48px));
+        padding: 34px 28px 26px;
+        border-radius: 30px;
+        background: rgba(255, 255, 255, 0.68);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        box-shadow: 0 30px 80px rgba(15, 23, 42, 0.12);
+        backdrop-filter: blur(20px);
+        text-align: center;
+        overflow: hidden;
+      }
+
+      .loading-shell::before {
+        content: '';
         position: absolute;
-        top: 50%;
+        inset: 1px;
+        border-radius: 29px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.54), rgba(255, 255, 255, 0.12));
+        pointer-events: none;
+      }
+
+      .loading-halo {
+        position: absolute;
+        width: 180px;
+        height: 180px;
         left: 50%;
-        transform: translateX(-50%) translateY(-50%);
-      }
-
-      .double-bounce1, .double-bounce2 {
-        width: 100%;
-        height: 100%;
+        top: -66px;
+        transform: translateX(-50%);
         border-radius: 50%;
-        opacity: 0.4;
-        position: absolute;
-        top: 0;
-        left: 0;
-
-        -webkit-animation: sk-bounce 2.0s infinite ease-in-out;
-        animation: sk-bounce 2.0s infinite ease-in-out;
+        background: radial-gradient(circle, var(--loading-accent-soft) 0%, rgba(255, 255, 255, 0) 72%);
+        filter: blur(2px);
       }
 
-      .double-bounce2 {
-        -webkit-animation-delay: -1.0s;
-        animation-delay: -1.0s;
+      .loading-logo,
+      .loading-brand,
+      .loading-copy,
+      .loading-progress {
+        position: relative;
+        z-index: 1;
       }
 
-      @-webkit-keyframes sk-bounce {
-        0%, 100% { -webkit-transform: scale(0.0) }
-        50% { -webkit-transform: scale(1.0) }
+      .loading-logo {
+        width: 96px;
+        height: 96px;
+        border-radius: 28px;
+        box-shadow: 0 18px 44px rgba(63, 87, 173, 0.22);
       }
 
-      @keyframes sk-bounce {
-        0%, 100% {
-          transform: scale(0.0);
-          -webkit-transform: scale(0.0);
-        } 50% {
-          transform: scale(1.0);
-          -webkit-transform: scale(1.0);
+      .loading-brand {
+        margin-top: 18px;
+        font-size: 28px;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        color: var(--loading-text);
+      }
+
+      .loading-copy {
+        margin: 10px auto 0;
+        max-width: 240px;
+        font-size: 13px;
+        line-height: 1.6;
+        color: var(--loading-muted);
+      }
+
+      .loading-progress {
+        margin: 22px auto 0;
+        width: 160px;
+        height: 4px;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.08);
+        overflow: hidden;
+      }
+
+      .loading-progress::after {
+        content: '';
+        display: block;
+        width: 55%;
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, var(--loading-accent), rgba(73, 118, 206, 0.95));
+        animation: loading-slide 1.8s ease-in-out infinite;
+      }
+
+      @keyframes loading-slide {
+        0% {
+          transform: translateX(-110%);
+        }
+        50% {
+          transform: translateX(120%);
+        }
+        100% {
+          transform: translateX(220%);
+        }
+      }
+
+      @media (max-width: 420px) {
+        .loading-shell {
+          padding: 28px 22px 22px;
+          border-radius: 24px;
+        }
+
+        .loading-brand {
+          font-size: 24px;
         }
       }
     </style>
@@ -78,9 +157,12 @@
 
     <!-- Loading page on application startup -->
     <div id="loading-page">
-      <div class="spinner">
-        <div class="double-bounce1 dot"></div>
-        <div class="double-bounce2 dot"></div>
+      <div class="loading-shell">
+        <div class="loading-halo"></div>
+        <img class="loading-logo" src="./assets/images/logo.png" alt="Vien logo">
+        <div class="loading-brand">Vien</div>
+        <div class="loading-copy">Quiet markdown, readying your workspace.</div>
+        <div class="loading-progress"></div>
       </div>
     </div>
 
@@ -95,10 +177,32 @@
         'ulysses': 'rgb(12, 139, 186)'
       }
 
-      const dots = document.querySelectorAll('.dot')
-      Array.from(dots).forEach(dot => {
-        dot.style.background = THEMES_COLOR[params.get('theme')] || 'rgba(33, 181, 111, 1)'
-      })
+      const hexToRgba = (hex, alpha) => {
+        const normalized = hex.replace('#', '')
+        if (normalized.length !== 6) return hex
+
+        const r = Number.parseInt(normalized.slice(0, 2), 16)
+        const g = Number.parseInt(normalized.slice(2, 4), 16)
+        const b = Number.parseInt(normalized.slice(4, 6), 16)
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`
+      }
+
+      const toSoftColor = (value) => {
+        if (value.startsWith('rgba(')) {
+          return value.replace(/rgba\((.+),\s*[^,]+\)$/, 'rgba($1, 0.18)')
+        }
+        if (value.startsWith('rgb(')) {
+          return value.replace(/rgb\((.+)\)$/, 'rgba($1, 0.18)')
+        }
+        if (value.startsWith('#')) {
+          return hexToRgba(value, 0.18)
+        }
+        return value
+      }
+
+      const accent = THEMES_COLOR[params.get('theme')] || 'rgba(33, 181, 111, 1)'
+      document.documentElement.style.setProperty('--loading-accent', accent)
+      document.documentElement.style.setProperty('--loading-accent-soft', toSoftColor(accent))
     </script>
 
     <!-- Renderer entry point — Vite injects the bundled script here -->

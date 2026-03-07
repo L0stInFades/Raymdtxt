@@ -40,23 +40,27 @@ interface MuyaInstance {
   [k: string]: unknown
 }
 
-type DiagramFunctionType = 'fencecode' | 'indentcode' | 'html' | 'frontmatter' | 'multiplemath' | 'flowchart' | 'sequence' | 'plantuml' | 'mermaid' | 'vega-lite'
-
 class StateRender {
-  codeCache: Map<string, string>;
-  container: HTMLElement | null;
-  diagramCache: Map<string, { code: string; functionType: string }>;
-  eventCenter: unknown;
-  labels: Map<string, { href: string; title: string }>;
-  loadImageMap: Map<string, ImageInfo>;
-  loadMathMap: Map<string, unknown>;
-  mermaidCache: Map<string, { code: string; functionType: string }>;
-  muya: MuyaInstance;
-  renderBlock!: (parent: Block | null, block: Block, activeBlocks: Block[], matches: HighlightRange[], useCache?: boolean) => import('snabbdom').VNode;
-  renderingRowContainer: Block | null;
-  renderingTable: Block | null;
-  tokenCache: Map<string, Record<string, unknown>[]>;
-  urlMap: Map<string, string>;
+  codeCache: Map<string, string>
+  container: HTMLElement | null
+  diagramCache: Map<string, { code: string; functionType: string }>
+  eventCenter: unknown
+  labels: Map<string, { href: string; title: string }>
+  loadImageMap: Map<string, ImageInfo>
+  loadMathMap: Map<string, unknown>
+  mermaidCache: Map<string, { code: string; functionType: string }>
+  muya: MuyaInstance
+  renderBlock!: (
+    parent: Block | null,
+    block: Block,
+    activeBlocks: Block[],
+    matches: HighlightRange[],
+    useCache?: boolean,
+  ) => import('snabbdom').VNode
+  renderingRowContainer: Block | null
+  renderingTable: Block | null
+  tokenCache: Map<string, Record<string, unknown>[]>
+  urlMap: Map<string, string>
   constructor(muya: MuyaInstance) {
     this.muya = muya
     this.eventCenter = muya.contentState
@@ -84,7 +88,9 @@ class StateRender {
     const travel = (block: Block) => {
       const { text, children } = block
       if (children?.length) {
-        children.forEach((c: Block) => travel(c))
+        children.forEach((c: Block) => {
+          travel(c)
+        })
       } else if (text) {
         const tokens = beginRules.reference_definition.exec(text)
         if (tokens) {
@@ -99,7 +105,9 @@ class StateRender {
       }
     }
 
-    blocks.forEach((b: Block) => travel(b))
+    blocks.forEach((b: Block) => {
+      travel(b)
+    })
   }
 
   checkConflicted(block: Block, token: { range: TokenRange }, cursor: Cursor) {
@@ -149,7 +157,11 @@ class StateRender {
 
   async renderMermaid() {
     if (this.mermaidCache.size) {
-      const mermaid = await loadRenderer('mermaid') as { initialize: (opts: Record<string, unknown>) => void; parse: (code: string) => void; init: (opts: unknown, target: Element) => void }
+      const mermaid = (await loadRenderer('mermaid')) as {
+        initialize: (opts: Record<string, unknown>) => void
+        parse: (code: string) => void
+        init: (opts: unknown, target: Element) => void
+      }
       mermaid.initialize({
         securityLevel: 'strict',
         theme: this.muya.options.mermaidTheme,
@@ -240,7 +252,13 @@ class StateRender {
   }
 
   // Only render the blocks which you updated
-  partialRender(blocks: Block[], activeBlocks: Block[], matches: HighlightRange[], startKey: string | null, endKey: string | null) {
+  partialRender(
+    blocks: Block[],
+    activeBlocks: Block[],
+    matches: HighlightRange[],
+    startKey: string | null,
+    endKey: string | null,
+  ) {
     const cursorOutMostBlock = activeBlocks[activeBlocks.length - 1]
     // If cursor is not in render blocks, need to render cursor block independently
     const needRenderCursorBlock = blocks.indexOf(cursorOutMostBlock) === -1
@@ -253,7 +271,7 @@ class StateRender {
     const needToRemoved: Element[] = []
     const firstOldDom = startKey
       ? document.querySelector(`#${startKey}`)
-      : document.querySelector(`div#${CLASS_OR_ID.AG_EDITOR_ID}`)?.firstElementChild ?? null
+      : (document.querySelector(`div#${CLASS_OR_ID.AG_EDITOR_ID}`)?.firstElementChild ?? null)
     if (!firstOldDom) {
       // TODO@Jocs Just for fix #541, Because I'll rewrite block and render method, it will nolonger have this issue.
       return
@@ -268,11 +286,14 @@ class StateRender {
 
     firstOldDom.insertAdjacentHTML('beforebegin', html)
 
-    Array.from(needToRemoved).forEach((dom) => dom.remove())
+    Array.from(needToRemoved).forEach((dom) => {
+      dom.remove()
+    })
 
     // Render cursor block independently
-    if (needRenderCursorBlock) {
+    if (needRenderCursorBlock && cursorOutMostBlock) {
       const { key } = cursorOutMostBlock
+      if (!key) return
       const cursorDom = document.querySelector(`#${key}`)
       if (cursorDom) {
         const oldCursorVnode = toVNode(cursorDom)
@@ -294,10 +315,12 @@ class StateRender {
    * @param {array} matches
    */
   singleRender(block: Block, activeBlocks: Block[], matches: HighlightRange[]) {
+    if (!block.key) return
     const selector = `#${block.key}`
     const newVdom = this.renderBlock(null, block, activeBlocks, matches, true)
     const rootDom = document.querySelector(selector)
-    const oldVdom = toVNode(rootDom!)
+    if (!rootDom) return
+    const oldVdom = toVNode(rootDom)
     patch(oldVdom, newVdom)
     this.renderMermaid()
     this.renderDiagram()

@@ -17,7 +17,11 @@ const marktextApi = (ContentState: { prototype: IContentState }) => {
    * @param {string} replacement The word to replace the selecte one.
    * @returns {boolean} True on success.
    */
-  ContentState.prototype._replaceCurrentWordInlineUnsafe = function (this: IContentState, word: string, replacement: string) {
+  ContentState.prototype._replaceCurrentWordInlineUnsafe = function (
+    this: IContentState,
+    word: string,
+    replacement: string,
+  ) {
     // Right clicking on a misspelled word select the whole word by Chromium.
     const { start, end } = selection.getCursorRange()
     const cursor: LineCursor = {

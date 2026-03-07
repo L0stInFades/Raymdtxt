@@ -65,7 +65,9 @@ const deleteCtrl = (ContentState: { prototype: IContentState }) => {
           parent = this.getParent(parent)!
         }
 
-        toBeRemoved.forEach((b) => this.removeBlock(b))
+        toBeRemoved.forEach((b) => {
+          this.removeBlock(b)
+        })
 
         const offset = start.offset
         this.cursor = {

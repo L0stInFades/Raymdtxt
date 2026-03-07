@@ -6,14 +6,21 @@ let uniqueIdCounter = 0
 
 export const getUniqueId = () => ++uniqueIdCounter
 
+// biome-ignore lint/suspicious/noShadowRestrictedNames: intentional function naming
 export const escape = function escape(html: string, encode?: boolean) {
   if (encode) {
     if (escape.escapeTest.test(html)) {
-      return html.replace(escape.escapeReplace, (ch: string) => escape.replacements[ch as keyof typeof escape.replacements] ?? ch);
+      return html.replace(
+        escape.escapeReplace,
+        (ch: string) => escape.replacements[ch as keyof typeof escape.replacements] ?? ch,
+      )
     }
   } else {
     if (escape.escapeTestNoEncode.test(html)) {
-      return html.replace(escape.escapeReplaceNoEncode, (ch: string) => escape.replacements[ch as keyof typeof escape.replacements] ?? ch);
+      return html.replace(
+        escape.escapeReplaceNoEncode,
+        (ch: string) => escape.replacements[ch as keyof typeof escape.replacements] ?? ch,
+      )
     }
   }
 
@@ -33,6 +40,7 @@ escape.replacements = {
 escape.escapeTestNoEncode = /[<>"']|&(?!#?\w+;)/
 escape.escapeReplaceNoEncode = /[<>"']|&(?!#?\w+;)/g
 
+// biome-ignore lint/suspicious/noShadowRestrictedNames: intentional function naming
 export const unescape = function unescape(html: string) {
   // explicitly match decimal, hex, and named HTML entities
   return html.replace(/&(#(?:\d+)|(?:#x[0-9A-Fa-f]+)|(?:\w+));?/gi, (_: string, n: string) => {
@@ -44,7 +52,7 @@ export const unescape = function unescape(html: string) {
         : String.fromCharCode(+n.substring(1))
     }
     return ''
-  });
+  })
 }
 
 export const edit = function edit(regex: RegExp | string, opt?: string) {
@@ -58,7 +66,7 @@ export const edit = function edit(regex: RegExp | string, opt?: string) {
       return this
     },
     getRegex: () => new RegExp(source, flags),
-  };
+  }
 }
 
 export const cleanUrl = function cleanUrl(sanitize: boolean, base: string | null, href: string) {
@@ -98,18 +106,18 @@ const resolveUrl = function resolveUrl(base: string, href: string) {
     }
   }
   base = baseUrls[` ${base}`]
-  let relativeBase = base.indexOf(':') === -1
+  const relativeBase = base.indexOf(':') === -1
 
   if (href.slice(0, 2) === '//') {
     if (relativeBase) {
       return href
     }
-    return base.replace(/^([^:]+:)[\s\S]*$/, '$1') + href;
+    return base.replace(/^([^:]+:)[\s\S]*$/, '$1') + href
   } else if (href.charAt(0) === '/') {
     if (relativeBase) {
       return href
     }
-    return base.replace(/^([^:]+:\/*[^/]*)[\s\S]*$/, '$1') + href;
+    return base.replace(/^([^:]+:\/*[^/]*)[\s\S]*$/, '$1') + href
   } else {
     return base + href
   }

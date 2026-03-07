@@ -3,7 +3,7 @@
     <h4>Key Bindings</h4>
     <section class="keybindings">
       <div class="text">
-        Customize MarkText shortcuts and click on the save button below to apply all changes (requires a restart).
+        Customize Vien shortcuts and click on the save button below to apply all changes (requires a restart).
         All available and default key binding can be found <a class="link" @click="openKeybindingWiki">online</a>.
       </div>
       <el-table
@@ -99,7 +99,7 @@ export default {
 
   methods: {
     openKeybindingWiki() {
-      window.api.shell.openExternal('https://github.com/marktext/marktext/blob/master/docs/KEYBINDINGS.md')
+      window.api.shell.openExternal('https://github.com/L0stInFades/vien/blob/develop/docs/KEYBINDINGS.md')
     },
     saveKeybindings() {
       if (this.keybindingConfigurator && this.keybindingList.length > 0) {

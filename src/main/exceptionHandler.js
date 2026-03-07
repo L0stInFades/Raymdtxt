@@ -43,7 +43,7 @@ const handleError = async (title, error, type) => {
   }
 
   if (EXIT_ON_ERROR) {
-    console.log('MarkText was terminated due to an unexpected error (MARKTEXT_EXIT_ON_ERROR variable was set)!')
+    console.log('Vien was terminated due to an unexpected error (MARKTEXT_EXIT_ON_ERROR variable was set)!')
     process.exit(1)
     // eslint, don't lie to me, the return statement is important!
     return // eslint-disable-line no-unreachable
@@ -84,7 +84,7 @@ ${title}.
 
 ### Version
 
-MarkText: ${global.MARKTEXT_VERSION_STRING}
+Vien: ${global.MARKTEXT_VERSION_STRING}
 Operating system: ${getOSInformation()}`,
         )
         break
@@ -110,8 +110,8 @@ const setupExceptionHandler = () => {
 
   // start crashReporter to save core dumps to temporary folder
   crashReporter.start({
-    companyName: 'marktext',
-    productName: 'marktext',
+    companyName: 'vien',
+    productName: 'vien',
     submitURL: 'http://0.0.0.0/',
     uploadToServer: false,
     compress: true,

@@ -1,11 +1,9 @@
 import path from 'node:path'
-import crypto from 'node:crypto'
 import fs from 'fs-extra'
 import { statSync, constants } from 'node:fs'
 import cp from 'node:child_process'
 import { tmpdir } from 'node:os'
 import dayjs from 'dayjs'
-import { Octokit } from '@octokit/rest'
 import { isImageFile } from 'common/filesystem/paths'
 import { isWindows } from './index'
 
@@ -21,12 +19,27 @@ export const rename = async (src: string, dest: string): Promise<void> => {
   return fs.move(src, dest)
 }
 
-export const getHash = (content: string, encoding: crypto.Encoding, type: string): string => {
-  return crypto.createHash(type).update(content, encoding).digest('hex')
+const digestToHex = (digest: ArrayBuffer): string => {
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('')
 }
 
-export const getContentHash = (content: string): string => {
-  return getHash(content, 'utf8', 'sha1')
+export const getHash = async (
+  content: string | ArrayBuffer | Uint8Array,
+  type: AlgorithmIdentifier,
+): Promise<string> => {
+  const source =
+    typeof content === 'string'
+      ? new TextEncoder().encode(content)
+      : content instanceof Uint8Array
+        ? content
+        : new Uint8Array(content)
+
+  const digest = await globalThis.crypto.subtle.digest(type, source)
+  return digestToHex(digest)
+}
+
+export const getContentHash = (content: string | ArrayBuffer | Uint8Array): Promise<string> => {
+  return getHash(content, 'SHA-1')
 }
 
 export const moveToRelativeFolder = async (
@@ -54,11 +67,7 @@ export const moveToRelativeFolder = async (
   return dstRelPath
 }
 
-export const moveImageToFolder = async (
-  pathname: string,
-  image: string | File,
-  outputDir: string,
-): Promise<string> => {
+export const moveImageToFolder = async (pathname: string, image: string | File, outputDir: string): Promise<string> => {
   await fs.ensureDir(outputDir)
   const isPath = typeof image === 'string'
   if (isPath) {
@@ -72,7 +81,8 @@ export const moveImageToFolder = async (
       if (noHashPath === imagePath) {
         return imagePath
       }
-      const hash = getContentHash(imagePath)
+      const imageBuffer = await fs.readFile(imagePath)
+      const hash = await getContentHash(imageBuffer)
       const hashFilePath = path.join(outputDir, `${hash}${extname}`)
       await fs.copy(imagePath, hashFilePath)
       return hashFilePath
@@ -110,6 +120,24 @@ interface UploadPreferences {
   cliScript: string
 }
 
+interface GithubUploadResponse {
+  content?: {
+    download_url?: string | null
+  }
+}
+
+const encodeGithubContentPath = (pathname: string): string => {
+  return pathname.split('/').map(encodeURIComponent).join('/')
+}
+
+const normalizeGithubContent = (content: string): string => {
+  return content.replace(/^data:[^;]+;base64,/, '')
+}
+
+const arrayBufferToBase64 = (data: ArrayBuffer): string => {
+  return Buffer.from(data).toString('base64')
+}
+
 export const uploadImage = async (
   pathname: string,
   image: string | File,
@@ -130,31 +158,52 @@ export const uploadImage = async (
     rj!('No image uploader provided.')
   }
 
-  const uploadByGithub = (content: string, filename: string) => {
-    const octokit = new Octokit({
-      auth,
-    })
+  const uploadByGithub = async (content: string, filename: string) => {
+    if (!auth) {
+      rj!('GitHub token is missing, the image will be copied to the image folder')
+      return
+    }
+
     const ghPath = `${dayjs().format('YYYY/MM')}/${dayjs().format('DD-HH-mm-ss')}-${filename}`
-    const message = `Upload by MarkText at ${dayjs().format('YYYY-MM-DD HH:mm:ss')}`
+    const message = `Upload by Vien at ${dayjs().format('YYYY-MM-DD HH:mm:ss')}`
     const payload: Record<string, string> = {
-      owner,
-      repo,
-      path: ghPath,
-      branch,
       message,
-      content,
+      content: normalizeGithubContent(content),
     }
-    if (!branch) {
-      delete payload.branch
+
+    if (branch) {
+      payload.branch = branch
     }
-    octokit.repos
-      .createOrUpdateFileContents(payload as Parameters<typeof octokit.repos.createOrUpdateFileContents>[0])
-      .then((result) => {
-        re!(result.data.content!.download_url!)
-      })
-      .catch((_) => {
-        rj!('Upload failed, the image will be copied to the image folder')
-      })
+
+    try {
+      const response = await fetch(
+        `https://api.github.com/repos/${owner}/${repo}/contents/${encodeGithubContentPath(ghPath)}`,
+        {
+          method: 'PUT',
+          headers: {
+            Accept: 'application/vnd.github+json',
+            Authorization: `Bearer ${auth}`,
+            'Content-Type': 'application/json',
+            'X-GitHub-Api-Version': '2022-11-28',
+          },
+          body: JSON.stringify(payload),
+        },
+      )
+
+      if (!response.ok) {
+        throw new Error(`GitHub upload failed with status ${response.status}`)
+      }
+
+      const result = (await response.json()) as GithubUploadResponse
+      const downloadUrl = result.content?.download_url
+      if (!downloadUrl) {
+        throw new Error('GitHub upload response did not include a download URL')
+      }
+
+      re!(downloadUrl)
+    } catch (_error) {
+      rj!('Upload failed, the image will be copied to the image folder')
+    }
   }
 
   const uploadByCommand = async (uploader: string, filepath: string | ArrayBuffer) => {
@@ -238,13 +287,11 @@ export const uploadImage = async (
             uploadByCommand(currentUploader, reader.result as ArrayBuffer)
             break
           default:
-            uploadByGithub(reader.result as string, image.name)
+            uploadByGithub(arrayBufferToBase64(reader.result as ArrayBuffer), image.name)
         }
       }
 
-      const readerFunction: 'readAsArrayBuffer' | 'readAsDataURL' =
-        currentUploader !== 'github' ? 'readAsArrayBuffer' : 'readAsDataURL'
-      reader[readerFunction](image)
+      reader.readAsArrayBuffer(image)
     }
   }
   return promise

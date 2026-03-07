@@ -8,7 +8,7 @@ import type { IContentState, Block, SelectionCursorPos, ListType, ListItemType }
 //      h2 => 2
 const getCurrentLevel = (type: string) => {
   if (/\d/.test(type)) {
-    return Number(/\d/.exec(type)![0]);
+    return Number(/\d/.exec(type)![0])
   } else {
     return 0
   }
@@ -70,8 +70,8 @@ const paragraphCtrl = (ContentState: { prototype: IContentState }) => {
     if (firstBlock.type === 'pre' && firstBlock.functionType === 'frontmatter') return
 
     const { frontmatterType } = this.muya.options
-    let lang
-    let style
+    let lang: string | undefined
+    let style: string | undefined
     switch (frontmatterType) {
       case '+':
         lang = 'toml'
@@ -148,15 +148,21 @@ const paragraphCtrl = (ContentState: { prototype: IContentState }) => {
       const oldListType = listBlock.listType
       listBlock.type = blockType
       listBlock.listType = listType as ListType
-      listBlock.children.forEach((b: Block) => b.listItemType = listType as ListItemType)
+      listBlock.children.forEach((b: Block) => {
+        b.listItemType = listType as ListItemType
+      })
 
       if (listType === 'order') {
         listBlock.start = listBlock.start || 1
-        listBlock.children.forEach((b: Block) => b.bulletMarkerOrDelimiter = orderListDelimiter as string)
+        listBlock.children.forEach((b: Block) => {
+          b.bulletMarkerOrDelimiter = orderListDelimiter as string
+        })
       }
       if ((listType === 'bullet' && oldListType === 'order') || (listType === 'task' && oldListType === 'order')) {
         delete listBlock.start
-        listBlock.children.forEach((b: Block) => b.bulletMarkerOrDelimiter = bulletListMarker as string)
+        listBlock.children.forEach((b: Block) => {
+          b.bulletMarkerOrDelimiter = bulletListMarker as string
+        })
       }
 
       // if the new block is task list, add checkbox
@@ -242,7 +248,7 @@ const paragraphCtrl = (ContentState: { prototype: IContentState }) => {
     const startParents = this.getParents(startBlock!)
     const endParents = this.getParents(endBlock!)
     const hasFencedCodeBlockParent = () => {
-      return [...startParents, ...endParents].some((b) => b.type === 'pre' && /code/.test(b.functionType as string));
+      return [...startParents, ...endParents].some((b) => b.type === 'pre' && /code/.test(b.functionType as string))
     }
     // change fenced code block to p paragraph
     if (affiliation.length && affiliation[0].type === 'pre' && /code/.test(affiliation[0].functionType as string)) {
@@ -338,13 +344,15 @@ const paragraphCtrl = (ContentState: { prototype: IContentState }) => {
         this.appendChild(preBlock, inputBlock)
         this.appendChild(preBlock, codeBlock)
         this.insertAfter(preBlock, referBlock)
-        let i
-        const removeCache = []
+        let i: number
+        const removeCache: Block[] = []
         for (i = startIndex; i <= endIndex; i++) {
           const child = children[i]
           removeCache.push(child)
         }
-        removeCache.forEach((b) => this.removeBlock(b))
+        removeCache.forEach((b) => {
+          this.removeBlock(b)
+        })
         const key = inputBlock.key
         const offset = 0
         this.cursor = {
@@ -441,6 +449,7 @@ const paragraphCtrl = (ContentState: { prototype: IContentState }) => {
       block = this.getParent(block)!
     }
     const preBlock = this.initHtmlBlock(block)
+    if (!preBlock) return
     const cursorBlock = this.firstInDescendant(preBlock)!
     const { key, text } = cursorBlock
     const match = /^[^\n]+\n[^\n]*/.exec(text)
@@ -540,7 +549,7 @@ const paragraphCtrl = (ContentState: { prototype: IContentState }) => {
         const [, hash, partText] = /(^ {0,3}#*[ \u00A0]*)([\s\S]*)/.exec(text)!
         let newLevel = 0 // 1, 2, 3, 4, 5, 6
         let newType = 'p'
-        let key
+        let key: string | undefined
 
         if (/\d/.test(paraType)) {
           newLevel = Number(paraType.split(/\s/)[1])
@@ -705,7 +714,7 @@ const paragraphCtrl = (ContentState: { prototype: IContentState }) => {
 
   // delete current paragraph
   ContentState.prototype.deleteParagraph = function (blockKey?: string) {
-    let startOutmostBlock
+    let startOutmostBlock: Block | null | undefined
     if (blockKey) {
       const block = this.getBlock(blockKey)!
       const firstEditableBlock = this.firstInDescendant(block)!
@@ -868,7 +877,11 @@ const paragraphCtrl = (ContentState: { prototype: IContentState }) => {
   }
 
   // Test whether the paragraph transformation is valid.
-  ContentState.prototype.isAllowedTransformation = function (block: Block, toType: string, isMultilineSelection: boolean) {
+  ContentState.prototype.isAllowedTransformation = function (
+    block: Block,
+    toType: string,
+    isMultilineSelection: boolean,
+  ) {
     const fromType = this.getTypeFromBlock(block)
     if (toType === 'front-matter') {
       // Front matter block is added at the beginning.
@@ -900,7 +913,7 @@ const paragraphCtrl = (ContentState: { prototype: IContentState }) => {
       case 'heading 4':
       case 'heading 5':
       case 'heading 6':
-        return /paragraph|heading/.test(toType);
+        return /paragraph|heading/.test(toType)
       default:
         // Tables and all code blocks are not allowed.
         return false

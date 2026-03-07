@@ -16,6 +16,7 @@ const htmlBlock = (ContentState: { prototype: IContentState }) => {
 
   ContentState.prototype.initHtmlBlock = function (block: Block) {
     let htmlContent = ''
+    if (!block.children.length || !block.children[0]) return false
     const text = block.children[0].text
     const matches = inlineRules.html_tag.exec(text)
     if (matches) {
@@ -53,10 +54,13 @@ const htmlBlock = (ContentState: { prototype: IContentState }) => {
   ContentState.prototype.updateHtmlBlock = function (block: Block) {
     const { type } = block
     if (type !== 'li' && type !== 'p') return false
+    if (!block.children.length || !block.children[0]) return false
     const { text } = block.children[0]
     const match = HTML_BLOCK_REG.exec(text)
     const tagName = match?.[1] && HTML_TAGS.find((t) => t === match[1])
-    return (VOID_HTML_TAGS as readonly string[]).indexOf(tagName as string) === -1 && tagName ? this.initHtmlBlock(block) : false
+    return (VOID_HTML_TAGS as readonly string[]).indexOf(tagName as string) === -1 && tagName
+      ? this.initHtmlBlock(block)
+      : false
   }
 }
 

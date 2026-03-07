@@ -1,13 +1,26 @@
 <template>
-  <div class="import-dialog">
+  <div class="import-dialog" data-testid="import-dialog-shell">
     <el-dialog
-      v-model:visible="showImport"
+      v-model="showImport"
       :show-close="false"
       :modal="true"
       custom-class="ag-dialog-table"
-      width="450px"
+      width="560px"
     >
       <div class="body">
+        <div class="import-hero" data-testid="import-dialog">
+          <div class="import-mark">
+            <svg :viewBox="importIcon.viewBox" aria-hidden="true">
+              <use :xlink:href="importIcon.url" />
+            </svg>
+          </div>
+          <div class="eyebrow">Bring Writing In</div>
+          <h3>Open markdown or import richer formats.</h3>
+          <p>
+            Drag files into Vien, open a markdown document directly, or use Pandoc-backed import
+            when the source comes from somewhere less tidy.
+          </p>
+        </div>
         <div
           class="drop-container"
           :class="{active: isOver}"
@@ -15,18 +28,22 @@
           @dragleave="dragLeaveHandler"
           @drop="dropHandler"
         >
-          <div class="img-wrapper">
-            <img :src="`${importIcon.url}`" alt="import file">
+          <div class="drop-content">
+            <div class="drop-kicker">Drop files to open or import</div>
+            <div class="drop-title">Markdown opens directly. Everything else goes through import.</div>
+            <p>Supported sources include plain markdown, HTML, Office files, LaTeX, and wiki text.</p>
           </div>
-          <div>Import or Open</div>
-          <p> Drop here to get you stuff into MarkText</p>
+          <div class="action-row">
+            <button class="button-primary" data-testid="import-open-markdown" @click.stop="openMarkdown">
+              Open Markdown
+            </button>
+            <button class="button" data-testid="import-document" @click.stop="importDocument">
+              Import Document
+            </button>
+          </div>
         </div>
         <div class="file-list">
-          <div>.md</div>
-          <div>.html</div>
-          <div>.docx</div>
-          <div>.tex</div>
-          <div>.wiki</div>
+          <div v-for="extension in supportedFormats" :key="extension">{{ extension }}</div>
         </div>
       </div>
     </el-dialog>
@@ -43,6 +60,7 @@ export default {
     return {
       showImport: false,
       isOver: false,
+      supportedFormats: ['.md', '.html', '.docx', '.tex', '.wiki', '.odt'],
     }
   },
   created() {
@@ -55,6 +73,9 @@ export default {
     showDialog(boolean) {
       if (boolean !== this.showImport) {
         this.showImport = boolean
+      }
+      if (!boolean) {
+        this.isOver = false
       }
     },
     dragOverHandler(_e) {
@@ -70,49 +91,141 @@ export default {
         for (const file of e.dataTransfer.files) {
           fileList.push(file.path)
         }
+        this.isOver = false
+        this.showImport = false
         window.api.ipc.send('mt::window::drop', fileList)
       }
+    },
+    openMarkdown() {
+      this.isOver = false
+      this.showImport = false
+      window.api.ipc.send('mt::cmd-open-file')
+    },
+    importDocument() {
+      this.isOver = false
+      this.showImport = false
+      window.api.ipc.send('mt::cmd-import-file')
     },
   },
 }
 </script>
 
 <style scoped>
-.drop-container {
-  border-radius: 5px;
-  color: var(--sideBarColor);
-  border: 1px dashed var(--sideBarTextColor);
-  & div,
-  & p {
+  .body {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .import-hero {
     text-align: center;
+    padding: 6px 10px 0;
   }
-  &.active {
-    border: 1px dashed var(--themeColor);
-    background-color: var(--itemBgColor);
+
+  .import-mark {
+    width: 76px;
+    height: 76px;
+    display: grid;
+    place-items: center;
+    margin: 0 auto 18px;
+    border-radius: 24px;
+    background: linear-gradient(135deg, rgba(255, 140, 92, 0.14), rgba(73, 118, 206, 0.16));
+    box-shadow: 0 18px 42px rgba(63, 87, 173, 0.14);
   }
-}
-.img-wrapper {
-  width: 50px;
-  height: 70px;
-  margin: 40px auto 0 auto;
-  & img {
-    width: 100%;
-    height: 100%;
+
+  .import-mark svg {
+    width: 40px;
+    height: 40px;
+    fill: var(--themeColor);
   }
-}
-.file-list {
-  margin-top: 20px;
-  display: flex;
-  justify-content: space-between;
-  & div {
-    width: 70px;
-    height: 70px;
-    border: 1px solid var(--sideBarTextColor);
-    border-radius: 3px;
-    text-align: center;
-    font-size: 18px;
-    line-height: 70px;
+
+  .eyebrow,
+  .drop-kicker {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .eyebrow {
+    color: var(--themeColor);
+  }
+
+  .import-hero h3 {
+    margin: 10px 0 12px;
+    font-size: 28px;
+    line-height: 1.15;
     color: var(--sideBarTitleColor);
   }
-}
+
+  .import-hero p {
+    max-width: 420px;
+    margin: 0 auto;
+    color: var(--sideBarColor);
+    line-height: 1.7;
+  }
+
+  .drop-container {
+    border-radius: 28px;
+    color: var(--sideBarColor);
+    border: 1px dashed var(--sideBarTextColor);
+    padding: 28px;
+    background: rgba(127, 127, 127, 0.04);
+    transition: border-color .2s ease, background-color .2s ease, transform .2s ease;
+  }
+
+  .drop-container.active {
+    border-color: var(--themeColor);
+    background-color: var(--itemBgColor);
+    transform: translateY(-2px);
+  }
+
+  .drop-content {
+    text-align: center;
+  }
+
+  .drop-kicker {
+    color: var(--themeColor);
+  }
+
+  .drop-title {
+    margin-top: 10px;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--sideBarTitleColor);
+  }
+
+  .drop-content p {
+    margin: 12px auto 0;
+    max-width: 390px;
+    line-height: 1.7;
+  }
+
+  .action-row {
+    margin-top: 22px;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .file-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+  }
+
+  .file-list div {
+    min-width: 72px;
+    padding: 10px 14px;
+    border: 1px solid var(--editorColor04);
+    border-radius: 999px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--sideBarTitleColor);
+    background: var(--itemBgColor);
+  }
 </style>

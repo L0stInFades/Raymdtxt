@@ -8,7 +8,7 @@ const FOOTNOTE_REG = /^\[\^([^^[\]\s]+?)(?<!\\)\]:$/
 
 const checkAutoIndent = (text: string, offset: number) => {
   const pairStr = text.substring(offset - 1, offset + 1)
-  return /^(\{\}|\[\]|\(\)|><)$/.test(pairStr);
+  return /^(\{\}|\[\]|\(\)|><)$/.test(pairStr)
 }
 const getIndentSpace = (text: string) => {
   const match = /^(\s*)\S/.exec(text)
@@ -24,7 +24,9 @@ const enterCtrl = (ContentState: { prototype: IContentState }) => {
     const activeLine = this.getBlock(key)!
     const { text } = activeLine
     newBlock.children = children.splice(index + 1)
-    newBlock.children.forEach((c: Block) => c.parent = newBlock.key)
+    newBlock.children.forEach((c: Block) => {
+      c.parent = newBlock.key
+    })
     children[index].nextSibling = null
     if (newBlock.children.length) {
       newBlock.children[0].preSibling = null
@@ -57,7 +59,7 @@ const enterCtrl = (ContentState: { prototype: IContentState }) => {
   ContentState.prototype.createRow = function (row: Block, isHeader = false) {
     const tr = this.createBlock('tr')
     const len = row.children.length
-    let i
+    let i: number
     for (i = 0; i < len; i++) {
       const cell = this.createBlock(isHeader ? 'th' : 'td', {
         align: row.children[i].align,
@@ -129,7 +131,9 @@ const enterCtrl = (ContentState: { prototype: IContentState }) => {
       this.insertAfter(newBlock, parent)
       const index = this.findIndex(parent.children, block)
       const blocksInListItem = parent.children.splice(index + 1)
-      blocksInListItem.forEach((b: Block) => this.appendChild(newBlock!, b))
+      blocksInListItem.forEach((b: Block) => {
+        this.appendChild(newBlock!, b)
+      })
       this.removeBlock(block)
 
       newBlock = newBlock.listItemType === 'task' ? newBlock.children[1] : newBlock.children[0]
@@ -373,18 +377,22 @@ const enterCtrl = (ContentState: { prototype: IContentState }) => {
     const left = start.offset
     const right = text.length - left
     const type = block.type
-    let newBlock
+    let newBlock: Block | undefined
 
     switch (true) {
       case left !== 0 && right !== 0: {
         // cursor in the middle
-        let { pre, post } = selection.chopHtmlByCursor(paragraph as HTMLElement)!
+        const chopResult = selection.chopHtmlByCursor(paragraph as HTMLElement)
+        if (!chopResult) break
+        let { pre, post } = chopResult
         if (/^h\d$/.test(block.type)) {
           if (block.headingStyle === 'atx') {
-            const PREFIX = /^#+/.exec(pre)![0]
-            post = `${PREFIX} ${post}`
+            const prefixMatch = /^#+/.exec(pre)
+            if (prefixMatch) {
+              post = `${prefixMatch[0]} ${post}`
+            }
           }
-          block.children[0].text = pre
+          if (block.children[0]) block.children[0].text = pre
           newBlock = this.createBlock(type, {
             headingStyle: block.headingStyle,
           })
@@ -418,7 +426,7 @@ const enterCtrl = (ContentState: { prototype: IContentState }) => {
           // Degrade thematice break to paragraph
           if (preText.replace(/ /g, '').length < 3) {
             block.type = 'p'
-            block.children[0].functionType = 'paragraphContent'
+            if (block.children[0]) block.children[0].functionType = 'paragraphContent'
           }
 
           if (postText.replace(/ /g, '').length >= 3) {
@@ -432,7 +440,7 @@ const enterCtrl = (ContentState: { prototype: IContentState }) => {
             newBlock = this.createBlockP(postText)
           }
 
-          block.children[0].text = preText
+          if (block.children[0]) block.children[0].text = preText
         }
 
         this.insertAfter(newBlock!, block)
@@ -496,7 +504,7 @@ const enterCtrl = (ContentState: { prototype: IContentState }) => {
     const tableNeedFocus = this.tableBlockUpdate(preParagraphBlock)
     const htmlNeedFocus = this.updateHtmlBlock(preParagraphBlock)
     const mathNeedFocus = this.updateMathBlock(preParagraphBlock)
-    let cursorBlock
+    let cursorBlock: Block | undefined
 
     switch (true) {
       case !!blockNeedFocus:
@@ -506,7 +514,8 @@ const enterCtrl = (ContentState: { prototype: IContentState }) => {
         cursorBlock = tableNeedFocus as Block
         break
       case !!htmlNeedFocus:
-        cursorBlock = (htmlNeedFocus as Block).children[0].children[0] // the second line
+        // the second line — guard against empty children
+        cursorBlock = (htmlNeedFocus as Block).children?.[0]?.children?.[0] ?? (htmlNeedFocus as Block)
         break
       case !!mathNeedFocus:
         cursorBlock = mathNeedFocus as Block
@@ -517,7 +526,10 @@ const enterCtrl = (ContentState: { prototype: IContentState }) => {
     }
 
     cursorBlock = getParagraphBlock(cursorBlock as Block)
-    const key = cursorBlock.type === 'p' || cursorBlock.type === 'pre' ? cursorBlock.children[0].key : cursorBlock.key
+    const key =
+      (cursorBlock.type === 'p' || cursorBlock.type === 'pre') && cursorBlock.children?.[0]
+        ? cursorBlock.children[0].key
+        : cursorBlock.key
     let offset = 0
     if (htmlNeedFocus) {
       const { text } = cursorBlock
@@ -532,7 +544,7 @@ const enterCtrl = (ContentState: { prototype: IContentState }) => {
 
     let needRenderAll = false
 
-    if (this.isCollapse() && cursorBlock.type === 'p') {
+    if (this.isCollapse() && cursorBlock.type === 'p' && cursorBlock.children?.[0]) {
       this.checkInlineUpdate(cursorBlock.children[0])
       needRenderAll = true
     }

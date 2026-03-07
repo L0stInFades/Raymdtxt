@@ -33,7 +33,7 @@ for (const emoji of emojis) {
 export const validEmoji = (text: string) => {
   return emojis.find((emoji: EmojiItem) => {
     return emoji.aliases.includes(text)
-  });
+  })
 }
 
 /**
@@ -48,7 +48,7 @@ export const checkEditEmoji = (node: Node | null) => {
 }
 
 class Emoji {
-  cache: Map<string, EmojiRenderObj>;
+  cache: Map<string, EmojiRenderObj>
   constructor() {
     this.cache = new Map()
   }

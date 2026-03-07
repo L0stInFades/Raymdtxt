@@ -32,9 +32,9 @@ const defaultOptions = {
 class TableBarTools extends BaseFloat {
   static pluginName = 'tableBarTools'
 
-  oldVnode: VNode | null;
-  tableBarContainer: HTMLDivElement;
-  tableInfo: TableInfo | null;
+  oldVnode: VNode | null
+  tableBarContainer: HTMLDivElement
+  tableInfo: TableInfo | null
 
   constructor(muya: IMuya, options = {}) {
     const name = 'ag-table-bar-tools'
@@ -44,7 +44,8 @@ class TableBarTools extends BaseFloat {
     this.oldVnode = null
     this.tableInfo = null
     this.floatBox.classList.add('ag-table-bar-tools')
-    const tableBarContainer = (this.tableBarContainer = document.createElement('div'))
+    this.tableBarContainer = document.createElement('div')
+    const tableBarContainer = this.tableBarContainer
     this.container.appendChild(tableBarContainer)
     this.listen()
   }
@@ -52,7 +53,13 @@ class TableBarTools extends BaseFloat {
   listen() {
     super.listen()
     const { eventCenter } = this.muya
-    eventCenter.subscribe('muya-table-bar', (({ reference, tableInfo }: { reference: HTMLElement | null; tableInfo: TableInfo }) => {
+    eventCenter.subscribe('muya-table-bar', (({
+      reference,
+      tableInfo,
+    }: {
+      reference: HTMLElement | null
+      tableInfo: TableInfo
+    }) => {
       if (reference) {
         this.tableInfo = tableInfo
         this.show(reference)

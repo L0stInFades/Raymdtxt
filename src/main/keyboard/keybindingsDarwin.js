@@ -4,10 +4,10 @@
 //       Our current key manager will forbid the usage of these key combinations too.
 
 export default new Map([
-  // MarkText menu
+  // Vien menu
   ['mt.hide', 'Command+H'],
   ['mt.hide-others', 'Command+Option+H'],
-  ['file.preferences', 'Command+,'], // located under MarkText menu in macOS only
+  ['file.preferences', 'Command+,'], // located under Vien menu in macOS only
 
   // File menu
   ['file.new-window', 'Command+N'],
@@ -51,7 +51,7 @@ export default new Map([
   ['paragraph.heading-5', 'Command+5'],
   ['paragraph.heading-6', 'Command+6'],
   ['paragraph.upgrade-heading', 'Command+Plus'],
-  ['paragraph.degrade-heading', 'Command+-'],
+  ['paragraph.degrade-heading', 'Command+Shift+-'],
   ['paragraph.table', 'Command+Shift+T'],
   ['paragraph.code-fence', 'Command+Option+C'],
   ['paragraph.quote-block', 'Command+Option+Q'],
@@ -82,8 +82,8 @@ export default new Map([
   // Window menu
   ['window.minimize', 'Command+M'],
   ['window.toggle-always-on-top', ''],
-  ['window.zoom-in', ''],
-  ['window.zoom-out', ''],
+  ['window.zoom-in', 'Command+='],
+  ['window.zoom-out', 'Command+-'],
   ['window.toggle-full-screen', 'Ctrl+Command+F'],
 
   // View menu

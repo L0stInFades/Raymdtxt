@@ -30,11 +30,11 @@ const defaultOptions = {
 class ImageToolbar extends BaseFloat {
   static pluginName = 'imageToolbar'
 
-  icons: ToolbarIcon[];
-  imageInfo: ImageInfo | null;
-  oldVnode: VNode | null;
-  reference: HTMLElement | null;
-  toolbarContainer: HTMLDivElement;
+  icons: ToolbarIcon[]
+  imageInfo: ImageInfo | null
+  oldVnode: VNode | null
+  reference: HTMLElement | null
+  toolbarContainer: HTMLDivElement
 
   constructor(muya: IMuya, options = {}) {
     const name = 'ag-image-toolbar'
@@ -45,7 +45,8 @@ class ImageToolbar extends BaseFloat {
     this.options = opts
     this.icons = icons
     this.reference = null
-    const toolbarContainer = (this.toolbarContainer = document.createElement('div'))
+    this.toolbarContainer = document.createElement('div')
+    const toolbarContainer = this.toolbarContainer
     this.container.appendChild(toolbarContainer)
     this.floatBox.classList.add('ag-image-toolbar-container')
     this.listen()
@@ -54,7 +55,13 @@ class ImageToolbar extends BaseFloat {
   listen() {
     const { eventCenter } = this.muya
     super.listen()
-    eventCenter.subscribe('muya-image-toolbar', (({ reference, imageInfo }: { reference: HTMLElement | null; imageInfo?: ImageInfo }) => {
+    eventCenter.subscribe('muya-image-toolbar', (({
+      reference,
+      imageInfo,
+    }: {
+      reference: HTMLElement | null
+      imageInfo?: ImageInfo
+    }) => {
       this.reference = reference
       if (reference) {
         this.imageInfo = imageInfo ?? null
@@ -74,8 +81,9 @@ class ImageToolbar extends BaseFloat {
     const { attrs } = imageInfo.token
     const dataAlign = attrs['data-align']
     const children = icons.map((i: ToolbarIcon) => {
+      // biome-ignore lint/suspicious/noImplicitAnyLet: legacy UI pattern
       let icon
-      let iconWrapperSelector = 'div.icon-wrapper'
+      const iconWrapperSelector = 'div.icon-wrapper'
       if (i.icon) {
         // SVG icon Asset
         icon = h(

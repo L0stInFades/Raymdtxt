@@ -28,7 +28,7 @@ interface ImagePickerItem {
 class ImagePathPicker extends BaseScrollFloat {
   static pluginName = 'imagePathPicker'
 
-  oldVnode: VNode | null;
+  oldVnode: VNode | null
 
   constructor(muya: IMuya) {
     const name = 'ag-list-picker'
@@ -43,7 +43,15 @@ class ImagePathPicker extends BaseScrollFloat {
   listen() {
     super.listen()
     const { eventCenter } = this.muya
-    eventCenter.subscribe('muya-image-picker', (({ reference, list, cb }: { reference: HTMLElement; list: ImagePickerItem[]; cb: (...args: unknown[]) => void }) => {
+    eventCenter.subscribe('muya-image-picker', (({
+      reference,
+      list,
+      cb,
+    }: {
+      reference: HTMLElement
+      list: ImagePickerItem[]
+      cb: (...args: unknown[]) => void
+    }) => {
       if (list.length) {
         this.show(reference, cb)
         this.renderArray = list
@@ -75,7 +83,7 @@ class ImagePathPicker extends BaseScrollFloat {
                 // cheat snabbdom that the pre block is changed!!!
                 oldvnode.children = []
                 if (oldvnode.elm) {
-                  (oldvnode.elm as HTMLElement).innerHTML = ''
+                  ;(oldvnode.elm as HTMLElement).innerHTML = ''
                 }
               },
             },

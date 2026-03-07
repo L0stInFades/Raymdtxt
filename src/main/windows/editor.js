@@ -77,6 +77,7 @@ class EditorWindow extends BaseWindow {
 
     let win = (this.browserWindow = new BrowserWindow(winOptions))
     this.id = win.id
+    this.resetDocumentState()
 
     if (spellcheckerEnabled && !isOsx) {
       try {
@@ -144,7 +145,7 @@ class EditorWindow extends BaseWindow {
       const { response } = await dialog.showMessageBox(win, {
         type: 'warning',
         buttons: ['Close', 'Reload', 'Keep It Open'],
-        message: 'MarkText has crashed',
+        message: 'Vien has crashed',
         detail: msg,
       })
 
@@ -411,6 +412,7 @@ class EditorWindow extends BaseWindow {
     this._markdownToOpen = []
     this._openedRootDirectory = ''
     this._openedFiles = []
+    this.resetDocumentState()
 
     browserWindow.webContents.once('did-finish-load', () => {
       this.lifecycle = WindowLifecycle.READY
@@ -445,6 +447,22 @@ class EditorWindow extends BaseWindow {
 
   get openedRootDirectory() {
     return this._openedRootDirectory
+  }
+
+  updateDocumentState(documentState = {}) {
+    if (!isOsx || !this.browserWindow || this.browserWindow.isDestroyed()) {
+      return
+    }
+
+    const { filename = '', pathname = '', isSaved = true } = documentState
+    const hasDocument = !!(filename || pathname)
+
+    this.browserWindow.setRepresentedFilename(pathname || '')
+    this.browserWindow.setDocumentEdited(hasDocument && isSaved === false)
+  }
+
+  resetDocumentState() {
+    this.updateDocumentState()
   }
 
   // --- private ---------------------------------

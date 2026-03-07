@@ -375,7 +375,7 @@ export const MUYA_DEFAULT_OPTION = Object.freeze({
   autoCheck: false,
   // Whether we should set spellcheck attribute on our container to highlight misspelled words.
   // NOTE: The browser is not able to correct misspelled words words without a custom
-  // implementation like in MarkText.
+  // implementation like in Vien.
   spellcheckEnabled: false,
   // transform the image to local folder, cloud or just return the local path
   imageAction: null,
@@ -395,11 +395,13 @@ export const MUYA_DEFAULT_OPTION = Object.freeze({
 })
 
 // export const DIAGRAM_TEMPLATE = Object.freeze({
-//   'mermaid': `graph LR;\nYou-->|MarkText|Me;`
+//   'mermaid': `graph LR;\nYou-->|Vien|Me;`
 // })
 
-export const isOsx = window?.navigator && /Mac/.test(window.navigator.platform)
-export const isWin = window?.navigator.userAgent && /win32|wow32|win64|wow64/i.test(window.navigator.userAgent)
+const navigatorInfo = typeof window !== 'undefined' ? window.navigator : null
+
+export const isOsx = !!navigatorInfo && /Mac/.test(navigatorInfo.platform)
+export const isWin = !!navigatorInfo?.userAgent && /win32|wow32|win64|wow64/i.test(navigatorInfo.userAgent)
 // http[s] (domain or IPv4 or localhost or IPv6) [port] /not-white-space
 export const URL_REG =
   /^http(s)?:\/\/([a-z0-9\-._~]+\.[a-z]{2,}|[0-9.]+|localhost|\[[a-f0-9.:]+\])(:[0-9]{1,5})?\/[\S]+/i

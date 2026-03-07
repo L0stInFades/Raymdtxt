@@ -37,10 +37,15 @@ const inputCtrl = (ContentState: { prototype: IContentState }) => {
   ContentState.prototype.checkQuickInsert = (block: Block) => {
     const { type, text, functionType } = block
     if (type !== 'span' || functionType !== 'paragraphContent') return false
-    return /^@\S*$/.test(text);
+    return /^@\S*$/.test(text)
   }
 
-  ContentState.prototype.checkCursorInTokenType = function (functionType: string, text: string, offset: number, type: string) {
+  ContentState.prototype.checkCursorInTokenType = function (
+    functionType: string,
+    text: string,
+    offset: number,
+    type: string,
+  ) {
     if (!/atxLine|paragraphContent|cellContent/.test(functionType)) {
       return false
     }
@@ -49,7 +54,9 @@ const inputCtrl = (ContentState: { prototype: IContentState }) => {
       hasBeginRules: false,
       options: this.muya.options,
     })
-    return (tokens as Token[]).filter((t: Token) => t.type === type).some((t: Token) => offset >= t.range.start && offset <= t.range.end);
+    return (tokens as Token[])
+      .filter((t: Token) => t.type === type)
+      .some((t: Token) => offset >= t.range.start && offset <= t.range.end)
   }
 
   ContentState.prototype.checkNotSameToken = function (functionType: string, oldText: string, text: string) {
@@ -107,13 +114,18 @@ const inputCtrl = (ContentState: { prototype: IContentState }) => {
     const block = this.getBlock(key)
     const paragraph = document.querySelector(`#${key}`)
 
+    // Guard against null block or paragraph — can happen during rapid edits or DOM mutations
+    if (!block || !paragraph) {
+      return
+    }
+
     // Fix issue 1447
     // Fixme: any better solution?
     if (
       oldStart.key === oldEnd.key &&
       oldStart.offset === oldEnd.offset &&
-      block!.text.endsWith('\n') &&
-      oldStart.offset === block!.text.length &&
+      block.text.endsWith('\n') &&
+      oldStart.offset === block.text.length &&
       event.inputType === 'insertText'
     ) {
       event.preventDefault()
@@ -127,21 +139,21 @@ const inputCtrl = (ContentState: { prototype: IContentState }) => {
       return (this as unknown as { inputHandler(e: InputEvent, notEqual: boolean): void }).inputHandler(event, true)
     }
 
-    let text = getTextContent(paragraph!, [CLASS_OR_ID.AG_MATH_RENDER, CLASS_OR_ID.AG_RUBY_RENDER])
+    let text = getTextContent(paragraph, [CLASS_OR_ID.AG_MATH_RENDER, CLASS_OR_ID.AG_RUBY_RENDER])
 
     let needRender = false
     let needRenderAll = false
     if (oldStart.key !== oldEnd.key) {
       const startBlock = this.getBlock(oldStart.key)
-      const startOutmostBlock = this.findOutMostBlock(startBlock!)
+      const startOutmostBlock = startBlock ? this.findOutMostBlock(startBlock) : null
       const endBlock = this.getBlock(oldEnd.key)
-      const endOutmostBlock = this.findOutMostBlock(endBlock!)
-      if (startBlock!.functionType === 'languageInput') {
+      const endOutmostBlock = endBlock ? this.findOutMostBlock(endBlock) : null
+      if (startBlock?.functionType === 'languageInput') {
         // fix #918.
-        if (startOutmostBlock === endOutmostBlock && !endBlock!.nextSibling) {
-          this.removeBlocks(startBlock!, endBlock!, false)
-          endBlock!.text = ''
-        } else if (startOutmostBlock !== endOutmostBlock) {
+        if (startOutmostBlock === endOutmostBlock && endBlock && !endBlock.nextSibling) {
+          this.removeBlocks(startBlock, endBlock, false)
+          endBlock.text = ''
+        } else if (startOutmostBlock !== endOutmostBlock && endBlock) {
           const preBlock = this.getParent(startBlock!)
           const pBlock = this.createBlock('p')
           this.removeBlocks(startBlock!, endBlock!)
@@ -149,11 +161,11 @@ const inputCtrl = (ContentState: { prototype: IContentState }) => {
           this.appendChild(pBlock, startBlock!)
           this.insertBefore(pBlock, preBlock!)
           this.removeBlock(preBlock!)
-        } else {
-          this.removeBlocks(startBlock!, endBlock!)
+        } else if (startBlock && endBlock) {
+          this.removeBlocks(startBlock, endBlock)
         }
       } else if (
-        startBlock!.functionType === 'paragraphContent' &&
+        startBlock?.functionType === 'paragraphContent' &&
         start.key === end.key &&
         oldStart.key === start.key &&
         oldEnd.key !== end.key
@@ -193,11 +205,17 @@ const inputCtrl = (ContentState: { prototype: IContentState }) => {
         if (/^delete/.test(event.inputType)) {
           // handle `deleteContentBackward` or `deleteContentForward`
           const deletedChar = block.text[offset]
-          if (event.inputType === 'deleteContentBackward' && postInputChar === (BRACKET_HASH as Record<string, string>)[deletedChar]) {
+          if (
+            event.inputType === 'deleteContentBackward' &&
+            postInputChar === (BRACKET_HASH as Record<string, string>)[deletedChar]
+          ) {
             needRender = true
             text = text.substring(0, offset) + text.substring(offset + 1)
           }
-          if (event.inputType === 'deleteContentForward' && inputChar === (BACK_HASH as Record<string, string>)[deletedChar]) {
+          if (
+            event.inputType === 'deleteContentForward' &&
+            inputChar === (BACK_HASH as Record<string, string>)[deletedChar]
+          ) {
             needRender = true
             start.offset -= 1
             end.offset -= 1
@@ -288,8 +306,8 @@ const inputCtrl = (ContentState: { prototype: IContentState }) => {
     }
 
     // show quick insert
-    const rect = paragraph!.getBoundingClientRect()
-    const checkQuickInsert = this.checkQuickInsert(block!)
+    const rect = paragraph.getBoundingClientRect()
+    const checkQuickInsert = this.checkQuickInsert(block)
     const reference = this.getPositionReference()
     reference.getBoundingClientRect = () => {
       const { x, y, left, top, height, bottom } = rect

@@ -70,6 +70,7 @@ const validWidthAndHeight = (value: string | null) => {
 }
 
 export const lowerPriority = (src: string, offset: number, rules: Record<string, RegExp>) => {
+  // biome-ignore lint/suspicious/noImplicitAnyLet: legacy parser pattern
   let i
   const ignoreIndex: number[] = []
   for (i = 0; i < offset; i++) {
@@ -181,7 +182,13 @@ const canCloseEmphasis = (src: string, offset: number, marker: string) => {
   return true
 }
 
-export const validateEmphasize = (src: string, offset: number, marker: string, pending: string, rules: Record<string, RegExp>) => {
+export const validateEmphasize = (
+  src: string,
+  offset: number,
+  marker: string,
+  pending: string,
+  rules: Record<string, RegExp>,
+) => {
   if (!canOpenEmphasis(src, marker, pending)) {
     return false
   }

@@ -1,5 +1,6 @@
 import katex from 'katex'
-import prism, { loadedLanguages, transformAliasToOrigin } from '../../../prism/'
+import prism from '../../../prism/runtime'
+import { loadedLanguages, transformAliasToOrigin } from '../../../prism/metadata'
 import 'katex/dist/contrib/mhchem.min.js'
 import { CLASS_OR_ID, DEVICE_MEMORY, PREVIEW_DOMPURIFY_CONFIG, HAS_TEXT_BLOCK_REG } from '../../../config'
 import type { Block } from '../../types'
@@ -16,7 +17,12 @@ const MARKER_HASK = {
   "'": `%${getLongUniqueId()}%`,
 }
 
-const getHighlightHtml = (text: string, highlights: { start: number; end: number; active: boolean }[], escape = false, handleLineEnding = false) => {
+const getHighlightHtml = (
+  text: string,
+  highlights: { start: number; end: number; active: boolean }[],
+  shouldEscape = false,
+  handleLineEnding = false,
+) => {
   let code = ''
   let pos = 0
   const getEscapeHTML = (className: string, content: string) => {
@@ -31,9 +37,9 @@ const getHighlightHtml = (text: string, highlights: { start: number; end: number
     if (handleLineEnding && text.endsWith('\n') && end === text.length) {
       highlightContent =
         highlightContent.substring(start, end - 1) +
-        (escape ? getEscapeHTML('ag-line-end', '\n') : '<span class="ag-line-end">\n</span>')
+        (shouldEscape ? getEscapeHTML('ag-line-end', '\n') : '<span class="ag-line-end">\n</span>')
     }
-    code += escape
+    code += shouldEscape
       ? getEscapeHTML(className, highlightContent)
       : `<span class="${className}">${highlightContent}</span>`
     pos = end
@@ -42,7 +48,7 @@ const getHighlightHtml = (text: string, highlights: { start: number; end: number
     if (handleLineEnding && text.endsWith('\n')) {
       code +=
         text.substring(pos, text.length - 1) +
-        (escape ? getEscapeHTML('ag-line-end', '\n') : '<span class="ag-line-end">\n</span>')
+        (shouldEscape ? getEscapeHTML('ag-line-end', '\n') : '<span class="ag-line-end">\n</span>')
     } else {
       code += text.substring(pos)
     }
@@ -73,7 +79,7 @@ export default function renderLeafBlock(
   block: Block,
   activeBlocks: Block[],
   matches: HighlightRange[],
-  useCache = false
+  useCache = false,
 ) {
   const { loadMathMap } = this
   const { cursor } = this.muya.contentState
@@ -110,7 +116,16 @@ export default function renderLeafBlock(
         this.tokenCache.set(text, tokens)
       }
     }
-    children = tokens.reduce((acc: unknown[], token: Record<string, unknown>) => [...acc, ...(this[snakeToCamel(token.type as string)] as Function)(h, cursor, block, token)], [])
+    children = []
+    for (const token of tokens) {
+      // biome-ignore lint/complexity/noBannedTypes: dynamic method dispatch requires Function type
+      const result = (this[snakeToCamel(token.type as string)] as Function)(h, cursor, block, token)
+      if (Array.isArray(result)) {
+        children.push(...result)
+      } else {
+        children.push(result)
+      }
+    }
   }
 
   if (editable === false) {
@@ -235,7 +250,7 @@ export default function renderLeafBlock(
       const wrapper = document.createElement('div')
       wrapper.classList.add(`language-${transformedLang}`)
       wrapper.innerHTML = code
-      prism.highlightElement(wrapper, false, function(this: Element) {
+      prism.highlightElement(wrapper, false, function (this: Element) {
         const highlightedCode = this.innerHTML
         selector += `.language-${transformedLang}`
         children = htmlToVNode(highlightedCode)

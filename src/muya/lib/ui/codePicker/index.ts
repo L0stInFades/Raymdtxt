@@ -1,6 +1,6 @@
 import BaseScrollFloat from '../baseScrollFloat'
 import { patch, h } from '../../parser/render/snabbdom'
-import { search } from '../../prism/index'
+import { search } from '../../prism/metadata'
 import fileIcons from '../fileIcons'
 import type { IMuya } from '../../types'
 import type { VNode } from 'snabbdom'
@@ -25,7 +25,7 @@ const defaultOptions = {
 class CodePicker extends BaseScrollFloat {
   static pluginName = 'codePicker'
 
-  oldVnode: VNode | null;
+  oldVnode: VNode | null
 
   constructor(muya: IMuya, options = {}) {
     const name = 'ag-list-picker'
@@ -40,7 +40,15 @@ class CodePicker extends BaseScrollFloat {
   listen() {
     super.listen()
     const { eventCenter } = this.muya
-    eventCenter.subscribe('muya-code-picker', (({ reference, lang, cb }: { reference: HTMLElement; lang: string; cb: (...args: unknown[]) => void }) => {
+    eventCenter.subscribe('muya-code-picker', (({
+      reference,
+      lang,
+      cb,
+    }: {
+      reference: HTMLElement
+      lang: string
+      cb: (...args: unknown[]) => void
+    }) => {
       const modes = search(lang)
       if (modes.length && reference) {
         this.show(reference, cb)
@@ -57,6 +65,7 @@ class CodePicker extends BaseScrollFloat {
     const { renderArray, oldVnode, scrollElement, activeItem } = this
     let children = renderArray.map((item: unknown) => {
       const mode = item as CodeMode
+      // biome-ignore lint/suspicious/noImplicitAnyLet: legacy UI pattern
       let iconClassNames
 
       if (mode.name) {
@@ -66,7 +75,8 @@ class CodePicker extends BaseScrollFloat {
       // Because `markdown mode in Codemirror` don't have extensions.
       // if still can not get the className, add a common className 'atom-icon light-cyan'
       if (!iconClassNames) {
-        iconClassNames = (mode.name === 'markdown' ? fileIcons.getClassByName('fackname.md') : null) ?? 'atom-icon light-cyan'
+        iconClassNames =
+          (mode.name === 'markdown' ? fileIcons.getClassByName('fackname.md') : null) ?? 'atom-icon light-cyan'
       }
       const iconSelector =
         'span' +

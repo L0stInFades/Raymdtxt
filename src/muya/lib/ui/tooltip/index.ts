@@ -12,8 +12,8 @@ const position = (source: HTMLElement, ele: HTMLElement) => {
 }
 
 class Tooltip {
-  cache: WeakMap<HTMLElement, HTMLDivElement>;
-  muya: IMuya;
+  cache: WeakMap<HTMLElement, HTMLDivElement>
+  muya: IMuya
   constructor(muya: IMuya) {
     this.muya = muya
     this.cache = new WeakMap()

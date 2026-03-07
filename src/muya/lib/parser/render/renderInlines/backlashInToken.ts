@@ -9,7 +9,7 @@ export default function backlashInToken(
   backlashes: string,
   outerClass: string,
   start: number,
-  token: Token
+  token: Token,
 ) {
   const { highlights = [] } = token as { highlights?: { start: number; end: number; active: boolean }[] }
   const chunks = backlashes.split('')
@@ -19,7 +19,9 @@ export default function backlashInToken(
 
   for (i = 0; i < len; i++) {
     const chunk = chunks[i]
-    const light = highlights.filter((light: { start: number; end: number; active: boolean }) => union({ start: start + i, end: start + i + 1 }, light))
+    const light = highlights.filter((light: { start: number; end: number; active: boolean }) =>
+      union({ start: start + i, end: start + i + 1 }, light),
+    )
     let selector = 'span'
     if (light.length) {
       const className = this.getHighlightClassName(light[0].active)

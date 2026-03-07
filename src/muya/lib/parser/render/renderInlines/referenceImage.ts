@@ -4,7 +4,14 @@ import { getImageInfo } from '../../../utils'
 import type { Block, Token } from '../../types'
 
 // reference_image
-export default function referenceImage(this: StateRenderContext, h: typeof import('snabbdom').h, cursor: Cursor, block: Block, token: Token, outerClass: string) {
+export default function referenceImage(
+  this: StateRenderContext,
+  h: typeof import('snabbdom').h,
+  cursor: Cursor,
+  block: Block,
+  token: Token,
+  outerClass: string,
+) {
   const className = this.getClassName(outerClass, block, token, cursor)
   const imageClass = CLASS_OR_ID.AG_IMAGE_MARKED_TEXT
   const { start, end } = token.range
@@ -19,9 +26,13 @@ export default function referenceImage(this: StateRenderContext, h: typeof impor
   }
   const imageInfo = getImageInfo(href)
   const { src } = imageInfo
+  // biome-ignore lint/suspicious/noImplicitAnyLet: legacy renderer pattern
   let id
+  // biome-ignore lint/suspicious/noImplicitAnyLet: legacy renderer pattern
   let isSuccess
+  // biome-ignore lint/suspicious/noImplicitAnyLet: legacy renderer pattern
   let domsrc
+  // biome-ignore lint/suspicious/noImplicitAnyLet: legacy renderer pattern
   let selector
   if (src) {
     ;({ id, isSuccess, domsrc } = this.loadImageAsync(imageInfo, { alt }, className, CLASS_OR_ID.AG_COPY_REMOVE))

@@ -1,5 +1,5 @@
-productName: "MarkText"
-appId: "com.github.marktext.marktext"
+productName: "Vien"
+appId: "com.github.l0stinfades.vien"
 
 asar: true
 asarUnpack:
@@ -67,7 +67,7 @@ fileAssociations:
   role: "Editor"
   icon: "../resources/icons/md.icns"
 mac:
-  artifactName: "marktext-${arch}-mac.${ext}"
+  artifactName: "vien-${arch}-mac.${ext}"
   icon: "resources/icons/icon.icns"
   darkModeSupport: true
   target:
@@ -76,7 +76,7 @@ mac:
     - target: zip
       arch: [x64, arm64]
 dmg:
-  artifactName: "marktext-${arch}.${ext}"
+  artifactName: "vien-${arch}.${ext}"
   contents:
   - x: 410
     y: 240
@@ -86,7 +86,7 @@ dmg:
     y: 240
     type: "file"
 win:
-  artifactName: "marktext-${arch}-win.${ext}"
+  artifactName: "vien-${arch}-win.${ext}"
   icon: "resources/icons/icon.ico"
   target:
   - target: "nsis"
@@ -95,23 +95,23 @@ win:
     arch: [ia32, x64]
   requestedExecutionLevel: "asInvoker"
 nsis:
-  artifactName: "marktext-setup.${ext}"
+  artifactName: "vien-setup.${ext}"
   perMachine: false
   oneClick: false
   allowToChangeInstallationDirectory: true
   include: "resources/windows/installer.nsh"
 linux:
-  artifactName: "marktext-${arch}.${ext}"
-  executableName: "marktext"
-  description: "A simple and elegant open-source markdown editor that focused on speed and usability."
-  maintainer: "MarkText Contributors"
+  artifactName: "vien-${arch}.${ext}"
+  executableName: "vien"
+  description: "A markdown editor that prioritizes harmony over rhythm and clarity over complexity."
+  maintainer: "Vien Contributors"
   category: "Office;TextEditor;Utility"
   mimeTypes:
   - "text/markdown"
   icon: "resources/icons"
   desktop:
-    StartupWMClass: "marktext"
-    Keywords: "marktext;"
+    StartupWMClass: "vien"
+    Keywords: "vien;"
   target:
   - target: "AppImage"
   - target: "deb"

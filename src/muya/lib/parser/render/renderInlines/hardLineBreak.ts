@@ -1,7 +1,13 @@
 import { CLASS_OR_ID } from '../../../config'
 import type { Block, Token } from '../../types'
 
-export default function softLineBreak(h: typeof import('snabbdom').h, _cursor: unknown, _block: Block, token: Token, _outerClass: string) {
+export default function softLineBreak(
+  h: typeof import('snabbdom').h,
+  _cursor: unknown,
+  _block: Block,
+  token: Token,
+  _outerClass: string,
+) {
   const { spaces, lineBreak, isAtEnd } = token
   const className = CLASS_OR_ID.AG_HARD_LINE_BREAK
   const spaceClass = CLASS_OR_ID.AG_HARD_LINE_BREAK_SPACE

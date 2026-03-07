@@ -283,7 +283,7 @@ const backspaceCtrl = (ContentState: { prototype: IContentState }) => {
     }
 
     const node = selection.getSelectionStart()
-    const parentNode = node && node.nodeType === 1 ? node.parentNode as HTMLElement : null
+    const parentNode = node && node.nodeType === 1 ? (node.parentNode as HTMLElement) : null
     const paragraph = findNearestParagraph(node)
     const id = paragraph!.id
     let block = this.getBlock(id)
@@ -362,7 +362,9 @@ const backspaceCtrl = (ContentState: { prototype: IContentState }) => {
       const tHead = table.children[0]
       const tBody = table.children[1]
       const tHeadHasContent = tHead.children[0].children.some((th: Block) => (th.children[0].text as string).trim())
-      const tBodyHasContent = tBody.children.some((row: Block) => row.children.some((td: Block) => (td.children[0].text as string).trim()))
+      const tBodyHasContent = tBody.children.some((row: Block) =>
+        row.children.some((td: Block) => (td.children[0].text as string).trim()),
+      )
       return tHeadHasContent || tBodyHasContent
     }
 
@@ -431,8 +433,8 @@ const backspaceCtrl = (ContentState: { prototype: IContentState }) => {
       const table = this.closest(block!, 'table')
       const figure = this.closest(table!, 'figure')
       const hasContent = tableHasContent(table!)
-      let key
-      let offset
+      let key: string | undefined
+      let offset: number | undefined
 
       if ((!preBlock || preBlock.functionType !== 'cellContent') && !hasContent) {
         const paragraphContent = this.createBlock('span')

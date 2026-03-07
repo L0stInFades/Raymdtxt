@@ -148,7 +148,8 @@ const clickCtrl = (ContentState: { prototype: IContentState }) => {
         })
       }
     }
-    const block = this.getBlock(start.key)!
+    const block = this.getBlock(start.key)
+    if (!block) return
     let needRender = false
     // is show format float box?
     if (
@@ -197,7 +198,11 @@ const clickCtrl = (ContentState: { prototype: IContentState }) => {
     }
   }
 
-  ContentState.prototype.setCheckBoxState = function (this: IContentState, checkbox: HTMLInputElement, checked: boolean) {
+  ContentState.prototype.setCheckBoxState = function (
+    this: IContentState,
+    checkbox: HTMLInputElement,
+    checked: boolean,
+  ) {
     checkbox.checked = checked
     const block = this.getBlock(checkbox.id)!
     block.checked = checked
@@ -217,7 +222,11 @@ const clickCtrl = (ContentState: { prototype: IContentState }) => {
     }
   }
 
-  ContentState.prototype.updateChildrenCheckBoxState = function (this: IContentState, checkbox: HTMLInputElement, checked: boolean) {
+  ContentState.prototype.updateChildrenCheckBoxState = function (
+    this: IContentState,
+    checkbox: HTMLInputElement,
+    checked: boolean,
+  ) {
     const checkboxes = checkbox.parentElement!.querySelectorAll(`input ~ ul .${CLASS_OR_ID.AG_TASK_LIST_ITEM_CHECKBOX}`)
     const len = checkboxes.length
     for (let i = 0; i < len; i++) {

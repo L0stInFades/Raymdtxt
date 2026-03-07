@@ -3,7 +3,7 @@ import { collectFootnotes } from '../utils'
 import type { IMuya } from '../types'
 
 class MouseEvent {
-  muya: IMuya;
+  muya: IMuya
   constructor(muya: IMuya) {
     this.muya = muya
     this.mouseBinding()

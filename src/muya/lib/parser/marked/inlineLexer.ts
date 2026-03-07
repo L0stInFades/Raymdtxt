@@ -1,6 +1,7 @@
 import Renderer from './renderer'
 import { normal, breaks, gfm, pedantic } from './inlineRules'
 import defaultOptions from './options'
+// biome-ignore lint/suspicious/noShadowRestrictedNames: intentional import naming
 import { escape, findClosingBracket, getUniqueId, rtrim } from './utils'
 import { validateEmphasize, lowerPriority } from '../utils'
 
@@ -9,7 +10,12 @@ import { validateEmphasize, lowerPriority } from '../utils'
  */
 
 // biome-ignore lint/suspicious/noExplicitAny: legacy constructor-function pattern with dynamic rule maps
-function InlineLexer(this: any, links: Record<string, { href: string; title: string }>, footnotes: Record<string, { order: number; identifier: string; footnoteId: number; footnoteIdentifierId?: number }>, options: Record<string, unknown>) {
+function InlineLexer(
+  this: any,
+  links: Record<string, { href: string; title: string }>,
+  footnotes: Record<string, { order: number; identifier: string; footnoteId: number; footnoteIdentifierId?: number }>,
+  options: Record<string, unknown>,
+) {
   this.options = options || defaultOptions
   this.links = links
   this.footnotes = footnotes
@@ -57,11 +63,17 @@ InlineLexer.prototype.output = function (src: string) {
   }
 
   let out = ''
+  // biome-ignore lint/suspicious/noImplicitAnyLet: legacy lexer pattern
   let link
+  // biome-ignore lint/suspicious/noImplicitAnyLet: legacy lexer pattern
   let text
+  // biome-ignore lint/suspicious/noImplicitAnyLet: legacy lexer pattern
   let href
+  // biome-ignore lint/suspicious/noImplicitAnyLet: legacy lexer pattern
   let title
+  // biome-ignore lint/suspicious/noImplicitAnyLet: legacy lexer pattern
   let cap
+  // biome-ignore lint/suspicious/noImplicitAnyLet: legacy lexer pattern
   let prevCapZero
   let lastChar = ''
 
@@ -375,21 +387,23 @@ InlineLexer.prototype.outputLink = function (cap: RegExpExecArray, link: { href:
 InlineLexer.prototype.smartypants = function (text: string) {
   /* eslint-disable no-useless-escape */
   if (!this.options.smartypants) return text
-  return text
-    // em-dashes
-    .replace(/---/g, '\u2014')
-    // en-dashes
-    .replace(/--/g, '\u2013')
-    // opening singles
-    .replace(/(^|[-\u2014/([{"\s])'/g, '$1\u2018')
-    // closing singles & apostrophes
-    .replace(/'/g, '\u2019')
-    // opening doubles
-    .replace(/(^|[-\u2014/([{\u2018\s])"/g, '$1\u201c')
-    // closing doubles
-    .replace(/"/g, '\u201d')
-    // ellipses
-    .replace(/\.{3}/g, '\u2026');
+  return (
+    text
+      // em-dashes
+      .replace(/---/g, '\u2014')
+      // en-dashes
+      .replace(/--/g, '\u2013')
+      // opening singles
+      .replace(/(^|[-\u2014/([{"\s])'/g, '$1\u2018')
+      // closing singles & apostrophes
+      .replace(/'/g, '\u2019')
+      // opening doubles
+      .replace(/(^|[-\u2014/([{\u2018\s])"/g, '$1\u201c')
+      // closing doubles
+      .replace(/"/g, '\u201d')
+      // ellipses
+      .replace(/\.{3}/g, '\u2026')
+  )
   /* eslint-ensable no-useless-escape */
 }
 
@@ -401,6 +415,7 @@ InlineLexer.prototype.mangle = function (text: string) {
   if (!this.options.mangle) return text
   const l = text.length
   let out = ''
+  // biome-ignore lint/suspicious/noImplicitAnyLet: legacy lexer pattern
   let ch
 
   for (let i = 0; i < l; i++) {

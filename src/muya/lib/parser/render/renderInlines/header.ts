@@ -2,7 +2,14 @@ import { CLASS_OR_ID } from '../../../config'
 import type { Block, Token } from '../../types'
 import type { Cursor, StateRenderContext } from '../renderContext'
 
-export default function header(this: StateRenderContext, h: typeof import('snabbdom').h, cursor: Cursor, block: Block, token: Token, outerClass: string) {
+export default function header(
+  this: StateRenderContext,
+  h: typeof import('snabbdom').h,
+  cursor: Cursor,
+  block: Block,
+  token: Token,
+  outerClass: string,
+) {
   const { content } = token
   const { start, end } = token.range
   const className = this.getClassName(

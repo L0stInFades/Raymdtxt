@@ -28,11 +28,11 @@ const defaultOptions = {
 class LinkTools extends BaseFloat {
   static pluginName = 'linkTools'
 
-  hideTimer: ReturnType<typeof setTimeout> | null;
-  icons: LinkIcon[];
-  linkContainer: HTMLDivElement;
-  linkInfo: LinkInfo | null;
-  oldVnode: VNode | null;
+  hideTimer: ReturnType<typeof setTimeout> | null
+  icons: LinkIcon[]
+  linkContainer: HTMLDivElement
+  linkInfo: LinkInfo | null
+  oldVnode: VNode | null
 
   constructor(muya: IMuya, options = {}) {
     const name = 'ag-link-tools'
@@ -43,7 +43,8 @@ class LinkTools extends BaseFloat {
     this.options = opts
     this.icons = icons
     this.hideTimer = null
-    const linkContainer = (this.linkContainer = document.createElement('div'))
+    this.linkContainer = document.createElement('div')
+    const linkContainer = this.linkContainer
     this.container.appendChild(linkContainer)
     this.listen()
   }
@@ -51,7 +52,13 @@ class LinkTools extends BaseFloat {
   listen() {
     const { eventCenter } = this.muya
     super.listen()
-    eventCenter.subscribe('muya-link-tools', (({ reference, linkInfo }: { reference: HTMLElement | null; linkInfo: LinkInfo }) => {
+    eventCenter.subscribe('muya-link-tools', (({
+      reference,
+      linkInfo,
+    }: {
+      reference: HTMLElement | null
+      linkInfo: LinkInfo
+    }) => {
       if (reference) {
         this.linkInfo = linkInfo
         setTimeout(() => {
@@ -85,8 +92,9 @@ class LinkTools extends BaseFloat {
   render() {
     const { icons, oldVnode, linkContainer } = this
     const children = icons.map((i: LinkIcon) => {
+      // biome-ignore lint/suspicious/noImplicitAnyLet: legacy UI pattern
       let icon
-      let iconWrapperSelector = 'div.icon-wrapper'
+      const iconWrapperSelector = 'div.icon-wrapper'
       if (i.icon) {
         // SVG icon Asset
         icon = h(
@@ -104,7 +112,7 @@ class LinkTools extends BaseFloat {
         )
       }
       const iconWrapper = h(iconWrapperSelector, icon)
-      let itemSelector = `li.item.${i.type}`
+      const itemSelector = `li.item.${i.type}`
 
       return h(
         itemSelector,

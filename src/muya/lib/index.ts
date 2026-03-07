@@ -10,6 +10,7 @@ import { CLASS_OR_ID, MUYA_DEFAULT_OPTION } from './config'
 import { wordCount } from './utils'
 import ExportMarkdown from './utils/exportMarkdown'
 import ExportHtml from './utils/exportHtml'
+import StateRender from './parser/render'
 import ToolTip from './ui/tooltip'
 import type { Cursor, MuyaOptions, Block, SearchMatches, IMuya, LineCursor, CursorPosition } from './types'
 import './assets/styles/index.css'
@@ -41,11 +42,6 @@ interface TableEditData {
   action: string
   location?: string
   [key: string]: unknown
-}
-
-interface WordCursor {
-  start: number
-  end: number
 }
 
 class Muya {
@@ -86,11 +82,12 @@ class Muya {
     // UI plugins
     if (Muya.plugins.length) {
       for (const { plugin: Plugin, options: opts } of Muya.plugins) {
-        (this as Record<string, unknown>)[Plugin.pluginName] = new Plugin(this, opts)
+        ;(this as Record<string, unknown>)[Plugin.pluginName] = new Plugin(this, opts)
       }
     }
 
     this.contentState = new ContentState(this as unknown as IMuya, this.options)
+    this.contentState.setStateRender(new StateRender(this as unknown as IMuya))
     this.clipboard = new Clipboard(this as unknown as IMuya)
     this.clickEvent = new ClickEvent(this as unknown as IMuya)
     this.keyboard = new Keyboard(this as unknown as IMuya)
@@ -135,7 +132,10 @@ class Muya {
             }
           }
 
-          if ((target as Element).getAttribute('id') === 'ag-editor-id' && (target as Element).childElementCount === 0) {
+          if (
+            (target as Element).getAttribute('id') === 'ag-editor-id' &&
+            (target as Element).childElementCount === 0
+          ) {
             eventCenter.dispatch('crashed')
             console.warn('editor crashed, and can not be input any more.')
           }
@@ -149,7 +149,8 @@ class Muya {
 
   dispatchChange = () => {
     const { eventCenter } = this
-    const markdown = (this.markdown = this.getMarkdown())
+    this.markdown = this.getMarkdown()
+    const markdown = this.markdown
     const wc = this.getWordCount(markdown)
     const cursor = this.getCursor()
     const history = this.getHistory()
@@ -420,7 +421,7 @@ class Muya {
   setOptions(options: Partial<MuyaOptions>, needRender = false) {
     // FIXME: Just to be sure, disabled due to #1648.
     if ((options as Record<string, unknown>).codeBlockLineNumbers) {
-      (options as Record<string, unknown>).codeBlockLineNumbers = false
+      ;(options as Record<string, unknown>).codeBlockLineNumbers = false
     }
 
     Object.assign(this.options, options)
@@ -455,7 +456,12 @@ class Muya {
   /**
    * Replace the word range with the given replacement.
    */
-  replaceWordInline(line: LineCursor, wordCursor: { start: CursorPosition; end: CursorPosition }, replacement: string, setCursor = false) {
+  replaceWordInline(
+    line: LineCursor,
+    wordCursor: { start: CursorPosition; end: CursorPosition },
+    replacement: string,
+    setCursor = false,
+  ) {
     this.contentState.replaceWordInline(line, wordCursor, replacement, setCursor)
   }
 

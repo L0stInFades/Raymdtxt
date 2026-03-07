@@ -2,48 +2,12 @@ import components from 'prismjs/components.js'
 import getLoader from 'prismjs/dependencies'
 import { getDefer } from '../utils'
 
-// Pre-bundle all prismjs language components so Vite can resolve them.
-// import.meta.glob is Vite-specific; kept in a .js file to avoid tsc TS1343 under CommonJS module mode.
-import { prismLangModules } from './prismLangModules'
-/**
- * The set of all languages which have been loaded using the below function.
- *
- * @type {Set<string>}
- */
-export const loadedLanguages = new Set(['markup', 'css', 'clike', 'javascript'])
-
-const { languages } = components
-
-// Look for the origin languge by alias
-export const transformAliasToOrigin = (langs: string[]): string[] => {
-  const result: string[] = []
-  for (const lang of langs) {
-    if (languages[lang]) {
-      result.push(lang)
-    } else {
-      const language = Object.keys(languages).find((name) => {
-        const l = languages[name]
-        if (l.alias) {
-          return l.alias === lang || (Array.isArray(l.alias) && l.alias.includes(lang))
-        }
-        return false
-      })
-
-      if (language) {
-        result.push(language)
-      } else {
-        // The lang is not exist, the will handle in `initLoadLanguage`
-        result.push(lang)
-      }
-    }
-  }
-
-  return result
-}
-
 // biome-ignore lint/suspicious/noExplicitAny: Prism lacks type declarations
-function initLoadLanguage(Prism: any) {
+function initLoadLanguage(Prism: any, loadedLanguages: Set<string>) {
   return async function loadLanguages(langs: string | string[]) {
+    const { prismLangModules } = await import('./prismLangModules')
+    const { languages } = components
+
     // If no argument is passed, load all components
     if (!langs) {
       langs = Object.keys(languages).filter((lang: string) => lang !== 'meta')
@@ -77,7 +41,7 @@ function initLoadLanguage(Prism: any) {
         })
       } else {
         delete Prism.languages[lang]
-        const key = Object.keys(prismLangModules).find(k => k.endsWith(`/prism-${lang}.js`))
+        const key = Object.keys(prismLangModules).find((k) => k.endsWith(`/prism-${lang}.js`))
         if (key) {
           await prismLangModules[key]()
         }
@@ -90,7 +54,7 @@ function initLoadLanguage(Prism: any) {
     })
 
     return Promise.all(promises)
-  };
+  }
 }
 
 export default initLoadLanguage

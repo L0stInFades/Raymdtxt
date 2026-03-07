@@ -2,7 +2,14 @@ import { CLASS_OR_ID } from '../../../config'
 import type { Block, Token } from '../../types'
 import type { Cursor, StateRenderContext } from '../renderContext'
 
-export default function footnoteIdentifier(this: StateRenderContext, h: typeof import('snabbdom').h, cursor: Cursor, block: Block, token: Token, outerClass: string) {
+export default function footnoteIdentifier(
+  this: StateRenderContext,
+  h: typeof import('snabbdom').h,
+  cursor: Cursor,
+  block: Block,
+  token: Token,
+  outerClass: string,
+) {
   const className = this.getClassName(outerClass, block, token, cursor)
   const { marker } = token
   const { start, end } = token.range

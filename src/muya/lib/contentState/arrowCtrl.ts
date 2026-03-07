@@ -92,8 +92,10 @@ const arrowCtrl = (ContentState: { prototype: IContentState }) => {
   ContentState.prototype.arrowHandler = function (this: IContentState, event: KeyboardEvent) {
     const node = selection.getSelectionStart()
     const paragraph = findNearestParagraph(node)
-    const id = paragraph!.id
-    const block = this.getBlock(id)!
+    if (!paragraph || !paragraph.id) return
+    const id = paragraph.id
+    const block = this.getBlock(id)
+    if (!block) return
     const preBlock = this.findPreBlockInLocation(block)
     const nextBlock = this.findNextBlockInLocation(block)
     const { start, end } = selection.getCursorRange()
@@ -131,7 +133,7 @@ const arrowCtrl = (ContentState: { prototype: IContentState }) => {
     }
 
     if (block.functionType === 'cellContent') {
-      let activeBlock
+      let activeBlock: Block | null | undefined
       const cellInNextRow = this.findNextRowCell(block)
       const cellInPrevRow = this.findPrevRowCell(block)
 
@@ -193,8 +195,8 @@ const arrowCtrl = (ContentState: { prototype: IContentState }) => {
     ) {
       event.preventDefault()
       event.stopPropagation()
-      let key
-      let newBlock
+      let key: string | undefined
+      let newBlock: Block | undefined
       if (nextBlock) {
         key = nextBlock.key
       } else {

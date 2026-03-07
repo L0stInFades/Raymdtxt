@@ -4,13 +4,7 @@ import { FORMAT_MARKER_MAP, FORMAT_TYPES } from '../config'
 import { getImageInfo } from '../utils/getImageInfo'
 import type { IContentState, Block, Token, Cursor } from '../types'
 
-const getOffset = (offset: number, {
-  range: { start, end },
-  type,
-  tag,
-  anchor,
-  alt
-}: Token) => {
+const getOffset = (offset: number, { range: { start, end }, type, tag, anchor, alt }: Token) => {
   const dis = offset - start
   const len = end - start
   switch (type) {
@@ -29,8 +23,12 @@ const getOffset = (offset: number, {
     }
     case 'html_tag': {
       // handle underline, sup, sub
-      const OPEN_MARKER_LEN = (FORMAT_MARKER_MAP as unknown as Record<string, { open: string; close: string }>)[tag as string].open.length
-      const CLOSE_MARKER_LEN = (FORMAT_MARKER_MAP as unknown as Record<string, { open: string; close: string }>)[tag as string].close.length
+      const OPEN_MARKER_LEN = (FORMAT_MARKER_MAP as unknown as Record<string, { open: string; close: string }>)[
+        tag as string
+      ].open.length
+      const CLOSE_MARKER_LEN = (FORMAT_MARKER_MAP as unknown as Record<string, { open: string; close: string }>)[
+        tag as string
+      ].close.length
       if (dis < 0) return 0
       if (dis >= 0 && dis < OPEN_MARKER_LEN) return -dis
       if (dis >= OPEN_MARKER_LEN && dis <= len - CLOSE_MARKER_LEN) return -OPEN_MARKER_LEN
@@ -58,10 +56,10 @@ const getOffset = (offset: number, {
   }
 }
 
-const clearFormat = (token: Token, {
-  start,
-  end
-}: { start?: { offset: number; delata?: number }; end?: { offset: number; delata?: number } }) => {
+const clearFormat = (
+  token: Token,
+  { start, end }: { start?: { offset: number; delata?: number }; end?: { offset: number; delata?: number } },
+) => {
   if (start) {
     const deltaStart = getOffset(start.offset, token)
     start.delata = (start.delata ?? 0) + (deltaStart ?? 0)
@@ -101,10 +99,11 @@ const clearFormat = (token: Token, {
   }
 }
 
-const addFormat = (type: string, block: Block, {
-  start,
-  end
-}: { start: { offset: number }; end: { offset: number } }) => {
+const addFormat = (
+  type: string,
+  block: Block,
+  { start, end }: { start: { offset: number }; end: { offset: number } },
+) => {
   if (
     block.type !== 'span' ||
     (block.type === 'span' && !/paragraphContent|cellContent|atxLine/.test(block.functionType as string))
@@ -208,7 +207,11 @@ const formatCtrl = (ContentState: { prototype: IContentState }) => {
     return { formats, tokens, neighbors }
   }
 
-  ContentState.prototype.clearBlockFormat = function (block: Block, { start, end }: Cursor = selection.getCursorRange(), type: string) {
+  ContentState.prototype.clearBlockFormat = function (
+    block: Block,
+    { start, end }: Cursor = selection.getCursorRange(),
+    type: string,
+  ) {
     if (!start || !end) {
       return
     }

@@ -141,7 +141,9 @@ const handleResponseForSave = async (e, { id, filename, markdown, pathname, opti
 
   filePath = path.resolve(filePath)
   const extension = path.extname(filePath) || '.md'
-  filePath = !filePath.endsWith(extension) ? (filePath += extension) : filePath
+  if (!filePath.endsWith(extension)) {
+    filePath += extension
+  }
   return writeMarkdownFile(filePath, markdown, options, win)
     .then(() => {
       if (!alreadyExistOnDisk) {
@@ -468,6 +470,11 @@ ipcMain.on('mt::cmd-new-editor-window', () => {
 ipcMain.on('mt::cmd-open-folder', (e) => {
   const win = BrowserWindow.fromWebContents(e.sender)
   openFolder(win)
+})
+
+ipcMain.on('mt::open-file-or-folder', (e, pathname) => {
+  const win = BrowserWindow.fromWebContents(e.sender)
+  openFileOrFolder(win, pathname)
 })
 
 ipcMain.on('mt::cmd-close-window', (e) => {

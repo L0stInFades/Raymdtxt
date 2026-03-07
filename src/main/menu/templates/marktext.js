@@ -1,4 +1,3 @@
-import { app } from 'electron'
 import { showAboutDialog } from '../actions/help'
 import * as actions from '../actions/marktext'
 
@@ -6,22 +5,25 @@ import * as actions from '../actions/marktext'
 
 export default function (keybindings) {
   return {
-    label: 'MarkText',
+    label: 'Vien',
     submenu: [
       {
-        label: 'About MarkText',
+        label: 'About Vien',
         click(_menuItem, focusedWindow) {
           showAboutDialog(focusedWindow)
         },
       },
       {
-        label: 'Check for updates...',
+        label: 'Check for Updates...',
         click(_menuItem, focusedWindow) {
           actions.checkUpdates(focusedWindow)
         },
       },
       {
-        label: 'Preferences',
+        type: 'separator',
+      },
+      {
+        label: 'Settings...',
         accelerator: keybindings.getAccelerator('file.preferences'),
         click() {
           actions.userSetting()
@@ -31,7 +33,6 @@ export default function (keybindings) {
         type: 'separator',
       },
       {
-        label: 'Services',
         role: 'services',
         submenu: [],
       },
@@ -39,32 +40,22 @@ export default function (keybindings) {
         type: 'separator',
       },
       {
-        label: 'Hide MarkText',
+        role: 'hide',
         accelerator: keybindings.getAccelerator('mt.hide'),
-        click() {
-          actions.osxHide()
-        },
       },
       {
-        label: 'Hide Others',
+        role: 'hideOthers',
         accelerator: keybindings.getAccelerator('mt.hide-others'),
-        click() {
-          actions.osxHideAll()
-        },
       },
       {
-        label: 'Show All',
-        click() {
-          actions.osxShowAll()
-        },
+        role: 'unhide',
       },
       {
         type: 'separator',
       },
       {
-        label: 'Quit MarkText',
+        role: 'quit',
         accelerator: keybindings.getAccelerator('file.quit'),
-        click: app.quit,
       },
     ],
   }

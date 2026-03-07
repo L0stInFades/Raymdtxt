@@ -31,14 +31,14 @@ TextRenderer.prototype.script = (content: string, marker: string) => {
   return `<${tagName}>${content}</${tagName}>`
 }
 
-TextRenderer.prototype.footnoteIdentifier = (identifier: string, {
-  footnoteId,
-  footnoteIdentifierId,
-  order
-}: FootnoteInfo) =>
+TextRenderer.prototype.footnoteIdentifier = (
+  identifier: string,
+  { footnoteId, footnoteIdentifierId, order }: FootnoteInfo,
+) =>
   `<a href="#${footnoteId ? `fn${footnoteId}` : ''}" class="footnote-ref" id="fnref${footnoteIdentifierId}" role="doc-noteref"><sup>${order || identifier}</sup></a>`
 
-TextRenderer.prototype.link = TextRenderer.prototype.image = (_href: string, _title: string | null, text: string) => `${text}`
+TextRenderer.prototype.link = TextRenderer.prototype.image = (_href: string, _title: string | null, text: string) =>
+  `${text}`
 
 TextRenderer.prototype.br = () => ''
 

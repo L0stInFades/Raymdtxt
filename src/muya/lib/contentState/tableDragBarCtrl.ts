@@ -51,7 +51,7 @@ const getDragCells = (tableId: string, barType: string, index: number) => {
   } else {
     const rows = Array.from(table!.querySelectorAll('tr'))
     const len = rows.length
-    let i
+    let i: number
     for (i = 0; i < len; i++) {
       dragCells.push(rows[i].children[index])
     }
@@ -89,8 +89,18 @@ const tableDragBarCtrl = (ContentState: { prototype: IContentState }) => {
       }
     }
 
-    const mouseMoveId = eventCenter.attachDOMEvent(document, 'mousemove', (this.handleMouseMove as Function).bind(this)) as string
-    const mouseUpId = eventCenter.attachDOMEvent(document, 'mouseup', (this.handleMouseUp as Function).bind(this)) as string
+    const mouseMoveId = eventCenter.attachDOMEvent(
+      document,
+      'mousemove',
+      // biome-ignore lint/complexity/noBannedTypes: method binding requires Function type
+      (this.handleMouseMove as Function).bind(this),
+    ) as string
+    const mouseUpId = eventCenter.attachDOMEvent(
+      document,
+      'mouseup',
+      // biome-ignore lint/complexity/noBannedTypes: method binding requires Function type
+      (this.handleMouseUp as Function).bind(this),
+    ) as string
     this.dragEventIds.push(mouseMoveId, mouseUpId)
   }
 
@@ -100,7 +110,8 @@ const tableDragBarCtrl = (ContentState: { prototype: IContentState }) => {
     }
     const { barType } = this.dragInfo
     const attrName = (barType === 'bottom' ? 'clientX' : 'clientY') as 'clientX' | 'clientY'
-    const offset = (this.dragInfo.offset = event[attrName] - (this.dragInfo[attrName] as number))
+    this.dragInfo.offset = event[attrName] - (this.dragInfo[attrName] as number)
+    const offset = this.dragInfo.offset
     if (Math.abs(offset) < 5) {
       return
     }
@@ -145,7 +156,7 @@ const tableDragBarCtrl = (ContentState: { prototype: IContentState }) => {
     let offset = this.dragInfo!.offset!
     let curIndex = index
     const len = aspects.length
-    let i
+    let i: number
     if (offset > 0) {
       for (i = index; i < len; i++) {
         const aspect = aspects[i]
@@ -204,7 +215,7 @@ const tableDragBarCtrl = (ContentState: { prototype: IContentState }) => {
     const aspect = aspects[index]
     const len = aspects.length
 
-    let i
+    let i: number
     if (offset > 0) {
       if (barType === 'bottom') {
         for (const row of cells) {
@@ -264,7 +275,7 @@ const tableDragBarCtrl = (ContentState: { prototype: IContentState }) => {
     const aspects = this.dragInfo!.aspects!
     const offset = this.dragInfo!.offset!
     let move = 0
-    let i
+    let i: number
     if (offset > 0) {
       for (i = index + 1; i <= curIndex; i++) {
         move += aspects[i]

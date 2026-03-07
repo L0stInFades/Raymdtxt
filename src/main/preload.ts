@@ -10,6 +10,7 @@ type WrappedIpcListener = ((...args: unknown[]) => void) & {
 const ALLOWED_SEND_CHANNELS = [
   // File operations
   'mt::open-file',
+  'mt::open-file-or-folder',
   'mt::save-tabs',
   'mt::save-and-close-tabs',
   'mt::window-tab-closed',
@@ -33,6 +34,7 @@ const ALLOWED_SEND_CHANNELS = [
   'mt::close-window-confirm',
   'mt::window-toggle-always-on-top',
   'mt::window-add-file-path',
+  'mt::window-document-state',
   'mt::window-tab-closed',
   // Preferences
   'mt::ask-for-user-preference',
@@ -53,6 +55,7 @@ const ALLOWED_SEND_CHANNELS = [
   'mt::cmd-import-file',
   'mt::open-file-by-window-id',
   'mt::open-setting-window',
+  'mt::clear-recently-used-documents',
   'mt::make-screenshot',
   'mt::check-for-update',
   'mt::NEED_UPDATE',
@@ -156,15 +159,12 @@ const ALLOWED_INVOKE_CHANNELS = [
   // Window operations (replacing @electron/remote)
   'mt::window-is-fullscreen',
   'mt::window-is-maximized',
+  'mt::get-recently-used-documents',
   'mt::clipboard-has-files',
   'mt::clipboard-get-files',
   'mt::clipboard-guess-file-path',
   'mt::ask-for-image-path',
 ] as const
-
-type AllowedSendChannel = (typeof ALLOWED_SEND_CHANNELS)[number]
-type AllowedReceiveChannel = (typeof ALLOWED_RECEIVE_CHANNELS)[number]
-type AllowedInvokeChannel = (typeof ALLOWED_INVOKE_CHANNELS)[number]
 
 const sendChannelSet = new Set<string>(ALLOWED_SEND_CHANNELS)
 const receiveChannelSet = new Set<string>(ALLOWED_RECEIVE_CHANNELS)

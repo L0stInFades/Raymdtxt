@@ -1,9 +1,42 @@
-import { Menu } from 'electron'
 import { minimizeWindow, toggleAlwaysOnTop, toggleFullScreen } from '../actions/window'
 import { zoomIn, zoomOut } from '../../windows/utils'
 import { isOsx } from '../../config'
 
 export default function (keybindings) {
+  if (isOsx) {
+    return {
+      label: '&Window',
+      role: 'window',
+      submenu: [
+        {
+          role: 'minimize',
+          accelerator: keybindings.getAccelerator('window.minimize'),
+        },
+        {
+          role: 'zoom',
+        },
+        {
+          type: 'separator',
+        },
+        {
+          id: 'alwaysOnTopMenuItem',
+          label: 'Always on Top',
+          type: 'checkbox',
+          accelerator: keybindings.getAccelerator('window.toggle-always-on-top'),
+          click(_menuItem, browserWindow) {
+            toggleAlwaysOnTop(browserWindow)
+          },
+        },
+        {
+          type: 'separator',
+        },
+        {
+          role: 'front',
+        },
+      ],
+    }
+  }
+
   const menu = {
     label: '&Window',
     role: 'window',
@@ -56,13 +89,5 @@ export default function (keybindings) {
     ],
   }
 
-  if (isOsx) {
-    menu.submenu.push({
-      label: 'Bring All to Front',
-      click() {
-        Menu.sendActionToFirstResponder('arrangeInFront:')
-      },
-    })
-  }
   return menu
 }

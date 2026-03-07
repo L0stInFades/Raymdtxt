@@ -22,9 +22,9 @@ interface QuickInsertObj {
 class QuickInsert extends BaseScrollFloat {
   static pluginName = 'quickInsert'
 
-  _renderObj: QuickInsertObj | null;
-  block: Block | null;
-  oldVnode: VNode | null;
+  _renderObj: QuickInsertObj | null
+  block: Block | null
+  oldVnode: VNode | null
 
   constructor(muya: IMuya) {
     const name = 'ag-quick-insert'

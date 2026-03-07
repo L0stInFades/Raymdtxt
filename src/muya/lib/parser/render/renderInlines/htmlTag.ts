@@ -4,7 +4,14 @@ import sanitize, { isValidAttribute } from '../../../utils/dompurify'
 import type { Block, Token } from '../../types'
 import type { Cursor, InlineRenderMethod, StateRenderContext } from '../renderContext'
 
-export default function htmlTag(this: StateRenderContext, h: typeof import('snabbdom').h, cursor: Cursor, block: Block, token: Token, outerClass: string) {
+export default function htmlTag(
+  this: StateRenderContext,
+  h: typeof import('snabbdom').h,
+  cursor: Cursor,
+  block: Block,
+  token: Token,
+  outerClass: string,
+) {
   const { tag, openTag, closeTag, children, attrs } = token
   const className = children ? this.getClassName(outerClass, block, token, cursor) : CLASS_OR_ID.AG_GRAY
   const tagClassName = className === CLASS_OR_ID.AG_HIDE ? className : CLASS_OR_ID.AG_HTML_TAG
@@ -14,7 +21,8 @@ export default function htmlTag(this: StateRenderContext, h: typeof import('snab
 
   const anchor =
     Array.isArray(children) && tag !== 'ruby' // important
-      ? children.reduce((acc, to) => {
+      ? // biome-ignore lint/performance/noAccumulatingSpread: performance warning, acceptable in this context
+        children.reduce((acc, to) => {
           const chunk = (this[snakeToCamel(to.type)] as InlineRenderMethod)(h, cursor, block, to, className)
           return Array.isArray(chunk) ? [...acc, ...chunk] : [...acc, chunk]
         }, [])

@@ -1,4 +1,6 @@
 import * as actions from '../actions/view'
+import { isOsx } from '../../config'
+import { zoomIn, zoomOut } from '../../windows/utils'
 
 export default function (keybindings) {
   const viewMenu = {
@@ -83,6 +85,32 @@ export default function (keybindings) {
         },
       },
     ],
+  }
+
+  if (isOsx) {
+    viewMenu.submenu.push(
+      {
+        type: 'separator',
+      },
+      {
+        label: 'Zoom In',
+        accelerator: keybindings.getAccelerator('window.zoom-in'),
+        click(_item, focusedWindow) {
+          zoomIn(focusedWindow)
+        },
+      },
+      {
+        label: 'Zoom Out',
+        accelerator: keybindings.getAccelerator('window.zoom-out'),
+        click(_item, focusedWindow) {
+          zoomOut(focusedWindow)
+        },
+      },
+      {
+        accelerator: keybindings.getAccelerator('window.toggle-full-screen'),
+        role: 'togglefullscreen',
+      },
+    )
   }
 
   if (global.MARKTEXT_DEBUG) {

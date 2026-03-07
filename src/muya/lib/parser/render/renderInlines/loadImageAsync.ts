@@ -3,13 +3,23 @@ import { getUniqueId, loadImage } from '../../../utils'
 import { insertAfter, operateClassName } from '../../../utils/domManipulate'
 import { CLASS_OR_ID } from '../../../config'
 
-export default function loadImageAsync(this: StateRenderContext, imageInfo: { src: string; isUnknownType?: boolean; [k: string]: unknown }, attrs: { alt?: string; title?: string; width?: number; height?: number; [k: string]: unknown }, className: string, imageClass: string) {
+export default function loadImageAsync(
+  this: StateRenderContext,
+  imageInfo: { src: string; isUnknownType?: boolean; [k: string]: unknown },
+  attrs: { alt?: string; title?: string; width?: number; height?: number; [k: string]: unknown },
+  className: string,
+  imageClass: string,
+) {
   const { src, isUnknownType } = imageInfo
   let id: string | undefined
+  // biome-ignore lint/suspicious/noImplicitAnyLet: legacy renderer pattern
   let isSuccess
-  let w
-  let h
-  let domsrc
+  // biome-ignore lint/suspicious/noImplicitAnyLet: legacy renderer pattern
+  let w: number | undefined
+  // biome-ignore lint/suspicious/noImplicitAnyLet: legacy renderer pattern
+  let domsrc: string | undefined
+  // biome-ignore lint/suspicious/noImplicitAnyLet: legacy renderer pattern
+  let h: number | undefined
 
   let reload = false
   if (this.loadImageMap.has(src)) {
@@ -27,8 +37,8 @@ export default function loadImageAsync(this: StateRenderContext, imageInfo: { sr
       .then(({ url, width, height }) => {
         const imageText = document.querySelector(`#${id}`)
         const img = document.createElement('img')
-        let dispMsec = Date.now()
-        let touchMsec = dispMsec
+        const dispMsec = Date.now()
+        const touchMsec = dispMsec
         if (/^file:\/\//.test(src)) {
           domsrc = `${url}?msec=${dispMsec}`
         } else {

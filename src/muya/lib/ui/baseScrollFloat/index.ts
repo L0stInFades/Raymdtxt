@@ -4,10 +4,10 @@ import type { IMuya } from '../../types'
 import type { FloatOptions } from '../baseFloat'
 
 class BaseScrollFloat extends BaseFloat {
-  activeItem: unknown;
-  reference: HTMLElement | { id: string; getBoundingClientRect(): DOMRect } | null;
-  renderArray: unknown[] = [];
-  scrollElement: HTMLDivElement;
+  activeItem: unknown
+  reference: HTMLElement | { id: string; getBoundingClientRect(): DOMRect } | null
+  renderArray: unknown[] = []
+  scrollElement: HTMLDivElement
   constructor(muya: IMuya, name: string, options: FloatOptions = {}) {
     super(muya, name, options)
     this.scrollElement = null as unknown as HTMLDivElement
@@ -97,7 +97,9 @@ class BaseScrollFloat extends BaseFloat {
 
   render() {}
 
-  getItemElement(_item?: unknown): HTMLElement | null { return null }
+  getItemElement(_item?: unknown): HTMLElement | null {
+    return null
+  }
 }
 
 export default BaseScrollFloat

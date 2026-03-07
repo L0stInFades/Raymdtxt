@@ -4,7 +4,7 @@
 import type { IMuya } from '../types'
 
 class Resize {
-  muya: IMuya;
+  muya: IMuya
   constructor(muya: IMuya) {
     this.muya = muya
     this.listen()

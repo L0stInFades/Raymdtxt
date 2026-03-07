@@ -13,9 +13,8 @@ const HTML_TAG_REPLACEMENTS: Record<string, string> = {
   "'": '&#39;',
 }
 
-export const isMetaKey = ({
-  key
-}: { key: string }) => key === 'Shift' || key === 'Control' || key === 'Alt' || key === 'Meta'
+export const isMetaKey = ({ key }: { key: string }) =>
+  key === 'Shift' || key === 'Control' || key === 'Alt' || key === 'Meta'
 
 export const noop = () => {}
 
@@ -38,11 +37,10 @@ export const conflict = (arr1: [number, number], arr2: [number, number]) => {
   return !(arr1[1] < arr2[0] || arr2[1] < arr1[0])
 }
 
-export const union = ({ start: tStart, end: tEnd }: { start: number; end: number }, {
-  start: lStart,
-  end: lEnd,
-  active
-}: { start: number; end: number; active: boolean }) => {
+export const union = (
+  { start: tStart, end: tEnd }: { start: number; end: number },
+  { start: lStart, end: lEnd, active }: { start: number; end: number; active: boolean },
+) => {
   if (!(tEnd <= lStart || lEnd <= tStart)) {
     if (lStart < tStart) {
       return {
@@ -77,7 +75,7 @@ export const throttle = <T extends (...args: unknown[]) => unknown>(func: T, wai
     }
   }
 
-  return function(this: unknown, ...callArgs: unknown[]) {
+  return function (this: unknown, ...callArgs: unknown[]) {
     const now = Date.now()
     const remaining = wait - (now - previous)
 
@@ -97,7 +95,7 @@ export const throttle = <T extends (...args: unknown[]) => unknown>(func: T, wai
       timeout = setTimeout(later, remaining)
     }
     return result
-  } as unknown as T;
+  } as unknown as T
 }
 // simple implementation...
 export const debounce = <T extends (...args: unknown[]) => unknown>(func: T, wait = 50) => {
@@ -107,7 +105,7 @@ export const debounce = <T extends (...args: unknown[]) => unknown>(func: T, wai
     timer = setTimeout(() => {
       func(...args)
     }, wait)
-  };
+  }
 }
 
 export const deepCopyArray = <T>(array: T[]): T[] => {
@@ -261,7 +259,10 @@ export const checkImageContentType = (url: string) => {
  * @param {string} src Image url
  * @param {string} baseUrl Base path; used on desktop to fix the relative image path.
  */
-export const getImageInfo = (src: string, baseUrl = (window as unknown as Record<string, unknown>).DIRNAME as string | undefined) => {
+export const getImageInfo = (
+  src: string,
+  baseUrl = (window as unknown as Record<string, unknown>).DIRNAME as string | undefined,
+) => {
   const imageExtension = IMAGE_EXT_REG.test(src)
   const isUrl = URL_REG.test(src) || (imageExtension && /^file:\/\/.+/.test(src))
 
@@ -310,38 +311,49 @@ export const getImageInfo = (src: string, baseUrl = (window as unknown as Record
   }
 }
 
-export const escapeHTML = (str: string) => str.replace(
-  /[&<>'"]/g,
-  (tag: string) => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    "'": '&#39;',
-    '"': '&quot;',
-  } as Record<string, string>)[tag] || tag,
-)
+export const escapeHTML = (str: string) =>
+  str.replace(
+    /[&<>'"]/g,
+    (tag: string) =>
+      (
+        ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          "'": '&#39;',
+          '"': '&quot;',
+        }) as Record<string, string>
+      )[tag] || tag,
+  )
 
-export const unescapeHTML = (str: string) => str.replace(
-  /(?:&amp;|&lt;|&gt;|&quot;|&#39;)/g,
-  (tag: string) => ({
-    '&amp;': '&',
-    '&lt;': '<',
-    '&gt;': '>',
-    '&#39;': "'",
-    '&quot;': '"',
-  } as Record<string, string>)[tag] || tag,
-)
+export const unescapeHTML = (str: string) =>
+  str.replace(
+    /(?:&amp;|&lt;|&gt;|&quot;|&#39;)/g,
+    (tag: string) =>
+      (
+        ({
+          '&amp;': '&',
+          '&lt;': '<',
+          '&gt;': '>',
+          '&#39;': "'",
+          '&quot;': '"',
+        }) as Record<string, string>
+      )[tag] || tag,
+  )
 
 export const escapeInBlockHtml = (html: string) => {
-  return html.replace(/(<(style|script|title)[^<>]*>)([\s\S]*?)(<\/\2>)/g, (_m: string, p1: string, _p2: string, p3: string, p4: string) => {
-    return `${escapeHTML(p1)}${p3}${escapeHTML(p4)}`
-  });
+  return html.replace(
+    /(<(style|script|title)[^<>]*>)([\s\S]*?)(<\/\2>)/g,
+    (_m: string, p1: string, _p2: string, p3: string, p4: string) => {
+      return `${escapeHTML(p1)}${p3}${escapeHTML(p4)}`
+    },
+  )
 }
 
 export const escapeHtmlTags = (html: string) => {
   return html.replace(/[&<>"']/g, (x: string) => {
     return HTML_TAG_REPLACEMENTS[x]
-  });
+  })
 }
 
 export const wordCount = (markdown: string) => {

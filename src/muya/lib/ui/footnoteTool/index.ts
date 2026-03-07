@@ -39,11 +39,11 @@ const defaultOptions = {
 class LinkTools extends BaseFloat {
   static pluginName = 'footnoteTool'
 
-  footnotes: Map<string, Block> | null;
-  hideTimer: ReturnType<typeof setTimeout> | null;
-  identifier: string | null;
-  oldVnode: VNode | null;
-  toolContainer: HTMLDivElement;
+  footnotes: Map<string, Block> | null
+  hideTimer: ReturnType<typeof setTimeout> | null
+  identifier: string | null
+  oldVnode: VNode | null
+  toolContainer: HTMLDivElement
 
   constructor(muya: IMuya, options = {}) {
     const name = 'ag-footnote-tool'
@@ -54,7 +54,8 @@ class LinkTools extends BaseFloat {
     this.footnotes = null
     this.options = opts
     this.hideTimer = null
-    const toolContainer = (this.toolContainer = document.createElement('div'))
+    this.toolContainer = document.createElement('div')
+    const toolContainer = this.toolContainer
     this.container.appendChild(toolContainer)
     this.floatBox.classList.add('ag-footnote-tool-container')
     this.listen()
@@ -63,7 +64,15 @@ class LinkTools extends BaseFloat {
   listen() {
     const { eventCenter } = this.muya
     super.listen()
-    eventCenter.subscribe('muya-footnote-tool', (({ reference, identifier, footnotes }: { reference: HTMLElement | null; identifier: string; footnotes: Map<string, Block> }) => {
+    eventCenter.subscribe('muya-footnote-tool', (({
+      reference,
+      identifier,
+      footnotes,
+    }: {
+      reference: HTMLElement | null
+      identifier: string
+      footnotes: Map<string, Block>
+    }) => {
       if (reference) {
         this.footnotes = footnotes
         this.identifier = identifier

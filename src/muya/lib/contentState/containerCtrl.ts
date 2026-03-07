@@ -88,8 +88,10 @@ const containerCtrl = (ContentState: { prototype: IContentState }) => {
 
   ContentState.prototype.handleContainerBlockClick = function (figureEle: HTMLElement) {
     const { id } = figureEle
-    const mathBlock = this.getBlock(id)!
+    const mathBlock = this.getBlock(id)
+    if (!mathBlock || !mathBlock.children.length) return
     const preBlock = mathBlock.children[0]
+    if (!preBlock.children.length || !preBlock.children[0] || !preBlock.children[0].children.length) return
     const firstLine = preBlock.children[0].children[0]
 
     const { key } = firstLine
@@ -130,6 +132,7 @@ const containerCtrl = (ContentState: { prototype: IContentState }) => {
       return false
     }
 
+    if (!block.children.length || !block.children[0]) return false
     const { text } = block.children[0]
     return text.trim() === '$$' ? this.initContainerBlock(functionType, block, '') : false
   }

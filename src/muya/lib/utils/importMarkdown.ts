@@ -3,33 +3,75 @@
  * there is some difference when parse loose list item and tight lsit item.
  * Both of them add a p block in li block, use the CSS style to distinguish loose and tight.
  */
-import StateRender from '../parser/render'
 import { tokenizer } from '../parser'
+import { beginRules } from '../parser/rules'
 import { getImageInfo } from '../utils'
 import { Lexer } from '../parser/marked'
 import ExportMarkdown from './exportMarkdown'
 import TurndownService, { usePluginAddRules } from './turndownService'
-import { loadLanguage } from '../prism/index'
-import type { IContentState, Block, CursorPosition, IMuya } from '../types'
+import type { IContentState, Block, CursorPosition } from '../types'
 
 /**
  * Extended content state interface for methods added by mixin files
  * that aren't explicitly typed in the base IContentState interface.
  */
 interface ContentStateInstance extends IContentState {
-  cursor: { start: CursorPosition; end: CursorPosition; anchor: CursorPosition; focus: CursorPosition };
-  isGitlabCompatibilityEnabled: boolean;
-  listIndentation: number;
-  createContainerBlock: (type: string, value: string, mathStyle?: string) => Block;
-  createHtmlBlock: (text: string) => Block;
-  markdownToState: (markdown: string) => Block[];
-  htmlToMarkdown: (html: string, keeps?: string[]) => string;
+  cursor: { start: CursorPosition; end: CursorPosition; anchor: CursorPosition; focus: CursorPosition }
+  isGitlabCompatibilityEnabled: boolean
+  listIndentation: number
+  createContainerBlock: (type: string, value: string, mathStyle?: string) => Block
+  createHtmlBlock: (text: string) => Block
+  markdownToState: (markdown: string) => Block[]
+  htmlToMarkdown: (html: string, keeps?: string[]) => string
 }
 
 // To be disabled rules when parse markdown, Because content state don't need to parse inline rules
 import { CURSOR_ANCHOR_DNA, CURSOR_FOCUS_DNA } from '../config'
 
 const languageLoaded = new Set()
+let prismModulePromise: Promise<typeof import('../prism/index')> | null = null
+
+const getPrismModule = () => {
+  prismModulePromise ??= import('../prism/index')
+  return prismModulePromise
+}
+
+const collectReferenceLabels = (blocks: Block[]) => {
+  const labels = new Map<string, { href: string; title: string }>()
+
+  const travel = (block: Block) => {
+    const { text, children } = block
+    if (children?.length) {
+      children.forEach((child: Block) => {
+        travel(child)
+      })
+      return
+    }
+
+    if (!text) {
+      return
+    }
+
+    const tokens = beginRules.reference_definition.exec(text)
+    if (!tokens) {
+      return
+    }
+
+    const key = (tokens[2] + tokens[3]).toLowerCase()
+    if (!labels.has(key)) {
+      labels.set(key, {
+        href: tokens[6],
+        title: tokens[10] || '',
+      })
+    }
+  }
+
+  blocks.forEach((block) => {
+    travel(block)
+  })
+
+  return labels
+}
 
 // Just because turndown change `\n`(soft line break) to space, So we add `span.ag-soft-line-break` to workaround.
 const turnSoftBreakToSpan = (html: string) => {
@@ -41,8 +83,8 @@ const turnSoftBreakToSpan = (html: string) => {
       if (node.nodeType === 3 && (node.parentNode as HTMLElement).tagName !== 'CODE') {
         let startLen = 0
         let endLen = 0
-        const text = node.nodeValue!
-          .replace(/^(\n+)/, (_: string, p: string) => {
+        const text = node
+          .nodeValue!.replace(/^(\n+)/, (_: string, p: string) => {
             startLen = p.length
             return ''
           })
@@ -99,14 +141,16 @@ const importRegister = (ContentState: any) => {
       this.muya.options
 
     // biome-ignore lint/suspicious/noExplicitAny: Lexer tokens are dynamically shaped with .type, .text, etc.
-    const tokens: any[] = (new (Lexer as unknown as new (opts: Record<string, unknown>) => { lex(src: string): unknown[] })(
-      {
-        disableInline: true,
-        footnote,
-        isGitlabCompatibilityEnabled,
-        superSubScript,
-      }
-    )).lex(markdown)
+    const tokens: any[] = new (
+      Lexer as unknown as new (
+        opts: Record<string, unknown>,
+      ) => { lex(src: string): unknown[] }
+    )({
+      disableInline: true,
+      footnote,
+      isGitlabCompatibilityEnabled,
+      superSubScript,
+    }).lex(markdown)
 
     // biome-ignore lint/suspicious/noExplicitAny: lexer tokens are dynamically typed
     let token: any
@@ -114,7 +158,8 @@ const importRegister = (ContentState: any) => {
     let value: string
     const parentList: Block[] = [rootState]
 
-    while ((token = tokens.shift())) {
+    token = tokens.shift()
+    while (token) {
       switch (token.type) {
         case 'frontmatter': {
           const { lang, style } = token
@@ -215,7 +260,8 @@ const importRegister = (ContentState: any) => {
             })
             if (lang && !languageLoaded.has(lang)) {
               languageLoaded.add(lang)
-              loadLanguage(lang)
+              getPrismModule()
+                .then(({ loadLanguage }) => loadLanguage(lang))
                 .then((infoList) => {
                   if (!Array.isArray(infoList)) return
                   // There are three status `loaded`, `noexist` and `cached`.
@@ -248,10 +294,10 @@ const importRegister = (ContentState: any) => {
           const restoreTableEscapeCharacters = (text: string) => {
             // NOTE: markedjs replaces all escaped "|" ("\|") characters inside a cell with "|".
             //       We have to re-escape the chraracter to not break the table.
-            return text.replace(/\|/g, '\\|');
+            return text.replace(/\|/g, '\\|')
           }
-          let i
-          let j
+          let i: number
+          let j: number
           const headerLen = header.length
           for (i = 0; i < headerLen; i++) {
             const headText = header[i]
@@ -321,7 +367,7 @@ const importRegister = (ContentState: any) => {
 
         case 'text': {
           value = token.text
-          while (tokens[0].type === 'text') {
+          while (tokens[0] && tokens[0].type === 'text') {
             token = tokens.shift()
             value += `\n${token.text}`
           }
@@ -433,6 +479,8 @@ const importRegister = (ContentState: any) => {
           console.warn(`Unknown type ${token.type}`)
           break
       }
+
+      token = tokens.shift()
     }
 
     return rootState.children.length ? rootState.children : [this.createBlockP()]
@@ -487,7 +535,11 @@ const importRegister = (ContentState: any) => {
     const { isGitlabCompatibilityEnabled, listIndentation } = this
     const markdown = new ExportMarkdown(blocks, listIndentation, isGitlabCompatibilityEnabled).generate()
     const cmCursor = markdown.split('\n').reduce(
-      (acc: { anchor: { line: number; ch: number }; focus: { line: number; ch: number } }, line: string, index: number) => {
+      (
+        acc: { anchor: { line: number; ch: number }; focus: { line: number; ch: number } },
+        line: string,
+        index: number,
+      ) => {
         const ach = line.indexOf(CURSOR_ANCHOR_DNA)
         const fch = line.indexOf(CURSOR_FOCUS_DNA)
         if (ach > -1 && fch > -1) {
@@ -522,7 +574,10 @@ const importRegister = (ContentState: any) => {
     return cmCursor
   }
 
-  ContentState.prototype.addCursorToMarkdown = (markdown: string, cmCursorArg: { anchor: { line: number; ch: number }; focus: { line: number; ch: number } }) => {
+  ContentState.prototype.addCursorToMarkdown = (
+    markdown: string,
+    cmCursorArg: { anchor: { line: number; ch: number }; focus: { line: number; ch: number } },
+  ) => {
     const { anchor, focus } = cmCursorArg
     if (!anchor || !focus) {
       return
@@ -618,18 +673,15 @@ const importRegister = (ContentState: any) => {
   ContentState.prototype.extractImages = function (this: ContentStateInstance, markdown: string) {
     const results = new Set<string>()
     const blocks = this.markdownToState(markdown)
-    // biome-ignore lint/suspicious/noExplicitAny: IMuya and StateRender's MuyaInstance are structurally compatible at runtime
-    const render = new StateRender(this.muya as any)
-    // biome-ignore lint/suspicious/noExplicitAny: Block types from ../types and parser/render are structurally compatible
-    render.collectLabels(blocks as any)
+    const labels = collectReferenceLabels(blocks)
 
     interface InlineToken {
-      type: string;
-      attrs?: { src?: string };
-      children?: InlineToken[];
-      tag?: string;
-      label?: string;
-      backlash?: { second: string };
+      type: string
+      attrs?: { src?: string }
+      children?: InlineToken[]
+      tag?: string
+      label?: string
+      backlash?: { second: string }
     }
 
     const travelToken = (token: InlineToken) => {
@@ -639,8 +691,8 @@ const importRegister = (ContentState: any) => {
           results.add(attrs.src)
         } else {
           const rawSrc = label! + backlash!.second
-          if (render.labels.has(rawSrc.toLowerCase())) {
-            const { href } = render.labels.get(rawSrc.toLowerCase())!
+          if (labels.has(rawSrc.toLowerCase())) {
+            const { href } = labels.get(rawSrc.toLowerCase())!
             const { src } = getImageInfo(href)
             if (src) {
               results.add(src)
@@ -661,7 +713,11 @@ const importRegister = (ContentState: any) => {
           travel(b)
         }
       } else if (text && type === 'span' && /paragraphContent|atxLine|cellContent/.test(functionType as string)) {
-        const tokens = tokenizer(text, { highlights: [], hasBeginRules: false, labels: render.labels }) as unknown as InlineToken[]
+        const tokens = tokenizer(text, {
+          highlights: [],
+          hasBeginRules: false,
+          labels,
+        }) as unknown as InlineToken[]
         for (const token of tokens) {
           travelToken(token)
         }

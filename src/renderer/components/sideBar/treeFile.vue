@@ -2,6 +2,8 @@
   <div
     :title="file.pathname"
     class="side-bar-file"
+    data-testid="tree-file"
+    :data-pathname="file.pathname"
     :style="{'padding-left': `${(depth * 20) + 20}px`, 'opacity': file.isMarkdown ? 1 : 0.75 }"
     @click="handleFileClick()"
     :class="[{'current': currentFile.pathname === file.pathname, 'active': file.id === activeItem.id }]"

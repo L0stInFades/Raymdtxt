@@ -35,7 +35,11 @@ export const TABLE_TOOLS = Object.freeze([
   },
 ])
 
-const renderToolBar = (type: string, tools: readonly { label: string; title: string; icon: string }[], activeBlocks: Record<string, unknown>[]) => {
+const renderToolBar = (
+  type: string,
+  tools: readonly { label: string; title: string; icon: string }[],
+  activeBlocks: Record<string, unknown>[],
+) => {
   const children = tools.map((tool: { label: string; title: string; icon: string }) => {
     const { label, title, icon } = tool
     const { align } = activeBlocks[1] // activeBlocks[0] is span block. cell content.

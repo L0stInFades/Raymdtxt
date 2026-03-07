@@ -5,7 +5,7 @@ import selection from '../selection'
 import type { IMuya } from '../types'
 
 class ClickEvent {
-  muya: IMuya;
+  muya: IMuya
   constructor(muya: IMuya) {
     this.muya = muya
     this.clickBinding()
@@ -15,7 +15,7 @@ class ClickEvent {
   contextClickBingding() {
     const { container, eventCenter, contentState } = this.muya
     const handler = (event: MouseEvent) => {
-      // Allow native context menu in MarkText.
+      // Allow native context menu in Vien.
       if (!(globalThis as Record<string, unknown>).marktext) {
         // __MARKTEXT_PATCH__
         event.preventDefault()
@@ -198,7 +198,8 @@ class ClickEvent {
       // Handle click imagewrapper when it's empty or image load failed.
       if (
         imageWrapper &&
-        ((imageWrapper as Element).classList.contains('ag-empty-image') || (imageWrapper as Element).classList.contains('ag-image-fail'))
+        ((imageWrapper as Element).classList.contains('ag-empty-image') ||
+          (imageWrapper as Element).classList.contains('ag-image-fail'))
       ) {
         const rect = (imageWrapper as Element).getBoundingClientRect()
         const reference = {
@@ -230,7 +231,10 @@ class ClickEvent {
       if (editIcon) {
         event.preventDefault()
         event.stopPropagation()
-        if ((editIcon as Element).parentNode && ((editIcon as Element).parentNode as Element).classList.contains('ag-container-block')) {
+        if (
+          (editIcon as Element).parentNode &&
+          ((editIcon as Element).parentNode as Element).classList.contains('ag-container-block')
+        ) {
           contentState.handleContainerBlockClick((editIcon as Element).parentNode)
         }
       }

@@ -10,9 +10,9 @@ import commandCenter from './commandCenter'
 // global states
 const state = {
   platform: process.platform, // platform of system `darwin` | `win32` | `linux`
-  appVersion: process.versions.MARKTEXT_VERSION_STRING, // MarkText version string
+  appVersion: process.versions.MARKTEXT_VERSION_STRING, // Vien version string
   windowActive: true, // whether current window is active or focused
-  init: false, // whether MarkText is initialized
+  init: false, // whether Vien is initialized
 }
 
 const getters = {}

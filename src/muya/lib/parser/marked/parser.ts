@@ -25,8 +25,17 @@ function Parser(this: any, options: Record<string, unknown>) {
  * Parse Loop
  */
 
-Parser.prototype.parse = function (src: Record<string, unknown>[] & { links: Record<string, { href: string; title: string }>; footnotes: Record<string, { order: number; identifier: string; footnoteId: number; footnoteIdentifierId?: number }> }) {
-  this.inline = new (InlineLexer as unknown as new (...args: unknown[]) => Record<string, unknown>)(src.links, src.footnotes, this.options)
+Parser.prototype.parse = function (
+  src: Record<string, unknown>[] & {
+    links: Record<string, { href: string; title: string }>
+    footnotes: Record<string, { order: number; identifier: string; footnoteId: number; footnoteIdentifierId?: number }>
+  },
+) {
+  this.inline = new (InlineLexer as unknown as new (...args: unknown[]) => Record<string, unknown>)(
+    src.links,
+    src.footnotes,
+    this.options,
+  )
   // use an InlineLexer with a TextRenderer to extract pure text
   this.inlineText = new (InlineLexer as unknown as new (...args: unknown[]) => Record<string, unknown>)(
     src.links,
@@ -109,10 +118,12 @@ Parser.prototype.tok = function () {
     case 'table': {
       let header = ''
       let body = ''
-      let i
+      let i: number
+      // biome-ignore lint/suspicious/noImplicitAnyLet: legacy parser pattern
       let row
+      // biome-ignore lint/suspicious/noImplicitAnyLet: legacy parser pattern
       let cell
-      let j
+      let j: number
 
       // header
       cell = ''

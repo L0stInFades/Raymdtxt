@@ -191,7 +191,7 @@ export default defineConfig(({ mode }) => {
         // legacy renderer code that still uses them directly.
         nodePolyfills({
           // Only polyfill built-ins that are actually used
-          include: ['path', 'os', 'buffer', 'events', 'util', 'stream', 'crypto'],
+          include: ['path', 'os', 'buffer', 'events', 'util', 'stream'],
           // Electron's renderer sandbox already provides `process` natively (correct platform etc.)
           // Do NOT override it with a browser shim — that would break process.platform detection.
           globals: { Buffer: true, process: true },
@@ -245,7 +245,7 @@ export default defineConfig(({ mode }) => {
         outDir: 'dist/electron',
         // Don't clean — main.js and preload.js are built first and must survive.
         emptyOutDir: false,
-        sourcemap: 'inline',
+        sourcemap: isDev ? 'inline' : false,
         rollupOptions: {
           external: ['electron'],
         },

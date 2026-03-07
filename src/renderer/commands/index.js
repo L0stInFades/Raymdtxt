@@ -609,7 +609,7 @@ const commands = [
   },
 
   // --------------------------------------------------------------------------
-  // MarkText
+  // Vien
 
   {
     id: 'file.preferences',
@@ -626,13 +626,13 @@ const commands = [
   {
     id: 'docs.user-guide',
     execute: async () => {
-      window.api.shell.openExternal('https://github.com/marktext/marktext/blob/master/docs/README.md')
+      window.api.shell.openExternal('https://github.com/L0stInFades/vien/blob/develop/README.md')
     },
   },
   {
     id: 'docs.markdown-syntax',
     execute: async () => {
-      window.api.shell.openExternal('https://github.com/marktext/marktext/blob/master/docs/MARKDOWN_SYNTAX.md')
+      window.api.shell.openExternal('https://github.com/L0stInFades/vien/blob/develop/docs/MARKDOWN_SYNTAX.md')
     },
   },
 

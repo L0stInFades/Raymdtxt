@@ -10,6 +10,14 @@ import { FileEncodingCommand, LineEndingCommand, QuickOpenCommand, TrailingNewli
 
 const autoSaveTimers = new Map()
 
+// Flag to suppress false "dirty" marking when Muya re-serializes markdown
+// during initial file load. Muya's setMarkdown() fires dispatchChange() via
+// setTimeout which triggers LISTEN_FOR_CONTENT_CHANGE. The round-tripped
+// markdown may differ slightly from the original (e.g. trailing newlines),
+// which would incorrectly mark the file as unsaved. This counter is
+// incremented before loading and decremented after the first change event.
+let _suppressDirtyCount = 0
+
 const state = {
   currentFile: {},
   tabs: [],
@@ -56,6 +64,9 @@ const mutations = {
       if (typeof fileState.markdown === 'string') {
         const { id, markdown, cursor, history, pathname } = fileState
         window.DIRNAME = pathname ? path.dirname(pathname) : ''
+        // Suppress the deferred dispatchChange from Muya re-serializing
+        // the markdown when switching to the next tab after removal.
+        _suppressDirtyCount++
         bus.emit('file-changed', { id, markdown, cursor, renderCursor: true, history })
       }
     }
@@ -125,6 +136,7 @@ const mutations = {
     // Backup few entries that we need to restore later.
     const oldId = tab.id
     const oldNotifications = tab.notifications
+    const oldCursor = tab.cursor
     let oldHistory = null
     if (tab.history.index >= 0 && tab.history.stack.length >= 1) {
       // Allow to restore the old document.
@@ -142,6 +154,11 @@ const mutations = {
     Object.assign(tab, newFileState)
     tab.id = oldId
     tab.notifications = oldNotifications
+    // Preserve the cursor position so that reloads (e.g. after autosave) don't
+    // jump the cursor to the end of the document.
+    if (oldCursor) {
+      tab.cursor = oldCursor
+    }
     if (oldHistory) {
       tab.history = oldHistory
     }
@@ -160,6 +177,9 @@ const mutations = {
     if (pathname === currentFile.pathname) {
       state.currentFile = tab
       const { id, cursor, history } = tab
+      // Suppress the deferred dispatchChange from Muya re-serializing
+      // the markdown during the reload of externally changed file.
+      _suppressDirtyCount++
       bus.emit('file-changed', { id, markdown, cursor, renderCursor: true, history })
     }
   },
@@ -269,6 +289,9 @@ const mutations = {
       if (typeof state.currentFile.markdown === 'string') {
         const { id, markdown, cursor, history, pathname } = state.currentFile
         window.DIRNAME = pathname ? path.dirname(pathname) : ''
+        // Suppress the deferred dispatchChange from Muya re-serializing
+        // the markdown when switching to the next tab after closing.
+        _suppressDirtyCount++
         bus.emit('file-changed', { id, markdown, cursor, renderCursor: true, history })
       }
     }
@@ -607,6 +630,10 @@ const actions = {
   },
 
   UPDATE_CURRENT_FILE({ commit, state, dispatch }, currentFile) {
+    // Suppress the deferred dispatchChange that fires when Muya
+    // re-serializes the markdown during the tab switch/load (file-changed ->
+    // handleFileChange -> setMarkdown -> setTimeout(dispatchChange)).
+    _suppressDirtyCount++
     commit('SET_CURRENT_FILE', currentFile)
     const { tabs } = state
     if (!tabs.some((file) => file.id === currentFile.id)) {
@@ -817,6 +844,10 @@ const actions = {
 
     if (selected) {
       const { id, markdown } = fileState
+      // Suppress the deferred dispatchChange from file-loaded
+      // (setMarkdownToEditor -> setMarkdown -> setTimeout(dispatchChange)).
+      // UPDATE_CURRENT_FILE already suppresses the file-changed event.
+      _suppressDirtyCount++
       dispatch('UPDATE_CURRENT_FILE', fileState)
       bus.emit('file-loaded', { id, markdown })
     } else {
@@ -870,6 +901,10 @@ const actions = {
     const { id, cursor } = docState
 
     if (selected) {
+      // Suppress the deferred dispatchChange from file-loaded
+      // (setMarkdownToEditor -> setMarkdown -> setTimeout(dispatchChange)).
+      // UPDATE_CURRENT_FILE already suppresses the file-changed event.
+      _suppressDirtyCount++
       dispatch('UPDATE_CURRENT_FILE', docState)
       bus.emit('file-loaded', { id, markdown, cursor })
     } else {
@@ -948,6 +983,16 @@ const actions = {
     // Set toc
     if (toc && !equal(toc, listToc)) {
       commit('SET_TOC', toc)
+    }
+
+    // When a file is first loaded into Muya, setMarkdown() fires
+    // dispatchChange() via setTimeout. The re-serialized markdown may
+    // differ from the stored value (trailing newlines, etc.), which
+    // would incorrectly mark the file as unsaved. Skip the dirty check
+    // for the first change event after a file load.
+    if (_suppressDirtyCount > 0) {
+      _suppressDirtyCount--
+      return
     }
 
     // Change save status/save to file only when the markdown changed!

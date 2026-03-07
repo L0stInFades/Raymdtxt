@@ -66,14 +66,20 @@ Lexer.prototype.token = function (src: string, top: boolean) {
   const { footnote, frontMatter, isGitlabCompatibilityEnabled, math } = this.options
   src = src.replace(/^ +$/gm, '')
 
+  // biome-ignore lint/suspicious/noImplicitAnyLet: legacy lexer pattern with dynamic variable usage
   let loose
+  // biome-ignore lint/suspicious/noImplicitAnyLet: legacy lexer pattern with dynamic variable usage
   let cap
   let bull: string
+  // biome-ignore lint/suspicious/noImplicitAnyLet: legacy lexer pattern with dynamic variable usage
   let b
+  // biome-ignore lint/suspicious/noImplicitAnyLet: legacy lexer pattern with dynamic variable usage
   let item
-  let space
+  let space: number
+  // biome-ignore lint/suspicious/noImplicitAnyLet: legacy lexer pattern with dynamic variable usage
   let i
-  let tag
+  let tag: string
+  // biome-ignore lint/suspicious/noImplicitAnyLet: legacy lexer pattern with dynamic variable usage
   let l
 
   // Only check front matter at the begining of a markdown file.
@@ -82,8 +88,11 @@ Lexer.prototype.token = function (src: string, top: boolean) {
     cap = this.rules.frontmatter.exec(src)
     if (this.checkFrontmatter && top && cap) {
       src = src.substring(cap[0].length)
+      // biome-ignore lint/suspicious/noImplicitAnyLet: legacy lexer pattern with dynamic variable usage
       let lang
+      // biome-ignore lint/suspicious/noImplicitAnyLet: legacy lexer pattern with dynamic variable usage
       let style
+      // biome-ignore lint/suspicious/noImplicitAnyLet: legacy lexer pattern with dynamic variable usage
       let text
       if (cap[1]) {
         lang = 'yaml'
@@ -224,7 +233,7 @@ Lexer.prototype.token = function (src: string, top: boolean) {
       let text = cap[2] ? cap[2].trim() : ''
 
       if (text.endsWith('#')) {
-        let trimmed = rtrim(text, '#')
+        const trimmed = rtrim(text, '#')
 
         if (this.options.pedantic) {
           text = trimmed.trim()
@@ -318,6 +327,7 @@ Lexer.prototype.token = function (src: string, top: boolean) {
     // list
     cap = this.rules.list.exec(src)
     if (cap) {
+      // biome-ignore lint/suspicious/noImplicitAnyLet: legacy lexer pattern with dynamic variable usage
       let checked
       src = src.substring(cap[0].length)
       bull = cap[2]
@@ -649,7 +659,7 @@ function indentCodeCompensation(raw: string, text: string) {
 
       return node
     })
-    .join('\n');
+    .join('\n')
 }
 
 export default Lexer

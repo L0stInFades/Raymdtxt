@@ -1,10 +1,23 @@
-import { loadLanguage } from '../prism/index'
 import { escapeHTML } from '../utils'
 // import resizeCodeBlockLineNumber from '../utils/resizeCodeLineNumber'
 import selection from '../selection'
 import type { IContentState, Block } from '../types'
 
 const CODE_UPDATE_REP = /^`{3,}(.*)/
+let prismModulePromise: Promise<typeof import('../prism/index')> | null = null
+
+const requestLanguageLoad = (lang: string) => {
+  if (!lang) {
+    return
+  }
+
+  prismModulePromise ??= import('../prism/index')
+  void prismModulePromise
+    .then(({ loadLanguage }) => loadLanguage(lang))
+    .catch((error) => {
+      console.warn(error)
+    })
+}
 
 const codeBlockCtrl = (ContentState: { prototype: IContentState }) => {
   /**
@@ -60,7 +73,7 @@ const codeBlockCtrl = (ContentState: { prototype: IContentState }) => {
     // Prevent possible XSS on language input when using lang attribute later on. The input is also sanitized before rendering.
     lang = escapeHTML(lang)
     if (lang !== '') {
-      loadLanguage(lang)
+      requestLanguageLoad(lang)
     }
 
     if (block.functionType === 'languageInput') {
@@ -73,7 +86,9 @@ const codeBlockCtrl = (ContentState: { prototype: IContentState }) => {
         preBlock.lang = lang
         preBlock.functionType = 'fencecode'
         nextSibling.lang = lang
-        nextSibling.children.forEach((c: Block) => c.lang = lang)
+        nextSibling.children.forEach((c: Block) => {
+          c.lang = lang
+        })
       }
 
       // Set cursor at the first line
@@ -101,6 +116,7 @@ const codeBlockCtrl = (ContentState: { prototype: IContentState }) => {
     if (block.type !== 'p') return false
     // If p block's children are more than one, no need to update
     if (block.children.length !== 1) return false
+    if (!block.children[0]) return false
 
     const { text } = block.children[0]
     const match = CODE_UPDATE_REP.exec(text)
@@ -120,7 +136,7 @@ const codeBlockCtrl = (ContentState: { prototype: IContentState }) => {
       })
 
       if (language) {
-        loadLanguage(language)
+        requestLanguageLoad(language)
       }
 
       block.type = 'pre'
@@ -150,8 +166,11 @@ const codeBlockCtrl = (ContentState: { prototype: IContentState }) => {
   ContentState.prototype.copyCodeBlock = function (this: IContentState, event: MouseEvent) {
     const { target } = event
     const preEle = (target as HTMLElement).closest('pre')
-    const preBlock = this.getBlock(preEle!.id)!
-    const codeBlock = preBlock.children.find((c: Block) => c.type === 'code')!
+    if (!preEle) return
+    const preBlock = this.getBlock(preEle.id)
+    if (!preBlock) return
+    const codeBlock = preBlock.children.find((c: Block) => c.type === 'code')
+    if (!codeBlock || !codeBlock.children.length || !codeBlock.children[0]) return
     const codeContent = codeBlock.children[0].text
     this.muya.clipboard.copy('copyCodeContent', codeContent)
   }

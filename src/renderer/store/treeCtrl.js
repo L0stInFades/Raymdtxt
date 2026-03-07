@@ -17,6 +17,29 @@ const getSubdirectoriesFromRoot = (rootPath, pathname) => {
   return relativePath ? relativePath.split(PATH_SEPARATOR) : []
 }
 
+const createFolderNode = (currentPath, directoryName) => {
+  return {
+    id: getUniqueId(),
+    pathname: `${currentPath}${PATH_SEPARATOR}${directoryName}`,
+    name: directoryName,
+    isCollapsed: true,
+    isDirectory: true,
+    isFile: false,
+    isMarkdown: false,
+    folders: [],
+    files: [],
+  }
+}
+
+const insertFolderSorted = (folders, folder) => {
+  const index = folders.findIndex((item) => item.name.localeCompare(folder.name) > 0)
+  if (index !== -1) {
+    folders.splice(index, 0, folder)
+  } else {
+    folders.push(folder)
+  }
+}
+
 /**
  * Add a new file to the tree list.
  *
@@ -34,18 +57,8 @@ export const addFile = (tree, file) => {
   for (const directoryName of subDirectories) {
     let childFolder = currentSubFolders.find((f) => f.name === directoryName)
     if (!childFolder) {
-      childFolder = {
-        id: getUniqueId(),
-        pathname: `${currentPath}${PATH_SEPARATOR}${directoryName}`,
-        name: directoryName,
-        isCollapsed: true,
-        isDirectory: true,
-        isFile: false,
-        isMarkdown: false,
-        folders: [],
-        files: [],
-      }
-      currentSubFolders.push(childFolder)
+      childFolder = createFolderNode(currentPath, directoryName)
+      insertFolderSorted(currentSubFolders, childFolder)
     }
 
     currentPath = `${currentPath}${PATH_SEPARATOR}${directoryName}`
@@ -91,18 +104,8 @@ export const addDirectory = (tree, dir) => {
   for (const directoryName of subDirectories) {
     let childFolder = currentSubFolders.find((f) => f.name === directoryName)
     if (!childFolder) {
-      childFolder = {
-        id: getUniqueId(),
-        pathname: `${currentPath}${PATH_SEPARATOR}${directoryName}`,
-        name: directoryName,
-        isCollapsed: true,
-        isDirectory: true,
-        isFile: false,
-        isMarkdown: false,
-        folders: [],
-        files: [],
-      }
-      currentSubFolders.push(childFolder)
+      childFolder = createFolderNode(currentPath, directoryName)
+      insertFolderSorted(currentSubFolders, childFolder)
     }
 
     currentPath = `${currentPath}${PATH_SEPARATOR}${directoryName}`

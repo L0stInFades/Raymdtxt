@@ -12,17 +12,17 @@
 import type { Block, BlockAlign } from '../types'
 
 interface ListInfo {
-  type: 'ul' | 'ol';
-  listCount?: number;
+  type: 'ul' | 'ol'
+  listCount?: number
 }
 
 class ExportMarkdown {
-  blocks: Block[];
-  isGitlabCompatibilityEnabled: boolean;
-  isLooseParentList: boolean;
-  listIndentation: 'number' | 'dfm';
-  listIndentationCount: number;
-  listType: ListInfo[];
+  blocks: Block[]
+  isGitlabCompatibilityEnabled: boolean
+  isLooseParentList: boolean
+  listIndentation: 'number' | 'dfm'
+  listIndentationCount: number
+  listType: ListInfo[]
   constructor(blocks: Block[], listIndentation: number | string = 1, isGitlabCompatibilityEnabled = false) {
     this.blocks = blocks
     this.listType = [] // 'ul' or 'ol'
@@ -152,7 +152,7 @@ class ExportMarkdown {
           if (insertNewLine) {
             this.insertLineBreak(result, indent)
           }
-          const listCount = block.start !== undefined ? block.start as number : 1
+          const listCount = block.start !== undefined ? (block.start as number) : 1
           this.listType.push({ type: 'ol', listCount })
           result.push(this.normalizeList(block, indent, listIndent))
           this.listType.pop()
@@ -189,7 +189,7 @@ class ExportMarkdown {
   normalizeParagraphText(block: Block, indent: string): string {
     const { text } = block
     const lines = text.split('\n')
-    return `${lines.map((line: string) => `${indent}${line}`).join('\n')}\n`;
+    return `${lines.map((line: string) => `${indent}${line}`).join('\n')}\n`
   }
 
   normalizeHeaderText(block: Block, indent: string): string {
@@ -201,7 +201,7 @@ class ExportMarkdown {
       return `${indent}${atxHeadingText}\n`
     } else if (headingStyle === 'setext') {
       const lines = text.trim().split('\n')
-      return `${lines.map((line: string) => `${indent}${line}`).join('\n')}\n${indent}${(marker as string).trim()}\n`;
+      return `${lines.map((line: string) => `${indent}${line}`).join('\n')}\n${indent}${(marker as string).trim()}\n`
     }
     return ''
   }
@@ -313,7 +313,7 @@ class ExportMarkdown {
     const tHeader = table.children[0]
     const tBody = table.children[1]
     const escapeText = (str: string) => {
-      return str.replace(/([^\\])\|/g, '$1\\|');
+      return str.replace(/([^\\])\|/g, '$1\\|')
     }
 
     tableData.push(tHeader.children[0].children.map((th: Block) => escapeText(th.children[0].text).trim()))
@@ -325,7 +325,7 @@ class ExportMarkdown {
 
     const columnWidth = tHeader.children[0].children.map((th: Block) => ({
       width: 5,
-      align: th.align as BlockAlign
+      align: th.align as BlockAlign,
     }))
 
     let i: number
@@ -353,10 +353,7 @@ class ExportMarkdown {
           indent +
           '|' +
           columnWidth
-            .map(({
-            width,
-            align
-          }: { width: number; align: BlockAlign }) => {
+            .map(({ width, align }: { width: number; align: BlockAlign }) => {
               let raw = '-'.repeat(width - 2)
               switch (align) {
                 case 'left':
@@ -439,6 +436,7 @@ class ExportMarkdown {
 
   normalizeFootnote(block: Block, indent: string): string {
     const result: string[] = []
+    if (!block.children.length || !block.children[0]) return ''
     const identifier = block.children[0].text
     result.push(`${indent}[^${identifier}]:`)
     const hasMultipleBlocks = block.children.length > 2 || block.children[1].type !== 'p'

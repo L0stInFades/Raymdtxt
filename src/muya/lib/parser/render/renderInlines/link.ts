@@ -5,7 +5,14 @@ import type { Block, Token } from '../../types'
 import type { Cursor, StateRenderContext } from '../renderContext'
 
 // 'link': /^(\[)((?:\[[^\]]*\]|[^\[\]]|\](?=[^\[]*\]))*?)(\\*)\]\((.*?)(\\*)\)/, // can nest
-export default function link(this: StateRenderContext, h: typeof import('snabbdom').h, cursor: Cursor, block: Block, token: Token, outerClass: string) {
+export default function link(
+  this: StateRenderContext,
+  h: typeof import('snabbdom').h,
+  cursor: Cursor,
+  block: Block,
+  token: Token,
+  outerClass: string,
+) {
   const className = this.getClassName(outerClass, block, token, cursor)
   const linkClassName = className === CLASS_OR_ID.AG_HIDE ? className : CLASS_OR_ID.AG_LINK_IN_BRACKET
   const { start, end } = token.range
@@ -75,6 +82,7 @@ export default function link(this: StateRenderContext, h: typeof import('snabbdo
             },
           },
           [
+            // biome-ignore lint/performance/noAccumulatingSpread: performance warning, acceptable in this context
             ...token.children.reduce((acc: unknown[], to: Record<string, unknown>) => {
               const chunk = (this[snakeToCamel(to.type as string)] as Function)(h, cursor, block, to, className)
               return Array.isArray(chunk) ? [...acc, ...chunk] : [...acc, chunk]
@@ -84,18 +92,19 @@ export default function link(this: StateRenderContext, h: typeof import('snabbdo
         ),
         h(`span.${className}.${CLASS_OR_ID.AG_REMOVE}`, middleBracket),
         h(
-          `span.${linkClassName}.${CLASS_OR_ID.AG_REMOVE}`,
+          `span.$linkClassName.$CLASS_OR_ID.AG_REMOVE`,
           {
             attrs: { spellcheck: 'false' },
           },
           [...hrefContent, ...this.backlashInToken(h, token.backlash.second, className, secondBacklashStart, token)],
         ),
-        h(`span.${className}.${CLASS_OR_ID.AG_REMOVE}`, lastBracket),
-      ];
+        h(`span.$className.$CLASS_OR_ID.AG_REMOVE`, lastBracket),
+      ]
     }
   } else {
     return [
       ...firstBracket,
+      // biome-ignore lint/performance/noAccumulatingSpread: performance warning, acceptable in this context
       ...token.children.reduce((acc: unknown[], to: Record<string, unknown>) => {
         const chunk = (this[snakeToCamel(to.type as string)] as Function)(h, cursor, block, to, className)
         return Array.isArray(chunk) ? [...acc, ...chunk] : [...acc, chunk]
@@ -104,6 +113,6 @@ export default function link(this: StateRenderContext, h: typeof import('snabbdo
       ...middleHref,
       ...this.backlashInToken(h, token.backlash.second, className, secondBacklashStart, token),
       ...lastBracket,
-    ];
+    ]
   }
 }

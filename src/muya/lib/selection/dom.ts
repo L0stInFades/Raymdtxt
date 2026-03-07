@@ -80,7 +80,9 @@ export const isAganippeParagraph = (element: Node | null): boolean => {
 }
 
 export const isBlockContainer = (element: Node | null): boolean => {
-  return !!element && element.nodeType !== 3 && blockContainerElementNames.indexOf(element.nodeName.toLowerCase()) !== -1
+  return (
+    !!element && element.nodeType !== 3 && blockContainerElementNames.indexOf(element.nodeName.toLowerCase()) !== -1
+  )
 }
 
 export const isMuyaEditorElement = (element: Node | null): boolean => {
@@ -133,7 +135,7 @@ export const getFirstSelectableLeafNode = (element: Node | null): Element | fals
 export const getClosestBlockContainer = (node: Node | null): Element | false => {
   return traverseUp(node, (node: Element) => {
     return isBlockContainer(node) || isMuyaEditorElement(node)
-  });
+  })
 }
 
 interface CursorPositionResult {
@@ -143,6 +145,7 @@ interface CursorPositionResult {
 
 export const getCursorPositionWithinMarkedText = (markedText: string, cursorOffset: number): CursorPositionResult => {
   const chunks: { index: number; leftSymbol: string; rightSymbol: string; lastIndex: number }[] = []
+  // biome-ignore lint/suspicious/noImplicitAnyLet: legacy selection pattern
   let match
 
   do {

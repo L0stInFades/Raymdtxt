@@ -3,7 +3,7 @@ import fsPromises from 'node:fs/promises'
 import { exec } from 'node:child_process'
 import dayjs from 'dayjs'
 import log from 'electron-log'
-import { app, BrowserWindow, clipboard, dialog, ipcMain, nativeTheme, shell } from 'electron'
+import { app, BrowserWindow, clipboard, dialog, ipcMain, nativeImage, nativeTheme, shell } from 'electron'
 import { isChildOfDirectory } from 'common/filesystem/paths'
 import { isLinux, isOsx, isWindows } from '../config'
 import parseArgs from '../cli/parser'
@@ -174,6 +174,10 @@ class App {
 
     if (isOsx) {
       app.dock.setMenu(dockMenu)
+      const dockIcon = nativeImage.createFromPath(path.join(__static, 'logo-96px.png'))
+      if (!dockIcon.isEmpty()) {
+        app.dock.setIcon(dockIcon)
+      }
     } else if (isWindows) {
       app.setJumpList([
         {

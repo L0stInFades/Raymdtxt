@@ -34,7 +34,14 @@ const renderIcon = (h: typeof import('snabbdom').h, className: string, icon: str
 }
 
 // I dont want operate dom directly, is there any better method? need help!
-export default function image(this: StateRenderContext, h: typeof import('snabbdom').h, _cursor: unknown, block: Block, token: Token, _outerClass: string) {
+export default function image(
+  this: StateRenderContext,
+  h: typeof import('snabbdom').h,
+  _cursor: unknown,
+  block: Block,
+  token: Token,
+  _outerClass: string,
+) {
   const imageInfo = getImageInfo(token.attrs.src)
   const { selectedImage } = this.muya.contentState
   const data = {
@@ -42,7 +49,9 @@ export default function image(this: StateRenderContext, h: typeof import('snabbd
       raw: token.raw,
     },
   }
+  // biome-ignore lint/suspicious/noImplicitAnyLet: legacy renderer pattern
   let id
+  // biome-ignore lint/suspicious/noImplicitAnyLet: legacy renderer pattern
   let isSuccess
   let domsrc: string | undefined
   let { src } = imageInfo

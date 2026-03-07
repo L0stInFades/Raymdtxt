@@ -28,15 +28,15 @@ interface SelectionState {
 }
 
 class Selection {
-  doc: Document;
+  doc: Document
   constructor(doc: Document) {
     this.doc = doc // document
   }
 
   findMatchingSelectionParent(testElementFunction: (el: Element) => boolean, contentWindow: Window) {
     const selection = contentWindow.getSelection()
-    let range
-    let current
+    let range: Range | undefined
+    let current: Node | undefined
 
     if (!selection || selection.rangeCount === 0) {
       return false
@@ -73,7 +73,7 @@ class Selection {
     let foundEnd = false
     let trailingImageCount = 0
     let stop = false
-    let nextCharIndex
+    let nextCharIndex: number | undefined
     let allowRangeToStartAtEndOfNode = false
     let lastTextNode: Text | null = null
 
@@ -138,13 +138,14 @@ class Selection {
           if (node.nodeName.toLowerCase() === 'img') {
             trailingImageCount++
           }
-          if (trailingImageCount === selectionState.trailingImageCount) {
+          if (trailingImageCount === selectionState.trailingImageCount && node.parentNode) {
             // Find which index the image is in its parent's children
             let endIndex = 0
-            while (node.parentNode!.childNodes[endIndex] !== node) {
+            while (endIndex < node.parentNode.childNodes.length && node.parentNode.childNodes[endIndex] !== node) {
               endIndex++
             }
-            range.setEnd(node.parentNode!, endIndex + 1)
+            const setEndOffset = Math.min(endIndex + 1, node.parentNode.childNodes.length)
+            range.setEnd(node.parentNode, setEndOffset)
             stop = true
           }
         }
@@ -204,15 +205,18 @@ class Selection {
           currentNode = currentNode.parentNode
         }
       }
-      if (currentNode !== null && currentNode.nodeName.toLowerCase() === 'a') {
+      if (currentNode !== null && currentNode.nodeName.toLowerCase() === 'a' && currentNode.parentNode) {
         let currentNodeIndex: number | null = null
-        for (let i = 0; currentNodeIndex === null && i < currentNode.parentNode!.childNodes.length; i++) {
-          if (currentNode.parentNode!.childNodes[i] === currentNode) {
+        for (let i = 0; currentNodeIndex === null && i < currentNode.parentNode.childNodes.length; i++) {
+          if (currentNode.parentNode.childNodes[i] === currentNode) {
             currentNodeIndex = i
           }
         }
-        range.setStart(currentNode.parentNode!, currentNodeIndex! + 1)
-        range.collapse(true)
+        if (currentNodeIndex !== null) {
+          const setOffset = Math.min(currentNodeIndex + 1, currentNode.parentNode.childNodes.length)
+          range.setStart(currentNode.parentNode, setOffset)
+          range.collapse(true)
+        }
       }
     }
     return range
@@ -221,7 +225,9 @@ class Selection {
   // Uses the emptyBlocksIndex calculated by getIndexRelativeToAdjacentEmptyBlocks
   // to move the cursor back to the start of the correct paragraph
   importSelectionMoveCursorPastBlocks(root: Node, index: number, range: Range): Range {
-    const treeWalker = this.doc.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, { acceptNode: filterOnlyParentElements })
+    const treeWalker = this.doc.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, {
+      acceptNode: filterOnlyParentElements,
+    })
     const startContainer = range.startContainer
     let startBlock: Node | null | false
     let targetNode: Node | undefined
@@ -277,11 +283,11 @@ class Selection {
   // by Tim Down
   getSelectionHtml() {
     const sel = this.doc.getSelection()
-    let i
+    let i: number
     let html = ''
-    let len
-    let container
-    if (sel && sel.rangeCount) {
+    let len: number
+    let container: HTMLElement | undefined
+    if (sel?.rangeCount) {
       container = this.doc.createElement('div')
       for (i = 0, len = sel.rangeCount; i < len; i += 1) {
         container.appendChild(sel.getRangeAt(i).cloneContents())
@@ -329,11 +335,15 @@ class Selection {
    *  @return {Object} 'left' and 'right' attributes contain offsets from beginning and end of Element
    */
   getCaretOffsets(element: Node, range?: Range) {
-    let preCaretRange
-    let postCaretRange
+    let preCaretRange: Range | undefined
+    let postCaretRange: Range | undefined
 
     if (!range) {
-      range = window.getSelection()!.getRangeAt(0)
+      const sel = window.getSelection()
+      if (!sel || sel.rangeCount === 0) {
+        return { left: 0, right: 0 }
+      }
+      range = sel.getRangeAt(0)
     }
 
     preCaretRange = range.cloneRange()
@@ -359,9 +369,26 @@ class Selection {
 
   select(startNode: Node, startOffset: number, endNode?: Node, endOffset?: number) {
     const range = this.doc.createRange()
+
+    // Defensive bounds checking to prevent "Failed to execute 'setStart' on 'Range': There is no child at offset N" errors
+    // For element nodes, offset must be <= childNodes.length
+    // For text nodes, offset must be <= node.length
+    const clampOffset = (node: Node, offset: number): number => {
+      if (offset < 0) return 0
+      if (node.nodeType === 3) {
+        // Text node
+        return Math.min(offset, (node as Text).length)
+      }
+      // Element node
+      return Math.min(offset, node.childNodes.length)
+    }
+
+    startOffset = clampOffset(startNode, startOffset)
     range.setStart(startNode, startOffset)
+
     if (endNode) {
-      range.setEnd(endNode, endOffset!)
+      endOffset = clampOffset(endNode, endOffset!)
+      range.setEnd(endNode, endOffset)
     } else {
       range.collapse(true)
     }
@@ -371,6 +398,13 @@ class Selection {
 
   setFocus(focusNode: Node, focusOffset: number) {
     const selection = this.doc.getSelection()
+    // Clamp focusOffset to prevent out-of-bounds errors
+    if (focusNode.nodeType === 3) {
+      focusOffset = Math.min(focusOffset, (focusNode as Text).length)
+    } else {
+      focusOffset = Math.min(focusOffset, focusNode.childNodes.length)
+    }
+    if (focusOffset < 0) focusOffset = 0
     selection?.extend(focusNode, focusOffset)
   }
 
@@ -428,8 +462,16 @@ class Selection {
 
   setCursorRange(cursorRange: { anchor: { key: string; offset: number }; focus: { key: string; offset: number } }) {
     const { anchor, focus } = cursorRange
+
+    // Guard against empty or invalid keys that would cause querySelector('#') to crash
+    if (!anchor.key || !focus.key) return
+
     const anchorParagraph = document.querySelector(`#${anchor.key}`)
     const focusParagraph = document.querySelector(`#${focus.key}`)
+
+    // Guard against missing DOM elements
+    if (!anchorParagraph || !focusParagraph) return
+
     const getNodeAndOffset = (node: Node | null, offset: number): { node: Node; offset: number } => {
       if (!node) return { node: document, offset: 0 }
       if (node.nodeType === 3) {
@@ -441,7 +483,7 @@ class Selection {
 
       const childNodes = node.childNodes
       const len = childNodes.length
-      let i
+      let i: number
       let count = 0
       for (i = 0; i < len; i++) {
         const child = childNodes[i] as HTMLElement
@@ -569,8 +611,18 @@ class Selection {
     const anchorParagraph = findNearestParagraph(anchorNode)
     const focusParagraph = findNearestParagraph(focusNode)
 
-    let aOffset = getOffsetOfParagraph(anchorNode!, anchorParagraph!) + anchorOffset
-    let fOffset = getOffsetOfParagraph(focusNode!, focusParagraph!) + focusOffset
+    // Guard against null paragraphs or empty IDs — prevents querySelector('#') crash
+    if (!anchorParagraph || !focusParagraph || !anchorParagraph.id || !focusParagraph.id) {
+      return new Cursor({
+        start: null,
+        end: null,
+        anchor: null,
+        focus: null,
+      })
+    }
+
+    let aOffset = getOffsetOfParagraph(anchorNode!, anchorParagraph) + anchorOffset
+    let fOffset = getOffsetOfParagraph(focusNode!, focusParagraph) + focusOffset
 
     // fix input after image.
     if (
@@ -591,7 +643,11 @@ class Selection {
       fOffset = aOffset
     }
 
-    if (anchorNode === focusNode && anchorNode!.nodeType === 1 && (anchorNode as Element).classList.contains('ag-image-container')) {
+    if (
+      anchorNode === focusNode &&
+      anchorNode!.nodeType === 1 &&
+      (anchorNode as Element).classList.contains('ag-image-container')
+    ) {
       const imageWrapper = anchorNode!.parentNode
       const preElement = (imageWrapper as Element)?.previousElementSibling
       aOffset = 0
@@ -633,12 +689,12 @@ class Selection {
 
   getCursorCoords() {
     const sel = this.doc.getSelection()
-    let range
+    let range: Range | undefined
     let x = 0
     let y = 0
     let width = 0
 
-    if (sel && sel.rangeCount) {
+    if (sel?.rangeCount) {
       range = sel.getRangeAt(0).cloneRange()
       if (range.getClientRects) {
         // range.collapse(true)

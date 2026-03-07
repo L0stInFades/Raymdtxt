@@ -35,8 +35,9 @@ const dragDropCtrl = (ContentState: { prototype: IContentState }) => {
     }
 
     if (anchor) {
-      const anchorParagraph = this.muya.container.querySelector(`#${anchor.key}`)
-      const rect = anchorParagraph!.getBoundingClientRect()
+      const anchorParagraph = anchor.key ? this.muya.container.querySelector(`#${anchor.key}`) : null
+      if (!anchorParagraph) return
+      const rect = anchorParagraph.getBoundingClientRect()
       const position = verticalPositionInRect(event, rect)
       this.dropAnchor = {
         position,

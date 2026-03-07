@@ -3,7 +3,14 @@ import type { Block, Token } from '../../types'
 import type { StateRenderContext } from '../renderContext'
 
 // change text to highlight vdom
-export default function highlight(this: StateRenderContext, h: typeof import('snabbdom').h, block: Block, rStart: number, rEnd: number, token: Token) {
+export default function highlight(
+  this: StateRenderContext,
+  h: typeof import('snabbdom').h,
+  block: Block,
+  rStart: number,
+  rEnd: number,
+  token: Token,
+) {
   const { text } = block
   const { highlights } = token
   let result = []

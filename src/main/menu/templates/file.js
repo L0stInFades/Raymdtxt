@@ -73,10 +73,18 @@ export default function (keybindings, userPreference, recentlyUsedFiles) {
     fileMenu.submenu.push(recentlyUsedMenu)
   } else {
     fileMenu.submenu.push({
-      role: 'recentdocuments',
+      role: 'recentDocuments',
       submenu: [
         {
-          role: 'clearrecentdocuments',
+          type: 'separator',
+          visible: recentlyUsedFiles.length > 0,
+        },
+        {
+          label: 'Clear Menu',
+          enabled: recentlyUsedFiles.length > 0,
+          click() {
+            actions.clearRecentlyUsed()
+          },
         },
       ],
     })

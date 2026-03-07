@@ -8,7 +8,7 @@
 //       can be produced with ^ or ` on any keyboard. --> ^, `, ", ~, ...
 
 export default new Map([
-  // MarkText menu on macOS only
+  // Vien menu on macOS only
   ['mt.hide', ''],
   ['mt.hide-others', ''],
 
@@ -55,7 +55,7 @@ export default new Map([
   ['paragraph.heading-5', 'Ctrl+Alt+5'],
   ['paragraph.heading-6', 'Ctrl+Alt+6'],
   ['paragraph.upgrade-heading', 'Ctrl+Plus'],
-  ['paragraph.degrade-heading', 'Ctrl+-'],
+  ['paragraph.degrade-heading', 'Ctrl+Alt+-'],
   ['paragraph.table', 'Ctrl+Shift+T'],
   ['paragraph.code-fence', 'Ctrl+Shift+K'],
   ['paragraph.quote-block', 'Ctrl+Shift+Q'],
@@ -86,8 +86,8 @@ export default new Map([
   // Window menu
   ['window.minimize', 'Ctrl+M'],
   ['window.toggle-always-on-top', ''],
-  ['window.zoom-in', ''],
-  ['window.zoom-out', ''],
+  ['window.zoom-in', 'Ctrl+='],
+  ['window.zoom-out', 'Ctrl+-'],
   ['window.toggle-full-screen', 'F11'],
 
   // View menu

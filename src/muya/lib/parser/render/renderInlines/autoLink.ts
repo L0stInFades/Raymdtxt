@@ -4,7 +4,14 @@ import type { Block, Token } from '../../types'
 import type { Cursor, StateRenderContext } from '../renderContext'
 
 // render auto_link to vdom
-export default function autoLink(this: StateRenderContext, h: typeof import('snabbdom').h, cursor: Cursor, block: Block, token: Token, outerClass: string) {
+export default function autoLink(
+  this: StateRenderContext,
+  h: typeof import('snabbdom').h,
+  cursor: Cursor,
+  block: Block,
+  token: Token,
+  outerClass: string,
+) {
   const className = this.getClassName(outerClass, block, token, cursor)
   const { isLink, marker, href, email } = token
   const { start, end } = token.range

@@ -51,17 +51,16 @@ const toJson = (res: UnsplashResponse) => {
 class ImageSelector extends BaseFloat {
   static pluginName = 'imageSelector'
 
-  imageInfo: ImageInfo | null;
-  imageSelectorContainer: HTMLDivElement;
-  isFullMode: boolean;
-  loading: boolean;
-  oldVnode: VNode | null;
-  photoList: UnsplashPhoto[];
-  renderArray: unknown[];
-  state: ImageState;
-  tab: string;
-  // biome-ignore lint/suspicious/noExplicitAny: unsplash-js API returns complex typed client
-  unsplash: ReturnType<typeof createApi> | null;
+  imageInfo: ImageInfo | null
+  imageSelectorContainer: HTMLDivElement
+  isFullMode: boolean
+  loading: boolean
+  oldVnode: VNode | null
+  photoList: UnsplashPhoto[]
+  renderArray: unknown[]
+  state: ImageState
+  tab: string
+  unsplash: ReturnType<typeof createApi> | null
 
   constructor(muya: IMuya, options: ImageSelectorOptions) {
     const name = 'ag-image-selector'
@@ -95,7 +94,8 @@ class ImageSelector extends BaseFloat {
       src: '',
       title: '',
     }
-    const imageSelectorContainer = (this.imageSelectorContainer = document.createElement('div'))
+    this.imageSelectorContainer = document.createElement('div')
+    const imageSelectorContainer = this.imageSelectorContainer
     this.container.appendChild(imageSelectorContainer)
     this.floatBox.classList.add('ag-image-selector-wrapper')
     this.listen()
@@ -104,7 +104,15 @@ class ImageSelector extends BaseFloat {
   listen() {
     super.listen()
     const { eventCenter } = this.muya
-    eventCenter.subscribe('muya-image-selector', (({ reference, cb, imageInfo }: { reference: HTMLElement | null; cb: (...args: unknown[]) => void; imageInfo: ImageInfo }) => {
+    eventCenter.subscribe('muya-image-selector', (({
+      reference,
+      cb,
+      imageInfo,
+    }: {
+      reference: HTMLElement | null
+      cb: (...args: unknown[]) => void
+      imageInfo: ImageInfo
+    }) => {
       if (reference) {
         // Unselected image.
         const { contentState } = this.muya
@@ -212,7 +220,14 @@ class ImageSelector extends BaseFloat {
   }
 
   srcInputKeyDown(event: KeyboardEvent) {
-    const { imagePathPicker } = this.muya as IMuya & { imagePathPicker: { status: boolean; step: (dir: string) => void; selectItem: (item: unknown) => void; activeItem: unknown } }
+    const { imagePathPicker } = this.muya as IMuya & {
+      imagePathPicker: {
+        status: boolean
+        step: (dir: string) => void
+        selectItem: (item: unknown) => void
+        activeItem: unknown
+      }
+    }
     if (!imagePathPicker.status) {
       if (event.key === EVENT_KEYS.Enter) {
         event.stopPropagation()
@@ -273,7 +288,9 @@ class ImageSelector extends BaseFloat {
     if (!value) {
       list = []
     } else {
-      list = await (this.muya.options as ImageSelectorOptions & { imagePathAutoComplete?: (value: string) => Promise<unknown[]> }).imagePathAutoComplete!(value)
+      list = await (
+        this.muya.options as ImageSelectorOptions & { imagePathAutoComplete?: (value: string) => Promise<unknown[]> }
+      ).imagePathAutoComplete!(value)
     }
     eventCenter.dispatch('muya-image-picker', { reference, list, cb })
   }
@@ -282,11 +299,7 @@ class ImageSelector extends BaseFloat {
     return this.replaceImageAsync(this.state)
   }
 
-  replaceImageAsync = async ({
-    alt,
-    src,
-    title
-  }: ImageState) => {
+  replaceImageAsync = async ({ alt, src, title }: ImageState) => {
     if (!this.muya.options.imageAction || URL_REG.test(src)) {
       const { alt: oldAlt, src: oldSrc, title: oldTitle } = this.imageInfo!.token.attrs
       if (alt !== oldAlt || src !== oldSrc || title !== oldTitle) {
@@ -304,7 +317,9 @@ class ImageSelector extends BaseFloat {
         this.hide()
 
         try {
-          const newSrc = await (this.muya.options.imageAction as (src: string, id: string, alt: string) => Promise<string>)(src, id, alt)
+          const newSrc = await (
+            this.muya.options.imageAction as (src: string, id: string, alt: string) => Promise<string>
+          )(src, id, alt)
           const { src: localPath } = getImageSrc(src)
           if (localPath) {
             ;(this.muya.contentState.stateRender as { urlMap: Map<string, string> }).urlMap.set(newSrc, localPath)
@@ -500,7 +515,7 @@ class ImageSelector extends BaseFloat {
             const target = (event as KeyboardEvent).target as HTMLInputElement | null
             const value = target?.value
             if ((event as KeyboardEvent).key === EVENT_KEYS.Enter && value) {
-              (event as Event).preventDefault()
+              ;(event as Event).preventDefault()
               ;(event as Event).stopPropagation()
               this.searchPhotos(value)
             }
@@ -528,8 +543,7 @@ class ImageSelector extends BaseFloat {
                   const alt = photo.alt_description
                   const src = photo.urls.regular
                   const { id: photoId } = photo
-                  this.unsplash!.photos
-                    .get({ photoId })
+                  this.unsplash!.photos.get({ photoId })
                     .then(toJson)
                     .then((result: unknown) => {
                       const data = result as { links: { download_location: string } }
@@ -559,7 +573,7 @@ class ImageSelector extends BaseFloat {
                 on: {
                   click: () => {
                     if ((this.options as ImageSelectorOptions).photoCreatorClick) {
-                      (this.options as ImageSelectorOptions).photoCreatorClick!(photo.user.links.html)
+                      ;(this.options as ImageSelectorOptions).photoCreatorClick!(photo.user.links.html)
                     }
                   },
                 },

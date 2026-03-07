@@ -551,11 +551,11 @@ const initialize = () => {
 
 export const downcode = (slug: string) => {
   initialize()
-  return slug.replace(downcoderRegex!, (m: string) => downcoderMap[m]);
+  return slug.replace(downcoderRegex!, (m: string) => downcoderMap[m])
 }
 
 export const slugify = (s: string) => {
-  let slug = downcode(s)
+  const slug = downcode(s)
     .toLowerCase()
     .trim()
     .replace(/[\u2000-\u206F\u2E00-\u2E7F\\'!"#$%&()*+,./:;<=>?@[\]^`{|}~]/g, '')

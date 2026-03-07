@@ -25,7 +25,7 @@
       </div>
     </div>
     <el-dialog
-      v-model:visible="dialogTableVisible"
+      v-model="dialogTableVisible"
       :show-close="isShowClose"
       :modal="true"
       custom-class="ag-dialog-table"

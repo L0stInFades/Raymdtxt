@@ -12,7 +12,13 @@ const emojiCtrl = (ContentState: { prototype: IContentState }) => {
     })
     let delta = 0
 
-    type EmojiToken = { range: { start: number; end: number }; type: string; content: string; raw: string; children?: EmojiToken[] }
+    type EmojiToken = {
+      range: { start: number; end: number }
+      type: string
+      content: string
+      raw: string
+      children?: EmojiToken[]
+    }
     const findEmojiToken = (tokens: EmojiToken[], offset: number): EmojiToken | undefined => {
       for (const token of tokens) {
         const { start, end } = token.range

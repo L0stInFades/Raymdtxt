@@ -6,7 +6,10 @@ const imageCtrl = (ContentState: { prototype: IContentState }) => {
   /**
    * insert inline image at the cursor position.
    */
-  ContentState.prototype.insertImage = function (this: IContentState, { alt = '', src = '', title = '' }: { alt?: string; src?: string; title?: string }) {
+  ContentState.prototype.insertImage = function (
+    this: IContentState,
+    { alt = '', src = '', title = '' }: { alt?: string; src?: string; title?: string },
+  ) {
     const match = /(?:\/|\\)?([^./\\]+)\.[a-z]+$/.exec(src)
     if (!alt) {
       alt = match?.[1] ? match[1] : ''
@@ -98,11 +101,20 @@ const imageCtrl = (ContentState: { prototype: IContentState }) => {
     this.muya.dispatchChange()
   }
 
-  ContentState.prototype.updateImage = function (this: IContentState, {
-    imageId,
-    key,
-    token
-  }: { imageId: string; key: string; token: { range: { start: number; end: number }; attrs: Record<string, string> } }, attrName: string, attrValue: string) {
+  ContentState.prototype.updateImage = function (
+    this: IContentState,
+    {
+      imageId,
+      key,
+      token,
+    }: {
+      imageId: string
+      key: string
+      token: { range: { start: number; end: number }; attrs: Record<string, string> }
+    },
+    attrName: string,
+    attrValue: string,
+  ) {
     // inline/left/center/right
     const block = this.getBlock(key)!
     const { range } = token
@@ -132,10 +144,14 @@ const imageCtrl = (ContentState: { prototype: IContentState }) => {
     }
   }
 
-  ContentState.prototype.replaceImage = function (this: IContentState, {
-    key,
-    token
-  }: { key: string; token: { type: string; range: { start: number; end: number }; attrs?: Record<string, string> } }, { alt = '', src = '', title = '' }: { alt?: string; src?: string; title?: string }) {
+  ContentState.prototype.replaceImage = function (
+    this: IContentState,
+    {
+      key,
+      token,
+    }: { key: string; token: { type: string; range: { start: number; end: number }; attrs?: Record<string, string> } },
+    { alt = '', src = '', title = '' }: { alt?: string; src?: string; title?: string },
+  ) {
     const { type } = token
     const block = this.getBlock(key)!
     const { start, end } = token.range
@@ -174,10 +190,10 @@ const imageCtrl = (ContentState: { prototype: IContentState }) => {
     return this.muya.dispatchChange()
   }
 
-  ContentState.prototype.deleteImage = function (this: IContentState, {
-    key,
-    token
-  }: { key: string; token: { range: { start: number; end: number }; raw: string } }) {
+  ContentState.prototype.deleteImage = function (
+    this: IContentState,
+    { key, token }: { key: string; token: { range: { start: number; end: number }; raw: string } },
+  ) {
     const block = this.getBlock(key)!
     const oldText = block.text
     const { start, end } = token.range
@@ -195,7 +211,10 @@ const imageCtrl = (ContentState: { prototype: IContentState }) => {
     return this.muya.dispatchChange()
   }
 
-  ContentState.prototype.selectImage = function (this: IContentState, imageInfo: { key: string; token: { range: { start: number; end: number }; raw: string }; imageId?: string }) {
+  ContentState.prototype.selectImage = function (
+    this: IContentState,
+    imageInfo: { key: string; token: { range: { start: number; end: number }; raw: string }; imageId?: string },
+  ) {
     this.selectedImage = imageInfo
     const { key } = imageInfo
     const block = this.getBlock(key)!

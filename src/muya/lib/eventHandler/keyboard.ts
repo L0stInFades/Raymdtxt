@@ -11,9 +11,9 @@ interface FloatTool {
 }
 
 class Keyboard {
-  isComposed: boolean;
-  muya: IMuya;
-  shownFloat: Set<FloatTool>;
+  isComposed: boolean
+  muya: IMuya
+  shownFloat: Set<FloatTool>
   constructor(muya: IMuya) {
     this.muya = muya
     this.isComposed = false
@@ -29,7 +29,7 @@ class Keyboard {
   listen() {
     // cache shown float box
     this.muya.eventCenter.subscribe('muya-float', (tool: unknown, status: unknown) => {
-      (status as boolean) ? this.shownFloat.add(tool as FloatTool) : this.shownFloat.delete(tool as FloatTool)
+      ;(status as boolean) ? this.shownFloat.add(tool as FloatTool) : this.shownFloat.delete(tool as FloatTool)
       if ((tool as FloatTool).name === 'ag-front-menu' && !status) {
         const seletedParagraph = this.muya.container.querySelector('.ag-selected')
         if (seletedParagraph) {
@@ -72,7 +72,8 @@ class Keyboard {
     const changeHandler = (event: Event) => {
       if (
         event.type === 'keyup' &&
-        ((event as KeyboardEvent).key === EVENT_KEYS.ArrowUp || (event as KeyboardEvent).key === EVENT_KEYS.ArrowDown) &&
+        ((event as KeyboardEvent).key === EVENT_KEYS.ArrowUp ||
+          (event as KeyboardEvent).key === EVENT_KEYS.ArrowDown) &&
         this.shownFloat.size > 0
       ) {
         return
@@ -267,11 +268,12 @@ class Keyboard {
         const oldAnchor = contentState.cursor.anchor
         const oldFocus = contentState.cursor.focus
         if (
-          oldAnchor && oldFocus && (
-          anchor.key !== oldAnchor.key ||
-          anchor.offset !== oldAnchor.offset ||
-          focus.key !== oldFocus.key ||
-          focus.offset !== oldFocus.offset)
+          oldAnchor &&
+          oldFocus &&
+          (anchor.key !== oldAnchor.key ||
+            anchor.offset !== oldAnchor.offset ||
+            focus.key !== oldFocus.key ||
+            focus.offset !== oldFocus.offset)
         ) {
           const needRender =
             contentState.checkNeedRender(contentState.cursor) || contentState.checkNeedRender({ start, end })

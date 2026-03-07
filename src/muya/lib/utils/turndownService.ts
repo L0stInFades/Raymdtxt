@@ -43,7 +43,7 @@ export const usePluginAddRules = (turndownService: any, keeps: string[]) => {
         const index = Array.prototype.indexOf.call(parent.children, node)
         prefix = `${start ? Number(start) + index : index + 1}. `
       }
-      return prefix + content + (node.nextSibling && !/\n$/.test(content) ? '\n' : '');
+      return prefix + content + (node.nextSibling && !/\n$/.test(content) ? '\n' : '')
     },
   })
 

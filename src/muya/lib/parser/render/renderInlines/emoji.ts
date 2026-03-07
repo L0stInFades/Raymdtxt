@@ -4,7 +4,14 @@ import type { Block, Token } from '../../types'
 import type { Cursor, StateRenderContext } from '../renderContext'
 
 // render token of emoji to vdom
-export default function emoji(this: StateRenderContext, h: typeof import('snabbdom').h, cursor: Cursor, block: Block, token: Token, outerClass: string) {
+export default function emoji(
+  this: StateRenderContext,
+  h: typeof import('snabbdom').h,
+  cursor: Cursor,
+  block: Block,
+  token: Token,
+  outerClass: string,
+) {
   const { start: rStart, end: rEnd } = token.range
   const className = this.getClassName(outerClass, block, token, cursor)
   const validation = validEmoji(token.content)

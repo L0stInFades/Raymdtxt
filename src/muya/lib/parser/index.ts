@@ -46,7 +46,15 @@ const matchHtmlTag = (src: string, disableHtml: boolean) => {
   return match
 }
 
-const tokenizerFac = (src: string, beginRules: Record<string, RegExp> | null | undefined, inlineRules: Record<string, RegExp>, pos = 0, top: boolean, labels: Map<string, { href: string; title: string }>, options: Record<string, unknown>) => {
+const tokenizerFac = (
+  src: string,
+  beginRules: Record<string, RegExp> | null | undefined,
+  inlineRules: Record<string, RegExp>,
+  pos = 0,
+  top: boolean,
+  labels: Map<string, { href: string; title: string }>,
+  options: Record<string, unknown>,
+) => {
   const originSrc = src
   const tokens: Record<string, unknown>[] = []
   let pending = ''
@@ -146,7 +154,7 @@ const tokenizerFac = (src: string, beginRules: Record<string, RegExp> | null | u
     }
     // strong | em
     const emRules = ['strong', 'em']
-    let inChunk
+    let inChunk: boolean | undefined
     for (const rule of emRules) {
       const to = inlineRules[rule].exec(src)
       if (to && isLengthEven(to[3])) {
@@ -442,7 +450,7 @@ const tokenizerFac = (src: string, beginRules: Record<string, RegExp> | null | u
 
     // html-tag
     const htmlTo = matchHtmlTag(src, disableHtml as boolean)
-    let attrs
+    let attrs: Record<string, unknown> | null | undefined
     // handle comment
     if (htmlTo?.[1] && !htmlTo[3]) {
       const len = htmlTo[0].length
@@ -462,32 +470,35 @@ const tokenizerFac = (src: string, beginRules: Record<string, RegExp> | null | u
       src = src.substring(len)
       pos = pos + len
       continue
-    } else if (htmlTo && !disallowedHtmlTag.test(htmlTo[3]) && (attrs = getAttributes(htmlTo[0]))) {
-      const tag = htmlTo[3]
-      const html = htmlTo[0]
-      const len = htmlTo[0].length
+    } else if (htmlTo) {
+      attrs = getAttributes(htmlTo[0])
+      if (attrs && !disallowedHtmlTag.test(htmlTo[3])) {
+        const tag = htmlTo[3]
+        const html = htmlTo[0]
+        const len = htmlTo[0].length
 
-      pushPending()
-      tokens.push({
-        type: 'html_tag',
-        raw: html,
-        tag,
-        openTag: htmlTo[2],
-        closeTag: htmlTo[5],
-        parent: tokens,
-        attrs,
-        content: htmlTo[4],
-        children: htmlTo[4]
-          ? tokenizerFac(htmlTo[4], undefined, inlineRules, pos + htmlTo[2].length, false, labels, options)
-          : '',
-        range: {
-          start: pos,
-          end: pos + len,
-        },
-      })
-      src = src.substring(len)
-      pos = pos + len
-      continue
+        pushPending()
+        tokens.push({
+          type: 'html_tag',
+          raw: html,
+          tag,
+          openTag: htmlTo[2],
+          closeTag: htmlTo[5],
+          parent: tokens,
+          attrs,
+          content: htmlTo[4],
+          children: htmlTo[4]
+            ? tokenizerFac(htmlTo[4], undefined, inlineRules, pos + htmlTo[2].length, false, labels, options)
+            : '',
+          range: {
+            start: pos,
+            end: pos + len,
+          },
+        })
+        src = src.substring(len)
+        pos = pos + len
+        continue
+      }
     }
 
     // soft line break
@@ -561,7 +572,15 @@ const tokenizerFac = (src: string, beginRules: Record<string, RegExp> | null | u
   return tokens
 }
 
-export const tokenizer = (src: string, { highlights = [] as { start: number; end: number; active: boolean }[], hasBeginRules = true, labels = new Map<string, { href: string; title: string }>(), options = {} as Record<string, unknown> } = {}) => {
+export const tokenizer = (
+  src: string,
+  {
+    highlights = [] as { start: number; end: number; active: boolean }[],
+    hasBeginRules = true,
+    labels = new Map<string, { href: string; title: string }>(),
+    options = {} as Record<string, unknown>,
+  } = {},
+) => {
   const rules = Object.assign({}, inlineRules, inlineExtensionRules)
   const tokens = tokenizerFac(src, hasBeginRules ? beginRules : null, rules, 0, true, labels, options)
 

@@ -12,6 +12,40 @@ import keybindingsDarwin from './keybindingsDarwin'
 import keybindingsLinux from './keybindingsLinux'
 import keybindingsWindows from './keybindingsWindows'
 
+/**
+ * Normalize the casing of modifier keys in an accelerator string so that
+ * Electron accepts them (e.g. "ctrl+shift+S" → "Ctrl+Shift+S").
+ */
+const normalizeAcceleratorCase = (accelerator) => {
+  return accelerator
+    .split('+')
+    .map((part) => {
+      const lower = part.toLowerCase()
+      switch (lower) {
+        case 'ctrl':
+        case 'control':
+          return 'Ctrl'
+        case 'alt':
+        case 'option':
+          return 'Alt'
+        case 'shift':
+          return 'Shift'
+        case 'meta':
+        case 'cmd':
+        case 'command':
+          return 'Command'
+        case 'commandorcontrol':
+        case 'cmdorctrl':
+          return 'CmdOrCtrl'
+        case 'super':
+          return 'Super'
+        default:
+          return part
+      }
+    })
+    .join('+')
+}
+
 class Keybindings {
   /**
    * @param {CommandManager} commandManager The command manager instance.
@@ -164,10 +198,14 @@ class Keybindings {
           if (value.length === 0) {
             // Unset key
             userAccelerators.set(key, '')
-          } else if (isValidElectronAccelerator(value)) {
-            userAccelerators.set(key, value)
           } else {
-            console.error(`[WARNING] "${value}" is not a valid accelerator.`)
+            // Normalize modifier casing (e.g. "ctrl+S" → "Ctrl+S") before validation.
+            const normalized = normalizeAcceleratorCase(value)
+            if (isValidElectronAccelerator(normalized)) {
+              userAccelerators.set(key, normalized)
+            } else {
+              console.error(`[WARNING] "${value}" is not a valid accelerator.`)
+            }
           }
         }
       }

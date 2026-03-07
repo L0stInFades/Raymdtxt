@@ -1,7 +1,7 @@
 import selection from '../selection'
 import { CLASS_OR_ID } from '../config'
 import { escapeHTML } from '../utils'
-import { getSanitizeHtml } from '../utils/exportHtml'
+import { getSanitizeHtml } from '../utils/sanitizeHtml'
 import ExportMarkdown from '../utils/exportMarkdown'
 import marked from '../parser/marked'
 import type { IContentState, Block } from '../types'
@@ -195,7 +195,7 @@ const copyCutCtrl = (ContentState: { prototype: IContentState }) => {
       const functionType = preElement!.getAttribute('data-role')
       const codeContent = mb.querySelector('.ag-code-content')
       const value = codeContent!.textContent
-      let pre
+      let pre: HTMLElement | undefined
       switch (functionType) {
         case 'multiplemath':
           pre = document.createElement('pre')
@@ -228,8 +228,8 @@ const copyCutCtrl = (ContentState: { prototype: IContentState }) => {
       event.preventDefault()
       const { row, column, cells } = selectedTableCells
       const tableContents = []
-      let i
-      let j
+      let i: number
+      let j: number
       const cellsArr = cells as Block[]
       for (i = 0; i < row; i++) {
         const rowWrapper = []

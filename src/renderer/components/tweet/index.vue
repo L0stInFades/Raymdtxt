@@ -1,7 +1,7 @@
 <template>
   <div class="tweet-dialog">
     <el-dialog
-      v-model:visible="showTweetDialog"
+      v-model="showTweetDialog"
       :show-close="false"
       :modal="true"
       custom-class="ag-dialog-table"
@@ -98,7 +98,7 @@ export default {
       this.selectedFace = name
     },
     reportViaGithub() {
-      window.api.shell.openExternal('https://github.com/marktext/marktext/issues/new')
+      window.api.shell.openExternal('https://github.com/L0stInFades/vien/issues/new')
     },
     reportViaTwitter() {
       const { value, selectedFace } = this
@@ -106,12 +106,11 @@ export default {
       const origin = 'https://twitter.com/intent/tweet'
 
       const params = {
-        via: 'marktextme',
-        url: encodeURI('https://github.com/marktext/marktext/'),
+        url: encodeURI('https://github.com/L0stInFades/vien/'),
         text: value,
       }
 
-      if (selectedFace === 'smile') params.hashtags = 'happyMarkText'
+      if (selectedFace === 'smile') params.hashtags = 'happyVien'
 
       window.api.shell.openExternal(
         `${origin}?${Object.keys(params)

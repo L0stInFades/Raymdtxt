@@ -95,18 +95,9 @@ export interface StateRenderContext {
 
   collectLabels(blocks: Block[]): void
 
-  checkConflicted(
-    block: Block,
-    token: { range: TokenRange },
-    cursor: Cursor,
-  ): boolean
+  checkConflicted(block: Block, token: { range: TokenRange }, cursor: Cursor): boolean
 
-  getClassName(
-    outerClass: string,
-    block: Block,
-    token: { range: TokenRange },
-    cursor: Cursor,
-  ): string
+  getClassName(outerClass: string, block: Block, token: { range: TokenRange }, cursor: Cursor): string
 
   getHighlightClassName(active: boolean): string
 
@@ -116,11 +107,7 @@ export interface StateRenderContext {
 
   renderDiagram(): Promise<void>
 
-  render(
-    blocks: Block[],
-    activeBlocks: Block[],
-    matches: HighlightRange[],
-  ): void
+  render(blocks: Block[], activeBlocks: Block[], matches: HighlightRange[]): void
 
   partialRender(
     blocks: Block[],
@@ -130,11 +117,7 @@ export interface StateRenderContext {
     endKey: string | null,
   ): void
 
-  singleRender(
-    block: Block,
-    activeBlocks: Block[],
-    matches: HighlightRange[],
-  ): void
+  singleRender(block: Block, activeBlocks: Block[], matches: HighlightRange[]): void
 
   invalidateImageCache(): void
 
@@ -169,13 +152,7 @@ export interface StateRenderContext {
   // ---- Mixin methods from renderInlines ----
 
   backlash: InlineRenderMethod
-  highlight(
-    h: typeof hFn,
-    block: Block,
-    rStart: number,
-    rEnd: number,
-    token: Token,
-  ): (string | VNode)[]
+  highlight(h: typeof hFn, block: Block, rStart: number, rEnd: number, token: Token): (string | VNode)[]
   header: InlineRenderMethod
   link: InlineRenderMethod
   htmlTag: InlineRenderMethod

@@ -25,6 +25,7 @@
       <div v-for="c of category" :key="c.name" class="item"
         @click="handleCategoryItemClick(c)"
         :class="{active: c.label === currentCategory}"
+        :data-testid="`pref-category-${c.name.toLowerCase()}`"
       >
         <svg :viewBox="c.icon.viewBox">
           <use :xlink:href="c.icon.url"></use>
@@ -84,7 +85,7 @@ export default {
         })
       }
     },
-    onIpcCategoryChange(_event, category) {
+    onIpcCategoryChange(category) {
       const validRoute =
         category && this.$router.getRoutes().findIndex((route) => route.path.endsWith(`/${category}`)) !== -1
       if (validRoute) {

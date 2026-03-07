@@ -6,7 +6,7 @@
 
     <!-- Opened tabs -->
     <div class="opened-files">
-      <div class="title">
+      <div class="title" data-testid="tree-opened-files-title">
         <svg class="icon icon-arrow" :class="{'fold': !showOpenedFiles}" aria-hidden="true" @click.stop="toggleOpenedFiles()">
           <use xlink:href="#icon-arrow"></use>
         </svg>
@@ -37,13 +37,13 @@
     <div
       class="project-tree" v-if="projectTree"
     >
-      <div class="title">
+      <div class="title" data-testid="tree-root-title">
         <svg class="icon icon-arrow" :class="{'fold': !showDirectories}" aria-hidden="true" @click.stop="toggleDirectories()">
           <use xlink:href="#icon-arrow"></use>
         </svg>
-        <span class="default-cursor text-overflow" @click.stop="toggleDirectories()">{{ projectTree.name }}</span>
+        <span class="default-cursor text-overflow" data-testid="tree-root-name" @click.stop="toggleDirectories()">{{ projectTree.name }}</span>
       </div>
-      <div class="tree-wrapper" v-show="showDirectories">
+      <div class="tree-wrapper" data-testid="tree-wrapper" v-show="showDirectories">
         <folder
           v-for="(folder, index) of projectTree.folders" :key="index + 'folder'"
           :folder="folder"
@@ -67,7 +67,7 @@
         </div>
       </div>
     </div>
-    <div v-else class="open-project">
+      <div v-else class="open-project" data-testid="open-project">
       <div class="centered-group">
         <svg aria-hidden="true" :viewBox="FolderIcon.viewBox">
           <use :xlink:href="FolderIcon.url"></use>

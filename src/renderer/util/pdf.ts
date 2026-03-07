@@ -49,8 +49,9 @@ export const getCssForOptions = (options: CssOptions): string => {
   // Font options
   output += '.markdown-body{'
   if (fontFamily) {
-    output += `font-family:"${fontFamily}",${FALLBACK_FONT_FAMILIES};`
-    output = `.hf-container{font-family:"${fontFamily}",${FALLBACK_FONT_FAMILIES};}${output}`
+    const safeFontFamily = fontFamily.replace(/["\\;{}]/g, '')
+    output += `font-family:"${safeFontFamily}",${FALLBACK_FONT_FAMILIES};`
+    output = `.hf-container{font-family:"${safeFontFamily}",${FALLBACK_FONT_FAMILIES};}${output}`
   }
   if (fontSize) {
     output += `font-size:${fontSize}px;`
@@ -77,7 +78,7 @@ export const getCssForOptions = (options: CssOptions): string => {
       output += liberTheme
     } else {
       // Read theme from disk
-      const { userDataPath } = (global as unknown as { marktext: { paths: { userDataPath: string } } }).marktext.paths
+      const { userDataPath } = (window as unknown as { marktext: { paths: { userDataPath: string } } }).marktext.paths
       const themePath = path.join(userDataPath, 'themes/export', theme)
       if (isFile(themePath)) {
         try {

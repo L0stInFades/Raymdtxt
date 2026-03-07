@@ -20,7 +20,11 @@ class MarkdownPrint {
       const images = printContainer.getElementsByTagName('img')
       for (const image of images) {
         const rawSrc = image.getAttribute('src')
-        image.src = getImageInfo(rawSrc).src
+        if (rawSrc) {
+          try {
+            image.src = getImageInfo(rawSrc).src
+          } catch (_) { /* keep original src */ }
+        }
       }
     }
     document.body.appendChild(printContainer)

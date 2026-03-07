@@ -31,10 +31,10 @@ const defaultOptions = {
 class FormatPicker extends BaseFloat {
   static pluginName = 'formatPicker'
 
-  formatContainer: HTMLDivElement;
-  formats: FormatInfo[] | null;
-  icons: FormatIcon[];
-  oldVnode: VNode | null;
+  formatContainer: HTMLDivElement
+  formats: FormatInfo[] | null
+  icons: FormatIcon[]
+  oldVnode: VNode | null
 
   constructor(muya: IMuya, options = {}) {
     const name = 'ag-format-picker'
@@ -44,7 +44,8 @@ class FormatPicker extends BaseFloat {
     this.formats = null
     this.options = opts
     this.icons = icons
-    const formatContainer = (this.formatContainer = document.createElement('div'))
+    this.formatContainer = document.createElement('div')
+    const formatContainer = this.formatContainer
     this.container.appendChild(formatContainer)
     this.floatBox.classList.add('ag-format-picker-container')
     this.listen()
@@ -53,7 +54,13 @@ class FormatPicker extends BaseFloat {
   listen() {
     const { eventCenter } = this.muya
     super.listen()
-    eventCenter.subscribe('muya-format-picker', (({ reference, formats }: { reference: HTMLElement | null; formats: FormatInfo[] }) => {
+    eventCenter.subscribe('muya-format-picker', (({
+      reference,
+      formats,
+    }: {
+      reference: HTMLElement | null
+      formats: FormatInfo[]
+    }) => {
       if (reference) {
         this.formats = formats
         setTimeout(() => {
@@ -70,8 +77,9 @@ class FormatPicker extends BaseFloat {
     const { icons, oldVnode, formatContainer, formats } = this
     if (!formats) return
     const children = icons.map((i: FormatIcon) => {
+      // biome-ignore lint/suspicious/noImplicitAnyLet: legacy UI pattern
       let icon
-      let iconWrapperSelector = 'div.icon-wrapper'
+      const iconWrapperSelector = 'div.icon-wrapper'
       if (i.icon) {
         // SVG icon Asset
         icon = h(
@@ -110,7 +118,7 @@ class FormatPicker extends BaseFloat {
       )
     })
 
-    const vnode = h('ul', children)
+    const vnode = h('ul.ag-format-picker', children)
 
     if (oldVnode) {
       patch(oldVnode, vnode)

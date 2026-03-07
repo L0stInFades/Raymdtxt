@@ -7,6 +7,7 @@ const tocCtrl = (ContentState: { prototype: IContentState }) => {
 
     for (const block of blocks) {
       if (/^h\d$/.test(block.type)) {
+        if (!block.children.length || !block.children[0]) continue
         const { headingStyle, key, type } = block
         const { text } = block.children[0]
         const content = headingStyle === 'setext' ? text.trim() : text.replace(/^\s*#{1,6}\s{1,}/, '').trim()

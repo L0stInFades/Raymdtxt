@@ -54,12 +54,16 @@ const searchCtrl = (ContentState: { prototype: IContentState }) => {
 
   ContentState.prototype.replaceOne = function (match: { start: number; end: number; key: string }, value: string) {
     const { start, end, key } = match
-    const block = this.getBlock(key)!
+    const block = this.getBlock(key)
+    if (!block) return
     const { text } = block
     block.text = text.substring(0, start) + value + text.substring(end)
   }
 
-  ContentState.prototype.replace = function (replaceValue: string, opt: { isSingle?: boolean; isRegexp?: boolean } = { isSingle: true }) {
+  ContentState.prototype.replace = function (
+    replaceValue: string,
+    opt: { isSingle?: boolean; isRegexp?: boolean } = { isSingle: true },
+  ) {
     const { isSingle, isRegexp } = opt
     delete opt.isSingle
     const searchOptions = Object.assign({}, defaultSearchOption, opt)
@@ -121,7 +125,7 @@ const searchCtrl = (ContentState: { prototype: IContentState }) => {
     const { blocks } = this
     const travel = (blocks: Block[]) => {
       for (const block of blocks) {
-        let { text, key } = block
+        const { text, key } = block
 
         if (text && typeof text === 'string') {
           const strMatches = matchString(text, value, options as unknown as Record<string, boolean>)

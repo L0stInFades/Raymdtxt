@@ -5,7 +5,7 @@ interface DOMEventRecord {
   target: EventTarget
   event: string
   // biome-ignore lint/suspicious/noExplicitAny: EventListener accepts Event but callers pass specific subtypes (KeyboardEvent, etc.)
-  listener: ((event: any) => void)
+  listener: (event: any) => void
   capture?: boolean
 }
 
@@ -15,8 +15,8 @@ interface SubscriptionHandler {
 }
 
 class EventCenter {
-  events: DOMEventRecord[];
-  listeners: Record<string, SubscriptionHandler[]>;
+  events: DOMEventRecord[]
+  listeners: Record<string, SubscriptionHandler[]>
   constructor() {
     this.events = []
     this.listeners = {}
@@ -26,8 +26,13 @@ class EventCenter {
    * [attachDOMEvent] bind event listener to target, and return a unique ID,
    * this ID
    */
-  // biome-ignore lint/suspicious/noExplicitAny: EventListener accepts Event but callers pass specific subtypes (KeyboardEvent, etc.)
-  attachDOMEvent(target: EventTarget, event: string, listener: ((event: any) => void), capture?: boolean): string | false {
+  attachDOMEvent(
+    target: EventTarget,
+    event: string,
+    // biome-ignore lint/suspicious/noExplicitAny: EventListener accepts Event but callers pass specific subtypes (KeyboardEvent, etc.)
+    listener: (event: any) => void,
+    capture?: boolean,
+  ): string | false {
     if (this.checkHasBind(target, event, listener, capture)) return false
     const eventId = getUniqueId()
     target.addEventListener(event, listener, capture)
@@ -59,7 +64,9 @@ class EventCenter {
    * [detachAllDomEvents remove all the DOM events handler]
    */
   detachAllDomEvents() {
-    this.events.forEach((event) => this.detachDOMEvent(event.eventId))
+    this.events.forEach((event) => {
+      this.detachDOMEvent(event.eventId)
+    })
   }
 
   /**
@@ -117,7 +124,7 @@ class EventCenter {
 
   // Determine whether the event has been bind
   // biome-ignore lint/suspicious/noExplicitAny: EventListener accepts Event but callers pass specific subtypes
-  checkHasBind(cTarget: EventTarget, cEvent: string, cListener: ((event: any) => void), cCapture?: boolean) {
+  checkHasBind(cTarget: EventTarget, cEvent: string, cListener: (event: any) => void, cCapture?: boolean) {
     for (const { target, event, listener, capture } of this.events) {
       if (target === cTarget && event === cEvent && listener === cListener && capture === cCapture) {
         return true

@@ -45,6 +45,7 @@ interface InlineRules {
 
 const inline: InlineRules = {
   escape: /^\\([!"#$%&'()*+,\-./:;<=>?@[\]\\^_`{|}~])/,
+  // biome-ignore lint/suspicious/noControlCharactersInRegex: intentionally match control characters in input
   autolink: /^<(scheme:[^\s\x00-\x1f<>]*|email)>/, // eslint-disable-line no-control-regex
   url: noop,
   tag:
@@ -119,6 +120,7 @@ inline._attribute = /\s+[a-zA-Z:_][\w.:-]*(?:\s*=\s*"[^"]*"|\s*=\s*'[^']*'|\s*=\
 inline.tag = edit(inline.tag).replace('comment', inline._comment).replace('attribute', inline._attribute).getRegex()
 
 inline._label = /(?:\[(?:\\.|[^[\]\\])*\]|\\.|`[^`]*`|[^[\]\\`])*?/
+// biome-ignore lint/suspicious/noControlCharactersInRegex: intentionally match control characters in input
 inline._href = /<(?:\\.|[^\n<>\\])+>|[^\s\x00-\x1f]*/ // eslint-disable-line no-control-regex
 inline._title = /"(?:\\"?|[^"\\])*"|'(?:\\'?|[^'\\])*'|\((?:\\\)?|[^)\\])*\)/
 
@@ -174,7 +176,9 @@ export const gfm: InlineRules = Object.assign({}, normal, {
   emoji: /^(:)([a-z_\d+-]+?)\1/, // not real GFM but put it in here
 })
 
-gfm.url = edit(gfm.url as RegExp, 'i').replace('email', gfm._extended_email).getRegex()
+gfm.url = edit(gfm.url as RegExp, 'i')
+  .replace('email', gfm._extended_email)
+  .getRegex()
 
 /**
  * GFM + Line Breaks Inline Grammar

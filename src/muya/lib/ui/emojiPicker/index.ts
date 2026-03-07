@@ -9,9 +9,9 @@ import './index.css'
 class EmojiPicker extends BaseScrollFloat {
   static pluginName = 'emojiPicker'
 
-  _renderObj: EmojiRenderObj | null;
-  emoji: Emoji;
-  oldVnode: VNode | null;
+  _renderObj: EmojiRenderObj | null
+  emoji: Emoji
+  oldVnode: VNode | null
 
   constructor(muya: IMuya) {
     const name = 'ag-emoji-picker'
@@ -47,7 +47,13 @@ class EmojiPicker extends BaseScrollFloat {
   listen() {
     super.listen()
     const { eventCenter } = this.muya
-    eventCenter.subscribe('muya-emoji-picker', (({ reference, emojiNode }: { reference: HTMLElement; emojiNode: HTMLElement | null }) => {
+    eventCenter.subscribe('muya-emoji-picker', (({
+      reference,
+      emojiNode,
+    }: {
+      reference: HTMLElement
+      emojiNode: HTMLElement | null
+    }) => {
       if (!emojiNode) return this.hide()
       const text = emojiNode.textContent?.trim()
       if (text) {

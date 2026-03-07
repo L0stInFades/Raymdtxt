@@ -28,7 +28,7 @@ export default function renderContainerBlock(
   block: Block,
   activeBlocks: Block[],
   matches: HighlightRange[],
-  useCache = false
+  useCache = false,
 ) {
   let selector = this.getSelector(block, activeBlocks)
   const {
@@ -52,7 +52,9 @@ export default function renderContainerBlock(
     this.renderingRowContainer = block
   }
 
-  const children = (block.children as Block[]).map((child: Block) => this.renderBlock(block, child, activeBlocks, matches, useCache))
+  const children = (block.children as Block[]).map((child: Block) =>
+    this.renderBlock(block, child, activeBlocks, matches, useCache),
+  )
   const data = {
     attrs: {},
     dataset: {},
@@ -119,7 +121,9 @@ export default function renderContainerBlock(
       // Judge whether to render the table drag bar.
       const { renderingTable, renderingRowContainer } = this
 
-      const findTable = renderingTable ? activeBlocks.find((b: Record<string, unknown>) => b.key === renderingTable.key) : null
+      const findTable = renderingTable
+        ? activeBlocks.find((b: Record<string, unknown>) => b.key === renderingTable.key)
+        : null
       if (findTable && renderingRowContainer) {
         const { row: tableRow, column: tableColumn } = findTable as unknown as { row: number; column: number }
         const isLastRow = () => {

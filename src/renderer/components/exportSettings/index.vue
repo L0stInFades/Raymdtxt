@@ -1,13 +1,13 @@
 <template>
-  <div class="print-settings-dialog">
+  <div class="print-settings-dialog" data-testid="export-dialog-shell">
     <el-dialog
-      v-model:visible="showExportSettingsDialog"
+      v-model="showExportSettingsDialog"
       :show-close="false"
       :modal="true"
       custom-class="ag-dialog-table"
       width="500px"
     >
-      <h3>Export Options</h3>
+      <h3 data-testid="export-dialog-title">Export Options</h3>
       <el-tabs v-model="activeName">
         <el-tab-pane label="Info" name="info">
           <span class="text">Please customize the page appearance and click on "export" to continue.</span>
@@ -106,7 +106,7 @@
           <div class="text">You can change the document appearance by choosing a theme or create a handcrafted one.</div>
           <cur-select
             description="Theme:"
-            more="https://github.com/marktext/marktext/blob/develop/docs/EXPORT_THEMES.md"
+            more="https://github.com/L0stInFades/vien/blob/develop/docs/EXPORT_THEMES.md"
             :value="theme"
             :options="themeList"
             :onChange="value => onSelectChange('theme', value)"
@@ -210,7 +210,7 @@
          </el-tab-pane>
       </el-tabs>
       <div class="button-controlls">
-        <button class="button-primary" @click="handleClicked">
+        <button class="button-primary" data-testid="export-confirm" @click="handleClicked">
           Export...
         </button>
       </div>

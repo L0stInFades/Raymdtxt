@@ -4,11 +4,17 @@ const linkCtrl = (ContentState: { prototype: IContentState }) => {
   /**
    * Change a link into text.
    */
-  ContentState.prototype.unlink = function (this: IContentState, linkInfo: { key: string; token: { type: string; content?: string; href?: string; raw: string; range: { start: number; end: number } } }) {
+  ContentState.prototype.unlink = function (
+    this: IContentState,
+    linkInfo: {
+      key: string
+      token: { type: string; content?: string; href?: string; raw: string; range: { start: number; end: number } }
+    },
+  ) {
     const { key, token } = linkInfo
     const block = this.getBlock(key)!
     const { text } = block
-    let anchor
+    let anchor: string | undefined
     switch (token.type) {
       case 'html_tag':
         anchor = token.content
