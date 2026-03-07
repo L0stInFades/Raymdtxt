@@ -176,11 +176,15 @@ const formatCtrl = (ContentState: { prototype: IContentState }) => {
     }
 
     const startBlock = this.getBlock(start.key)
+    if (!startBlock) {
+      return { formats: [], tokens: [], neighbors: [] }
+    }
+
     const formats: Token[] = []
     const neighbors: Token[] = []
     let tokens: Token[] = []
     if (start.key === end.key) {
-      const { text } = startBlock!
+      const { text } = startBlock
       tokens = tokenizer(text, {
         options: this.muya.options,
       }) as Token[]
@@ -266,6 +270,10 @@ const formatCtrl = (ContentState: { prototype: IContentState }) => {
 
     const startBlock = this.getBlock(start.key)
     const endBlock = this.getBlock(end.key)
+    if (!startBlock || !endBlock) {
+      return
+    }
+
     start.delata = end.delata = 0
     if (start.key === end.key) {
       const { formats, tokens, neighbors } = this.selectionFormats()
@@ -286,14 +294,14 @@ const formatCtrl = (ContentState: { prototype: IContentState }) => {
         }
         start.offset += start.delata ?? 0
         end.offset += end.delata ?? 0
-        startBlock!.text = generator(tokens)
+        startBlock.text = generator(tokens)
       } else if (currentFormats.length) {
         for (const token of currentFormats) {
           clearFormat(token, { start, end })
         }
         start.offset += start.delata ?? 0
         end.offset += end.delata ?? 0
-        startBlock!.text = generator(tokens)
+        startBlock.text = generator(tokens)
       } else {
         if (currentNeightbors.length) {
           for (const neighbor of currentNeightbors) {
@@ -302,8 +310,8 @@ const formatCtrl = (ContentState: { prototype: IContentState }) => {
         }
         start.offset += start.delata ?? 0
         end.offset += end.delata ?? 0
-        startBlock!.text = generator(tokens)
-        addFormat(type, startBlock!, { start, end })
+        startBlock.text = generator(tokens)
+        addFormat(type, startBlock, { start, end })
         if (type === 'image') {
           // Show image selector when create a inline image by menu/shortcut/or just input `![]()`
           requestAnimationFrame(() => {
@@ -331,14 +339,14 @@ const formatCtrl = (ContentState: { prototype: IContentState }) => {
         this.clearBlockFormat(nextBlock, { start, end }, formatType)
         nextBlock = this.findNextBlockInLocation(nextBlock)
       }
-      this.clearBlockFormat(endBlock!, { start, end }, formatType)
+      this.clearBlockFormat(endBlock, { start, end }, formatType)
 
       if (type !== 'clear') {
-        addFormat(type, startBlock!, {
+        addFormat(type, startBlock, {
           start,
-          end: { offset: startBlock!.text.length },
+          end: { offset: startBlock.text.length },
         })
-        nextBlock = this.findNextBlockInLocation(startBlock!)
+        nextBlock = this.findNextBlockInLocation(startBlock)
         while (nextBlock && nextBlock !== endBlock) {
           addFormat(type, nextBlock, {
             start: { offset: 0 },
@@ -346,7 +354,7 @@ const formatCtrl = (ContentState: { prototype: IContentState }) => {
           })
           nextBlock = this.findNextBlockInLocation(nextBlock)
         }
-        addFormat(type, endBlock!, {
+        addFormat(type, endBlock, {
           start: { offset: 0 },
           end,
         })
