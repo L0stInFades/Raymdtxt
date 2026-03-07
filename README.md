@@ -1,52 +1,45 @@
 # Vien
 
-Calm Markdown for long-form writing.
+Vien is a Markdown editor for long stretches of attention.
 
-Vien is a desktop Markdown editor built for a single continuous surface. You write, read, revise, and export in one place, without a split preview and without an interface that keeps pulling your attention away from the page.
+No split preview. No busy dashboard. No productivity theater.
+Just one continuous surface for writing, reading, revising, and exporting.
 
-It is local-first, keyboard-friendly, and being shaped to feel especially at home on macOS.
+It is local-first, keyboard-fluent, and being shaped to feel especially at home on macOS.
+Its tone comes from Ludwig Wandinger's [*Is Peace Wild?*](https://ludwigwandinger.bandcamp.com/album/is-peace-wild-2): spacious, nocturnal, restrained, and emotionally clear.
 
 ## Screenshots
 
 ![Vien welcome screen](docs/screenshots/welcome.png)
 ![Vien about dialog](docs/screenshots/about.png)
 
-## Why The Name
+## A Name From The Record
 
-Vien takes its name from `Vien`, a track on Ludwig Wandinger's album [*Is Peace Wild?*](https://ludwigwandinger.bandcamp.com/album/is-peace-wild-2).
+Vien takes its name from the track `Vien` on *Is Peace Wild?*.
 
-The record circles around calm, tenderness, and contradiction. Its mood is spacious, nocturnal, and emotionally precise. That was the right brief for this editor: not loud productivity theater, but a writing tool with enough atmosphere to feel intentional and enough restraint to stay out of the way.
+That album never rushes to prove anything. It moves in low light, leaves room around each gesture, and lets tension stay gentle instead of turning it into noise. That felt like the right instinct for a writing tool.
 
-Ludwig Wandinger is a Berlin-based producer, drummer, performer, and visual artist whose work moves between experimental electronics, percussion, and visual form. Vien borrows more from that sensibility than from any one sound: clarity without sterility, texture without clutter, quiet without emptiness.
+So this project is not trying to look "efficient" at every second. It is trying to feel settled. Quiet, but not empty. Precise, but not cold. Something closer to a clear desk at night than a dashboard full of controls.
 
-## What Vien Tries To Be
+## What Lives Here
 
-- One writing surface instead of an editor/preview split
-- Native-feeling desktop behavior, especially on macOS
-- Local Markdown files and folders first
-- Fast enough to disappear during real writing
-- Quiet, but never generic
+What Vien offers, without raising its voice:
 
-## Features
-
-- WYSIWYG Markdown editing in one continuous view
-- CommonMark and GitHub Flavored Markdown friendly
+- One continuous WYSIWYG Markdown surface
+- CommonMark and GitHub Flavored Markdown support
 - File tree, recent documents, quick open, and tabs
 - Focus Mode, Typewriter Mode, and Source Code Mode
 - Styled HTML and PDF export
-- Pandoc-based import paths for more document types
-- Multiple editor themes
-- macOS menu bar, Dock integration, recent files, and document edited state
+- Import paths for common document formats
+- macOS-native menu bar, Dock integration, recent files, and document edited state
 
-## Stack
+## Why It Exists
 
-- Electron 34
-- Vue 3
-- Vite
-- Muya editor engine
-- Element Plus
+Vien is being shaped for people who like calm writing software but still want a real desktop app: local files, native behavior, keyboard depth, and an interface that does not keep asking to be looked at.
 
-## Development
+It is especially focused on macOS polish, but it keeps the open-source, file-first spirit of the editor lineage it came from.
+
+## Start Quietly
 
 ```bash
 git clone https://github.com/L0stInFades/vien.git
@@ -55,24 +48,28 @@ pnpm install
 pnpm run dev
 ```
 
-## Build
+To package the app for your current platform:
 
 ```bash
 pnpm run build
 ```
 
+To build the macOS release artifacts directly:
+
+```bash
+pnpm run release:mac
+```
+
 ## Project Status
 
-Vien is an actively refined continuation of the MarkText lineage.
+Vien is an actively refined continuation of the MarkText foundation.
 
-- Modernized to Electron 34, Vue 3, Vite, and Element Plus
-- Hardened with `contextIsolation` enabled and `nodeIntegration` disabled
-- Currently focused on native desktop polish, performance, and reliability
+The work now is less about adding noise and more about removing roughness: better macOS behavior, better reliability, better pacing, and a stronger sense that the editor belongs on the desktop rather than inside a browser-shaped shell.
 
 ## Credits
 
-- Built on the foundation of [MarkText](https://github.com/marktext/marktext)
-- Naming and tonal inspiration from [Ludwig Wandinger](https://www.ludwigwandinger.com/) and [*Is Peace Wild?*](https://ludwigwandinger.bandcamp.com/album/is-peace-wild-2)
+- Built on the open-source foundation of [MarkText](https://github.com/marktext/marktext)
+- Named in response to [Ludwig Wandinger](https://www.ludwigwandinger.com/) and [*Is Peace Wild?*](https://ludwigwandinger.bandcamp.com/album/is-peace-wild-2)
 
 ## License
 
