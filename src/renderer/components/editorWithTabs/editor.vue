@@ -992,27 +992,43 @@ export default {
           break
         }
         case 'pdf': {
-          // NOTE: We need to set page size via Electron.
+          // Typora-style Stage 1+2: generate self-contained HTML with baked SVGs.
+          // Stage 3 (native delegation) happens in main process via hidden BrowserWindow.
           try {
-            const { pageSize, pageSizeWidth, pageSizeHeight, isLandscape } = options
+            const {
+              pageSize,
+              pageSizeWidth,
+              pageSizeHeight,
+              isLandscape,
+              pageMarginTop,
+              pageMarginRight,
+              pageMarginBottom,
+              pageMarginLeft,
+            } = options
             const pageOptions = {
               pageSize,
               pageSizeWidth,
               pageSizeHeight,
               isLandscape,
+              pageMarginTop,
+              pageMarginRight,
+              pageMarginBottom,
+              pageMarginLeft,
             }
 
             const html = await this.editor.exportStyledHTML({
               title: '',
-              printOptimization: true,
+              // No @media print wrapper — hidden window renders normally,
+              // printToPDF handles margins/page-size via its own API.
+              printOptimization: false,
               extraCss,
               toc: htmlToc,
               header,
               footer,
               headerFooterStyled,
             })
-            this.printer.renderMarkdown(html, true)
-            this.$store.dispatch('EXPORT', { type, pageOptions })
+            // Send full HTML to main process — no print-container rendering needed
+            this.$store.dispatch('EXPORT', { type, content: html, pageOptions })
           } catch (err) {
             log.error('Failed to export document:', err)
             notice.notify({
@@ -1020,7 +1036,6 @@ export default {
               type: 'error',
               message: `There is something wrong when export ${htmlTitle || 'PDF'}.`,
             })
-            this.handlePrintServiceClearup()
           }
           break
         }

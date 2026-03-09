@@ -39,33 +39,79 @@ class ExportHtml {
 
   async renderMermaid() {
     const codes = this.exportContainer!.querySelectorAll('code.language-mermaid')
-    for (const code of codes) {
-      const preEle = code.parentNode as HTMLElement
-      const mermaidContainer = document.createElement('div')
-      mermaidContainer.innerHTML = sanitize(unescapeHTML(code.innerHTML), EXPORT_DOMPURIFY_CONFIG, true)
-      mermaidContainer.classList.add('mermaid')
-      preEle.replaceWith(mermaidContainer)
-    }
+    if (codes.length === 0) return
+
     // biome-ignore lint/suspicious/noExplicitAny: mermaid lacks proper type declarations
     const mermaid = (await loadRenderer('mermaid')) as any
-    // We only export light theme, so set mermaid theme to `default`, in the future, we can choose whick theme to export.
+
+    // Determine theme: use editor's mermaid theme if available, else 'default'.
+    // Save original theme to restore after export (prevents polluting live preview).
+    const editorTheme = this.muya?.options?.mermaidTheme || 'default'
     mermaid.initialize({
       securityLevel: 'strict',
-      theme: 'default',
+      startOnLoad: false,
+      theme: editorTheme,
+      flowchart: { htmlLabels: true, useMaxWidth: true },
     })
-    mermaid.init(undefined, this.exportContainer!.querySelectorAll('div.mermaid'))
-    if (this.muya) {
-      mermaid.initialize({
-        securityLevel: 'strict',
-        theme: this.muya.options.mermaidTheme,
-      })
+
+    // Offscreen canvas — Typora-style: positioned off-screen so mermaid can
+    // measure DOM layout without causing visible flash. mermaid.render() uses
+    // this as svgContainingElement, then removes its own temp nodes after each call.
+    const offscreenCanvas = document.createElement('div')
+    offscreenCanvas.id = 'mermaid-export-canvas'
+    offscreenCanvas.style.cssText = 'position:absolute;left:-99999px;top:-99999px;'
+    document.body.appendChild(offscreenCanvas)
+
+    // Collect diagrams: extract source text before replacing DOM
+    const diagrams: { preEle: HTMLElement; sourceText: string }[] = []
+    for (const code of codes) {
+      const preEle = code.parentNode as HTMLElement
+      const sourceText = unescapeHTML(code.innerHTML)
+      diagrams.push({ preEle, sourceText })
     }
+
+    // Parallel rendering with per-diagram error isolation (Typora pattern).
+    // Each mermaid.render() gets our offscreen canvas as the container so
+    // rendering never touches visible DOM. Mermaid cleans up its own temp
+    // elements after each call; we just collect the SVG strings.
+    let idCounter = 0
+    const results = await Promise.all(
+      diagrams.map(async ({ sourceText }) => {
+        const renderId = `export-mermaid-${idCounter++}`
+        try {
+          const { svg } = await mermaid.render(renderId, sourceText, offscreenCanvas)
+          return svg as string
+        } catch (err) {
+          console.error(`Mermaid render failed for ${renderId}:`, err)
+          // Graceful degradation: show source as code block
+          return `<pre class="mermaid-error" style="color:#c00;border:1px solid #c00;padding:8px;white-space:pre-wrap;">${sanitize(sourceText, EXPORT_DOMPURIFY_CONFIG, true)}</pre>`
+        }
+      }),
+    )
+
+    // Stitch SVG results into export container
+    for (let i = 0; i < diagrams.length; i++) {
+      const mermaidContainer = document.createElement('div')
+      mermaidContainer.classList.add('mermaid')
+      mermaidContainer.innerHTML = results[i]
+      diagrams[i].preEle.replaceWith(mermaidContainer)
+    }
+
+    // Cleanup offscreen canvas and restore mermaid config for live preview
+    offscreenCanvas.remove()
+    mermaid.initialize({
+      securityLevel: 'strict',
+      startOnLoad: false,
+      theme: editorTheme,
+    })
   }
 
   async renderDiagram() {
     const selector = 'code.language-vega-lite, code.language-flowchart, code.language-sequence, code.language-plantuml'
-    const renderers = new Map<string, unknown>()
     const codes = this.exportContainer!.querySelectorAll(selector)
+    if (codes.length === 0) return
+
+    const renderers = new Map<string, unknown>()
     for (const code of codes) {
       const rawCode = unescapeHTML(code.innerHTML)
       const functionType = (() => {
@@ -180,6 +226,9 @@ class ExportHtml {
     this.exportContainer = document.createElement('div')
     const exportContainer = this.exportContainer
     exportContainer.classList.add('ag-render-container')
+    // Position off-screen: diagrams/mermaid need the element in DOM for layout
+    // measurement, but we don't want a visible flash during export.
+    exportContainer.style.cssText = 'position:absolute;left:-99999px;top:-99999px;'
     exportContainer.innerHTML = html
     document.body.appendChild(exportContainer)
 

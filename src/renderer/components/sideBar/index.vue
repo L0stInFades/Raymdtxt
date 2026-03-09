@@ -37,9 +37,6 @@
         :tabs="tabs"
         v-if="rightColumn === 'files'"
       ></tree>
-      <side-bar-search
-        v-else-if="rightColumn === 'search'"
-      ></side-bar-search>
       <toc
         v-else-if="rightColumn === 'toc'"
       ></toc>
@@ -51,7 +48,6 @@
 <script>
 import { sideBarIcons, sideBarBottomIcons } from './help'
 import Tree from './tree.vue'
-import SideBarSearch from './search.vue'
 import Toc from './toc.vue'
 import { mapState } from 'vuex'
 
@@ -66,7 +62,6 @@ export default {
   },
   components: {
     Tree,
-    SideBarSearch,
     Toc,
   },
   computed: {

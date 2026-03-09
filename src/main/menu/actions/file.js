@@ -1,5 +1,7 @@
-import { rename as renameFs } from 'node:fs'
+import { rename as renameFs, writeFileSync, unlinkSync } from 'node:fs'
 import path from 'node:path'
+import os from 'node:os'
+import { pathToFileURL } from 'node:url'
 import { BrowserWindow, app, dialog, ipcMain, shell } from 'electron'
 import log from 'electron-log'
 import { isDirectory, isFile, exists } from 'common/filesystem'
@@ -16,6 +18,15 @@ import pandoc from '../../utils/pandoc'
 // TODO(refactor): "save" and "save as" should be moved to the editor window (editor.js) and
 // the renderer should communicate only with the editor window for file relevant stuff.
 // E.g. "mt::save-tabs" --> "mt::window-save-tabs$wid:<windowId>"
+
+/** Strip any known markdown extension from a filename. */
+const stripMarkdownExt = (filename) => {
+  const ext = path.extname(filename).slice(1).toLowerCase()
+  if (MARKDOWN_EXTENSIONS.includes(ext)) {
+    return filename.slice(0, -(ext.length + 1))
+  }
+  return filename
+}
 
 const getExportExtensionFilter = (type) => {
   if (type === 'pdf') {
@@ -55,51 +66,168 @@ const getPdfPageOptions = (options) => {
   }
 }
 
+/**
+ * Convert margin values (mm) from pageOptions into printToPDF margins (inches).
+ * Electron's printToPDF expects margins in inches for marginType: 'custom'.
+ */
+const getPdfMarginOptions = (options) => {
+  if (!options) return {}
+  const { pageMarginTop, pageMarginRight, pageMarginBottom, pageMarginLeft } = options
+  // If no margins specified, use Chromium defaults
+  if (pageMarginTop == null && pageMarginBottom == null) return {}
+  const mmToInches = (mm) => (mm || 0) / 25.4
+  return {
+    margins: {
+      marginType: 'custom',
+      top: mmToInches(pageMarginTop),
+      bottom: mmToInches(pageMarginBottom),
+      left: mmToInches(pageMarginLeft),
+      right: mmToInches(pageMarginRight),
+    },
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Typora-style three-stage export pipeline
+// Stage 1: Frontend preprocessing (renderer generates self-contained HTML)
+// Stage 2: Static baking (renderer pre-renders Mermaid/KaTeX/diagrams → SVG)
+// Stage 3: Native delegation (main process: temp file → hidden window → PDF)
+// ---------------------------------------------------------------------------
+
+/**
+ * Rewrite relative image paths in HTML to absolute file:// URLs.
+ * This ensures images render correctly in the isolated export window.
+ */
+const rewriteImagePaths = (html, documentPath) => {
+  if (!documentPath || !html) return html
+  const baseDir = path.dirname(documentPath)
+  return html.replace(/(<img\s[^>]*?\bsrc=")([^"]+)(")/gi, (_match, prefix, src, suffix) => {
+    if (/^(https?:|data:|file:|blob:)/i.test(src)) return _match
+    const decoded = decodeURIComponent(src)
+    const absolutePath = path.resolve(baseDir, decoded)
+    return `${prefix}file://${encodeURI(absolutePath)}${suffix}`
+  })
+}
+
+/**
+ * Stage 3 — PDF: Write HTML to temp file, render in hidden BrowserWindow,
+ * capture via printToPDF. This isolates the export from the editor window
+ * and produces cleaner output (no @media print hacks on editor).
+ */
+const exportPdfNative = async (parentWin, { content, pathname, title, pageOptions }) => {
+  // Rewrite relative image paths to absolute file:// URLs
+  const html = rewriteImagePaths(content, pathname)
+
+  // Write to temp file so hidden window can load via file:// protocol
+  const tempFile = path.join(os.tmpdir(), `vien-export-${Date.now()}.html`)
+  writeFileSync(tempFile, html, 'utf8')
+
+  const exportWin = new BrowserWindow({
+    show: false,
+    width: 800,
+    height: 600,
+    webPreferences: {
+      // No nodeIntegration — just a plain HTML renderer
+      nodeIntegration: false,
+      contextIsolation: true,
+    },
+  })
+
+  try {
+    // Load the temp HTML file
+    await exportWin.loadURL(pathToFileURL(tempFile).href)
+
+    // Wait for all images to finish loading before capturing PDF.
+    // loadURL resolves on did-finish-load (DOM ready), but images are async.
+    // Timeout after 10s to avoid hanging on broken image URLs.
+    await exportWin.webContents.executeJavaScript(`
+      Promise.race([
+        new Promise((resolve) => {
+          const imgs = document.querySelectorAll('img');
+          if (imgs.length === 0) return resolve();
+          let remaining = imgs.length;
+          const done = () => { if (--remaining <= 0) resolve(); };
+          imgs.forEach(img => {
+            if (img.complete) done();
+            else { img.onload = done; img.onerror = done; }
+          });
+        }),
+        new Promise((resolve) => setTimeout(resolve, 10000))
+      ])
+    `)
+
+    // Build printToPDF options — margins passed directly (not via CSS @page)
+    const pdfOptions = {
+      printBackground: true,
+      ...getPdfPageOptions(pageOptions),
+      ...getPdfMarginOptions(pageOptions),
+    }
+
+    const data = await exportWin.webContents.printToPDF(pdfOptions)
+
+    // Show save dialog
+    const dirname = pathname ? path.dirname(pathname) : getPath('documents')
+    const nakedFilename = pathname ? stripMarkdownExt(path.basename(pathname)) : title || 'Untitled'
+    const defaultPath = path.join(dirname, `${nakedFilename}.pdf`)
+
+    const { filePath, canceled } = await dialog.showSaveDialog(parentWin, {
+      defaultPath,
+      filters: [{ name: 'PDF', extensions: ['pdf'] }],
+    })
+
+    if (filePath && !canceled) {
+      await writeFile(filePath, data, '.pdf', 'binary')
+      parentWin.webContents.send('mt::export-success', { type: 'pdf', filePath })
+    }
+  } finally {
+    exportWin.destroy()
+    try {
+      unlinkSync(tempFile)
+    } catch (_) {
+      /* temp cleanup */
+    }
+  }
+}
+
 // Handle the export response from renderer process.
 const handleResponseForExport = async (e, { type, content, pathname, title, pageOptions }) => {
   const win = BrowserWindow.fromWebContents(e.sender)
-  const extension = EXTENSION_HASN[type]
-  const dirname = pathname ? path.dirname(pathname) : getPath('documents')
-  let nakedFilename = pathname ? path.basename(pathname, '.md') : title
-  if (!nakedFilename) {
-    nakedFilename = 'Untitled'
-  }
 
-  const defaultPath = path.join(dirname, `${nakedFilename}${extension}`)
-  const { filePath, canceled } = await dialog.showSaveDialog(win, {
-    defaultPath,
-    filters: getExportExtensionFilter(type),
-  })
-
-  if (filePath && !canceled) {
-    try {
-      if (type === 'pdf') {
-        const options = { printBackground: true }
-        Object.assign(options, getPdfPageOptions(pageOptions))
-        const data = await win.webContents.printToPDF(options)
-        removePrintServiceFromWindow(win)
-        await writeFile(filePath, data, extension, 'binary')
-      } else {
-        if (!content) {
-          throw new Error('No HTML content found.')
-        }
-        await writeFile(filePath, content, extension, 'utf8')
-      }
-      win.webContents.send('mt::export-success', { type, filePath })
-    } catch (err) {
-      log.error('Error while exporting:', err)
-      const ERROR_MSG = err.message || `Error happened when export ${filePath}`
-      win.webContents.send('mt::show-notification', {
-        title: 'Export failure',
-        type: 'error',
-        message: ERROR_MSG,
-      })
-    }
-  } else {
-    // User canceled save dialog
+  try {
     if (type === 'pdf') {
-      removePrintServiceFromWindow(win)
+      // Stage 3: Native delegation via hidden BrowserWindow
+      if (!content) {
+        throw new Error('No HTML content for PDF export.')
+      }
+      await exportPdfNative(win, { content, pathname, title, pageOptions })
+    } else {
+      // HTML export: write content directly
+      if (!content) {
+        throw new Error('No HTML content found.')
+      }
+      const extension = EXTENSION_HASN[type]
+      const dirname = pathname ? path.dirname(pathname) : getPath('documents')
+      let nakedFilename = pathname ? stripMarkdownExt(path.basename(pathname)) : title
+      if (!nakedFilename) nakedFilename = 'Untitled'
+
+      const defaultPath = path.join(dirname, `${nakedFilename}${extension}`)
+      const { filePath, canceled } = await dialog.showSaveDialog(win, {
+        defaultPath,
+        filters: getExportExtensionFilter(type),
+      })
+
+      if (filePath && !canceled) {
+        await writeFile(filePath, content, extension, 'utf8')
+        win.webContents.send('mt::export-success', { type, filePath })
+      }
     }
+  } catch (err) {
+    log.error('Error while exporting:', err)
+    win.webContents.send('mt::show-notification', {
+      title: 'Export failure',
+      type: 'error',
+      message: err.message || `Error exporting ${type}`,
+    })
   }
 }
 

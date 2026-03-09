@@ -1,7 +1,4 @@
-import fs from 'node:fs'
-import path from 'node:path'
 import Slugger from 'muya/lib/parser/marked/slugger'
-import { isFile } from 'common/filesystem'
 import { escapeHTML, unescapeHTML } from 'muya/lib/utils'
 import academicTheme from '@/assets/themes/export/academic.theme.css?inline'
 import liberTheme from '@/assets/themes/export/liber.theme.css?inline'
@@ -38,10 +35,13 @@ export const getCssForOptions = (options: CssOptions): string => {
     theme,
     headerFooterFontSize,
   } = options
-  const isPrintable = type !== 'styledHtml'
+  // 'print' (Cmd+P): CSS @page controls margins via @media print wrapper.
+  // 'pdf': hidden BrowserWindow + printToPDF API handles margins — no @page needed.
+  // 'styledHtml': plain HTML export — no print wrapper.
+  const needsPrintWrapper = type === 'print'
 
   let output = ''
-  if (isPrintable) {
+  if (needsPrintWrapper) {
     output += `@media print{@page{
       margin: ${pageMarginTop}mm ${pageMarginRight}mm ${pageMarginBottom}mm ${pageMarginLeft}mm;}`
   }
@@ -76,19 +76,10 @@ export const getCssForOptions = (options: CssOptions): string => {
       output += academicTheme
     } else if (theme === 'liber') {
       output += liberTheme
-    } else {
-      // Read theme from disk
-      const { userDataPath } = (window as unknown as { marktext: { paths: { userDataPath: string } } }).marktext.paths
-      const themePath = path.join(userDataPath, 'themes/export', theme)
-      if (isFile(themePath)) {
-        try {
-          const themeCSS = fs.readFileSync(themePath, 'utf8')
-          output += themeCSS
-        } catch (_) {
-          // No-op
-        }
-      }
     }
+    // NOTE: Custom themes from userDataPath/themes/export/ are not yet
+    // supported (renderer fs is stubbed after Phase 3 vite migration).
+    // TODO: Add IPC-based theme loading for custom export themes.
   }
 
   if (headerFooterFontSize) {
@@ -99,8 +90,8 @@ export const getCssForOptions = (options: CssOptions): string => {
     }`
   }
 
-  if (isPrintable) {
-    // Close @page
+  if (needsPrintWrapper) {
+    // Close @media print
     output += '}'
   }
   return unescapeHTML(sanitize(escapeHTML(output), EXPORT_DOMPURIFY_CONFIG))
@@ -118,7 +109,7 @@ interface TocOptions {
 
 const generateHtmlToc = (
   tocList: TocEntry[],
-  // @ts-ignore - Slugger is a prototype-based constructor, not a class
+  // @ts-expect-error - Slugger is a prototype-based constructor, not a class
   slugger: InstanceType<typeof Slugger>,
   currentLevel: number,
   options: TocOptions,
@@ -151,7 +142,7 @@ const generateHtmlToc = (
 
 export const getHtmlToc = (toc: TocEntry[], options: TocOptions = {}): string => {
   const list = cloneObj(toc)
-  // @ts-ignore - Slugger is a prototype-based constructor
+  // @ts-expect-error - Slugger is a prototype-based constructor
   const slugger = new Slugger()
   const tocList = generateHtmlToc(list, slugger, 0, options)
   if (!tocList) {

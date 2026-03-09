@@ -9,12 +9,6 @@ const mutations = {}
 const actions = {
   LISTEN_FOR_EDIT({ commit }) {
     window.api.ipc.on('mt::editor-edit-action', (type) => {
-      if (type === 'findInFolder') {
-        commit('SET_LAYOUT', {
-          rightColumn: 'search',
-          showSideBar: true,
-        })
-      }
       bus.emit(type, type)
     })
   },

@@ -141,9 +141,6 @@ const actions = {
   },
 
   LISTEN_FOR_VIEW({ commit, dispatch }) {
-    window.api.ipc.on('mt::show-command-palette', () => {
-      bus.emit('show-command-palette')
-    })
     window.api.ipc.on('mt::toggle-view-mode-entry', (entryName) => {
       commit('TOGGLE_VIEW_MODE', entryName)
       dispatch('DISPATCH_EDITOR_VIEW_STATE', { [entryName]: state[entryName] })

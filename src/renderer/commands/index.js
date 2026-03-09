@@ -73,13 +73,6 @@ const commands = [
     },
   },
   {
-    id: 'file.print',
-    execute: async () => {
-      await delay(50)
-      bus.emit('showExportDialog', 'print')
-    },
-  },
-  {
     id: 'file.close-tab',
     execute: async () => {
       window.api.localEmit('mt::editor-close-tab', null)
@@ -105,38 +98,10 @@ const commands = [
     },
   },
   {
-    id: 'file.rename-file',
-    execute: async () => {
-      await delay(50)
-      window.api.localEmit('mt::editor-rename-file', null)
-    },
-  },
-  {
     id: 'file.import-file',
     execute: async () => {
       window.api.ipc.send('mt::cmd-import-file')
     },
-  },
-  {
-    id: 'file.export-file',
-    subcommands: [
-      {
-        id: 'file.export-file-html',
-        description: 'HTML',
-        execute: async () => {
-          await delay(50)
-          bus.emit('showExportDialog', 'styledHtml')
-        },
-      },
-      {
-        id: 'file.export-file-pdf',
-        description: 'PDF',
-        execute: async () => {
-          await delay(50)
-          bus.emit('showExportDialog', 'pdf')
-        },
-      },
-    ],
   },
 
   // --------------------------------------------------------------------------
@@ -200,13 +165,6 @@ const commands = [
     execute: async () => {
       await delay(150)
       bus.emit('replace', 'replace')
-    },
-  },
-  {
-    id: 'edit.find-in-folder',
-    execute: async () => {
-      await delay(150)
-      window.api.localEmit('mt::editor-edit-action', null, 'findInFolder')
     },
   },
 

@@ -23,11 +23,8 @@
         :text-direction="textDirection"
         :platform="platform"
       ></editor-with-tabs>
-      <command-palette></command-palette>
       <about-dialog></about-dialog>
-      <export-setting-dialog></export-setting-dialog>
-      <rename></rename>
-      <tweet></tweet>
+      <export-panel></export-panel>
     </div>
   </div>
 </template>
@@ -38,16 +35,12 @@ import EditorWithTabs from '@/components/editorWithTabs'
 import TitleBar from '@/components/titleBar'
 import SideBar from '@/components/sideBar'
 import AboutDialog from '@/components/about'
-import CommandPalette from '@/components/commandPalette'
-import ExportSettingDialog from '@/components/exportSettings'
-import Rename from '@/components/rename'
-import Tweet from '@/components/tweet'
+import ExportPanel from '@/components/exportPanel'
 import { loadingPageMixins } from '@/mixins'
 import { mapState } from 'vuex'
 import { DEFAULT_STYLE } from '@/config'
 import { useAutoUpdatesStore } from '@/store/pinia/autoUpdates'
 import { useNotificationStore } from '@/store/pinia/notification'
-import { useTweetStore } from '@/store/pinia/tweet'
 
 export default {
   name: 'marktext',
@@ -56,10 +49,7 @@ export default {
     TitleBar,
     SideBar,
     AboutDialog,
-    ExportSettingDialog,
-    Rename,
-    Tweet,
-    CommandPalette,
+    ExportPanel,
   },
   mixins: [loadingPageMixins],
   computed: {
@@ -108,8 +98,6 @@ export default {
     dispatch('LINTEN_WIN_STATUS')
     // module: command center
     dispatch('LISTEN_COMMAND_CENTER_BUS')
-    // module: tweet (Pinia)
-    useTweetStore().listen()
     // module: layout
     dispatch('LISTEN_FOR_LAYOUT')
     // module: listenForMain
